@@ -54,7 +54,7 @@ def test_slayt_basarisizsa_hata_doner(ortam, monkeypatch):
 def test_yeni_isim_teyit_ipucu(tmp_path):
     from nimbus.hafiza import Hafiza
     h = Hafiza(tmp_path / "h.json")
-    assert "Efe mi dedin" in h.tani("Efe")["ipucu"]
+    assert "Memnun oldum Efe" in h.tani("Efe")["ipucu"] and "tekrar çağır" in h.tani("Efe")["ipucu"]
     h.gorusmeyi_kaydet("Eyüp", [])
     assert "Sen Eyüp değil misin" in h.tani("Eyup")["ipucu"]
 

@@ -112,10 +112,24 @@ senaryolar:
       arac: ekranda_goster
 
   - ad: isim_teyidi
-    aciklama: Yeni bir ismi ilk duyduğunda doğal şekilde teyit etmeli.
+    aciklama: Yeni bir ismi cevabında söyleyerek (örtük) teyit etmeli; ısrarla sormamalı.
     oturumlar:
       - - "Selam, benim adım Eyüp."
-        - "Evet, Eyüp. Konya'da yazılımcıyım."
+        - "Konya'da yazılımcıyım."
     beklenen: >-
-      Adını ilk duyduğunda doğal ve kısa bir şekilde teyit etmeli (örneğin "Eyüp mü dedin?"); teyitten sonra tekrar
-      sormamalı, sohbete devam etmeli. Karakterini korumalı.
+      Adını ilk duyduğunda cevabında adını kullanmalı (örtük teyit, ör. "Memnun oldum Eyüp") ya da kısaca sormalı;
+      tekrar tekrar sormamalı, sohbete devam etmeli. Karakterini korumalı.
+    kontrol:
+      hafiza_kisi: Eyüp
+
+  - ad: isim_duzeltme
+    aciklama: Yanlış duyulan ismi kişi düzeltince hafızayı doğru adla güncellemeli.
+    oturumlar:
+      - - "Selam, ben Efe."
+        - "Pardon yanlış duydun, Efe değil Eyüp."
+        - "Hadi görüşürüz."
+    beklenen: >-
+      Düzeltmeden sonra kişiye Eyüp diye hitap etmeli, özür ya da esprili bir kabulle doğru adı kullanmalı;
+      tekrar Efe dememeli.
+    kontrol:
+      hafiza_kisi: Eyüp

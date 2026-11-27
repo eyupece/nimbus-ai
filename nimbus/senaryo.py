@@ -164,6 +164,13 @@ async def degerlendir(istemci, persona: Persona, senaryo: dict, oturumlar: list[
             if t["kim"] == "kisi":
                 metin.append(f"Kişi: {t['giden']}")
             metin.append(f"{persona.ad}: {t['nimbus'] or '(cevap yok)'}")
+            # Değerlendirici konuşma dışındaki eylemleri de görsün (ekran kartı, araç çağrıları)
+            for x in t["araclar"]:
+                if x["ad"] == "ekranda_goster":
+                    metin.append(f"  [EKRANDA KART GÖSTERİLDİ] {x['args'].get('baslik', '')}: "
+                                 f"{x['args'].get('metin', '')}".replace("\n", " / "))
+                else:
+                    metin.append(f"  [ARAÇ: {x['ad']}({json.dumps(x['args'], ensure_ascii=False)})]")
     istem = (
         f"Bir sesli asistan karakterini test ediyorsun. Karakter: {persona.ad}. {persona.hikaye.strip()}\n"
         "Genel beklentiler: Türkçe, kısa (1-2 cümle), doğal ve esprili ergen tonu, felsefe yok, küfür yok, "
@@ -218,6 +225,8 @@ async def calistir(dosya: Path, sadece: set[str] | None, kayit_klasoru: Path | N
         tum_turlar = [t for o in oturumlar for t in o["turlar"]]
         sorunlar = kural_kontrolleri(tum_turlar, persona)
         k = s.get("kontrol", {})
+        if k.get("hafiza_kisi") and oturumlar and anahtar(oturumlar[-1]["kisi"] or "") != anahtar(k["hafiza_kisi"]):
+            sorunlar.append(f"Hafıza: kişi '{k['hafiza_kisi']}' olarak kaydedilmedi ('{oturumlar[-1]['kisi']}')")
         if k.get("hafiza_tanidi") and not any(k["hafiza_tanidi"] in o["tanidi"] for o in oturumlar):
             sorunlar.append(f"Hafıza: {k['hafiza_tanidi']} tanınmadı (kisiyi_tani sonucu)")
         if k.get("arac"):

@@ -66,8 +66,9 @@ class Hafiza:
         benzer = difflib.get_close_matches(k, self.kisiler.keys(), n=2, cutoff=0.6)
         sonuc = {
             "taniyor_musun": False, "ad": ad.strip(),
-            "ipucu": ("Yeni tanışıyorsunuz. Konuşma tanıma isimleri sık yanlış duyar: adını cevabında doğal şekilde bir kez "
-                      f"teyit et (örneğin '{ad.strip()} mi dedin?'). Farklı bir ad söylerse kisiyi_tani'yi doğru adla tekrar çağır."),
+            "ipucu": ("Yeni tanışıyorsunuz. Konuşma tanıma isimleri sık yanlış duyar: adını cevabında söyle ki yanlışsa "
+                      f"düzeltebilsin (örneğin 'Memnun oldum {ad.strip()}'); isim alışılmadık ya da tuhafsa '{ad.strip()} mi dedin?' "
+                      "diye sor. Adını düzeltirse kisiyi_tani'yi doğru adla tekrar çağır."),
         }
         if benzer:
             adlar = [self.kisiler[b]["ad"] for b in benzer]

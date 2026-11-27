@@ -129,7 +129,9 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] **Eylem:** `ekranda_goster` (bulut yüzün yanında bilgi kartı), `--sunum` ile `slayt` (ön plandaki pencereye ok tuşu;
       DevFest'te Nimbus sunum ortağı). Araç işleyicileri hata verse bile modele her zaman yanıt döner (BLOCKING donması yok).
       LED (WLED) donanımla birlikte Faz 2'ye kaldı. (senaryo + canlı test bekliyor)
-- [x] İsim teyidi: yeni isim ilk duyulunca "Efe mi dedin?" ("Eyüp" iki kez yanlış duyuldu: Elif, Efe)
+- [x] İsim teyidi: **örtük** ("Memnun oldum Eyüp" → yanlışsa kişi düzeltir, Nimbus hafızayı doğru adla günceller);
+      sadece tuhaf isimlerde "X mi dedin?" ("Eyüp" iki kez yanlış duyuldu: Elif, Efe). Senaryo: isim_teyidi, isim_duzeltme
+- [x] Senaryo koşucusu: değerlendirici artık ekran kartlarını ve araç çağrılarını da görüyor (kartları göremeyip yanlış başarısız sayıyordu)
 - [x] **Hafıza:** `kisiyi_tani(ad)` (NON_BLOCKING + WHEN_IDLE: konuşmayı bekletmez), konuşma bitince ayrı metin modeliyle
       not çıkarma (konuşma sırasında fonksiyonla not almak jestlerdeki gibi akışı bozardı), benzer isim ipucu,
       `--hafiza` / `--unut AD`; kayıtlar yerelde `data/hafiza.json`. Not: kisiyi_tani artık BLOCKING (senaryo testi bulgusu).
@@ -184,6 +186,7 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 | 27.11.2026 | Nimbus'un sesi: Zephyr | 12 sesin art arda dinlendiği testte en iyisi bulundu (Puck etkileyici değildi) |
 | 27.11.2026 | Test: otomatik paket + senaryo koşucusu; insan testi sadece his gerektirenlere | Elle tek tek test yorucu; sesli testi bulut ortamı yapamıyor (Gemini erişimi yok), metin senaryoları Eyüp'ün makinesinde koşar |
 | 27.11.2026 | PO rolü Claude'da (ROADMAP.md ile), Eyüp karar verir | Eyüp yönlendirilmek istiyor; ayrı rol yapan agent ekibi bu boyutta fazla yük |
+| 28.11.2026 | İsim teyidi örtük (adı cevapta söyle), açık soru sadece tuhaf isimlerde | Her yeni kişiye "X mi dedin?" sahnede yapay; ad söylenince kişi yanlışsa zaten düzeltir |
 | 27.11.2026 | Commit'leri Claude atar (Eyüp adına), push'u Eyüp yapar | Bu oturumun GitHub yazma yetkisi yok; Eyüp kod/komutla uğraşmak istemiyor |
 
 ## Fikir havuzu (ertelenenler)
