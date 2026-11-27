@@ -70,8 +70,8 @@
   .yanak { fill: var(--yanak); opacity: .25; transition: opacity .3s; }
   body.gul .yanak { opacity: .7; }
 
-  /* Ağız: seviye 0-3 */
-  #agiz { transition: ry .06s linear, rx .06s linear; }
+  /* Ağız: açıklık 0-1 */
+  #agiz { transition: ry .045s linear, rx .045s linear; }
 
   /* Uyku zzz */
   .z { font-weight: 700; fill: #dfe6ff; opacity: 0; }
@@ -185,12 +185,11 @@ const durumEtiketi = document.getElementById("durum-etiketi");
 const baglanti = document.getElementById("baglanti");
 const gozbebekleri = document.querySelectorAll(".gozbebegi");
 
-// ---------- Ağız ----------
-const AGIZ = [ {rx: 26, ry: 4}, {rx: 24, ry: 10}, {rx: 22, ry: 17}, {rx: 20, ry: 25} ];
-function agizAyarla(seviye) {
-  const a = AGIZ[Math.max(0, Math.min(3, seviye))];
-  agiz.setAttribute("rx", a.rx);
-  agiz.setAttribute("ry", a.ry);
+// ---------- Ağız: açıklık 0.0 - 1.0 ----------
+function agizAyarla(aciklik) {
+  const a = Math.max(0, Math.min(1, aciklik));
+  agiz.setAttribute("rx", (26 - 7 * a).toFixed(1));  // açıldıkça biraz daralır ("o" şekli)
+  agiz.setAttribute("ry", (4 + 22 * a).toFixed(1));
 }
 
 // ---------- Durum ----------
@@ -269,7 +268,7 @@ function baglan() {
   };
   ws.onmessage = (e) => {
     const m = JSON.parse(e.data);
-    if (m.tip === "agiz") agizAyarla(m.seviye);
+    if (m.tip === "agiz") agizAyarla(m.aciklik);
     else if (m.tip === "jest") jestYap(m.ad);
     else if (m.tip === "durum") durumAyarla(m.ad);
     else if (m.tip === "altyazi") altyaziGoster(m);
@@ -280,7 +279,7 @@ baglan();
 // Sunucu yokken (dosyayı doğrudan açınca) önizleme: ?demo
 if (location.search.includes("demo")) {
   durumAyarla("sohbet");
-  setInterval(() => agizAyarla(Math.floor(Math.random() * 4)), 90);
+  setInterval(() => agizAyarla(Math.random()), 90);
   let i = 0;
   setInterval(() => jestYap(JEST_SINIFLARI[i++ % JEST_SINIFLARI.length]), 2500);
 }

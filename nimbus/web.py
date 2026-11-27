@@ -30,7 +30,7 @@ class WebGovde:
         self.konsol = konsol  # jest/durumları terminale de yazmak için (opsiyonel)
         self._istemciler: set[ServerConnection] = set()
         self._dongu: asyncio.AbstractEventLoop | None = None
-        self._son_agiz = -1
+        self._son_agiz = -1.0
         self._son_durum = "uyku"
 
     # ---------- Sunucu ----------
@@ -80,10 +80,12 @@ class WebGovde:
             pass  # sekme kapandıysa önemli değil
 
     # ---------- Gövde arayüzü ----------
-    def agiz(self, seviye: int) -> None:
-        if seviye != self._son_agiz:  # sadece değişince gönder
-            self._son_agiz = seviye
-            self._gonder({"tip": "agiz", "seviye": seviye})
+    def agiz(self, aciklik: float) -> None:
+        aciklik = round(aciklik, 2)
+        # Gözle fark edilmeyecek küçük değişimleri gönderme; kapanışı her zaman gönder
+        if abs(aciklik - self._son_agiz) >= 0.03 or (aciklik == 0 and self._son_agiz != 0):
+            self._son_agiz = aciklik
+            self._gonder({"tip": "agiz", "aciklik": aciklik})
 
     def jest(self, ad: str) -> None:
         self._gonder({"tip": "jest", "ad": ad})

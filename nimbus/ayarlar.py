@@ -18,6 +18,7 @@ class Ayarlar:
     gemini_anahtar: str | None
     mikrofon: str | None
     sessizlik_ms: int
+    agiz_kaydir_ms: int  # ağız senkronu ince ayarı: + geciktirir, - öne alır
     kayit_klasoru: Path
 
     @classmethod
@@ -31,5 +32,6 @@ class Ayarlar:
             gemini_anahtar=os.getenv("GEMINI_API_KEY"),
             mikrofon=os.getenv("NIMBUS_MIKROFON"),
             sessizlik_ms=int(os.getenv("NIMBUS_SESSIZLIK_MS", "400")),
+            agiz_kaydir_ms=int(os.getenv("NIMBUS_AGIZ_KAYDIR_MS", "0")),
             kayit_klasoru=KOK / "logs",
         )

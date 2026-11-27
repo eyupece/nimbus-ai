@@ -356,7 +356,7 @@ class Oturum:
     async def calistir(self) -> None:
         self.istemci, arka_uc = istemci_olustur(self.a)
         self.mikrofon = Mikrofon(self.pya, self.a.mikrofon)
-        self.hoparlor = Hoparlor(self.pya, self.govde)
+        self.hoparlor = Hoparlor(self.pya, self.govde, kaydir_ms=self.a.agiz_kaydir_ms)
 
         self.a.kayit_klasoru.mkdir(exist_ok=True)
         dosya = self.a.kayit_klasoru / f"konusma-{datetime.now():%Y%m%d-%H%M%S}.jsonl"
@@ -364,6 +364,8 @@ class Oturum:
 
         print(f"☁️  {arka_uc} | Model: {self.a.model} | Persona: {self.persona.ad} ({self.persona.ses})")
         print(f"🎙  Mikrofon: {self.mikrofon.ad}")
+        print(f"👄 Ağız senkronu: ses kartı gecikmesi {self.hoparlor.cikis_gecikmesi * 1000:.0f} ms "
+              f"(ince ayar: .env NIMBUS_AGIZ_KAYDIR_MS={self.a.agiz_kaydir_ms})")
         if hasattr(self.govde, "baslat"):
             await self.govde.baslat()
         operator_dinle(self.komutlar, asyncio.get_running_loop())

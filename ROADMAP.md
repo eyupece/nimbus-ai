@@ -88,7 +88,9 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] Persona YAML v2 + yükleyici (özellik yüzdeleri, kurallar, hikâye)
 - [x] Durum makinesi (UYKU → KARŞILAMA → SOHBET → VEDA), her kişi için ayrı Live bağlantısı
 - [x] Fonksiyonlar: `jest(ad)` (göz kırp, gözleri kıs, şaşkın, düşün, gül, kızgın) ve `uykuya_don()`; sessiz (SILENT) yanıt
-- [x] Ses genliğinden ağız senkronu (4 seviye, 20 ms pencere, bir pencere önden) → gövdeye bildiriliyor
+- [x] Ses genliğinden ağız senkronu → gövdeye bildiriliyor
+- [x] Ağız senkronu v2: ses kartı gecikmesi kadar erteleme (ağız sesin önüne geçiyordu), 4 basamak yerine 0-1 sürekli açıklık,
+      hızlı açılma / yavaş kapanma yumuşatması; ince ayar `NIMBUS_AGIZ_KAYDIR_MS` (servoda mekanik gecikme için de kullanılacak)
 - [ ] Jest gecikmesi: jestleri seyrekleştir ya da sık ifadeleri lokal üret (örn. "Hımm" → düşün) ve fonksiyonu büyük anlara bırak
 - [ ] Persona ince ayarı: daha az felsefe, daha az "evlat", daha çok espri
 - [x] Sanal yüz: **bulut karakter** (`web/index.html`), lokal HTTP + WebSocket sunucusu, ağız senkronu, 6 jest, uyku animasyonu, altyazı

@@ -16,8 +16,8 @@ JEST_EMOJI = {"goz_kirp": "😉 göz kırptı", "gozleri_kis": "🤨 gözlerini 
 
 
 class Govde(Protocol):
-    def agiz(self, seviye: int) -> None:
-        """Ağız açıklığı: 0 (kapalı) - 3 (tam açık). ~20 ms'de bir çağrılır."""
+    def agiz(self, aciklik: float) -> None:
+        """Ağız açıklığı: 0.0 (kapalı) - 1.0 (tam açık). ~20 ms'de bir, sesin duyulduğu anda çağrılır."""
 
     def jest(self, ad: str) -> None:
         """Kısa bir ifade/hareket: JESTLER listesinden."""
@@ -32,7 +32,7 @@ class Govde(Protocol):
 class SessizGovde:
     """Hiçbir şey yapmayan gövde (sadece ses)."""
 
-    def agiz(self, seviye: int) -> None:
+    def agiz(self, aciklik: float) -> None:
         pass
 
     def jest(self, ad: str) -> None:

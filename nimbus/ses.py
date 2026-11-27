@@ -21,18 +21,15 @@ GERI_DONGU = ("stereo mix", "stereo karışımı", "loopback", "what u hear", "w
 # Windows'un "varsayılana yönlendir" sanal cihazları; varsayılan Stereo Mix ise onu kaydeder
 YONLENDIRICI = ("sound mapper", "ses eşleyici", "primary sound capture", "birincil ses yakalama")
 
-# Ağız senkronu: 20 ms'lik pencerelerde ses şiddeti -> 0..3 açıklık
+# Ağız senkronu: 20 ms'lik pencerelerde ses şiddeti -> 0..1 açıklık
 AGIZ_PENCERE = int(CIKIS_HIZI * 0.02) * 2  # bayt
-AGIZ_ESIKLERI = (300, 1500, 4000)
+AGIZ_TABAN = 250    # bu şiddetin altı: ağız kapalı
+AGIZ_TAVAN = 5000   # bu şiddetin üstü: ağız tam açık
 
 
 def rms(veri: bytes) -> float:
     ornekler = array.array("h", veri[: len(veri) // 2 * 2])
     return math.sqrt(sum(x * x for x in ornekler) / len(ornekler)) if ornekler else 0.0
-
-
-def agiz_seviyesi(deger: float) -> int:
-    return sum(deger > e for e in AGIZ_ESIKLERI)
 
 
 def cihaz_adi(d: dict) -> str:
@@ -118,55 +115,95 @@ class Mikrofon:
         self._akis.close()
 
 
-class Hoparlor:
-    """Kendi iş parçacığında çalar; her 20 ms'de gövdeye ağız seviyesini bildirir."""
+class AgizYumusatici:
+    """Ses şiddetini 0-1 arası ağız açıklığına çevirir: hızlı açılır, yavaş kapanır (doğal konuşma)."""
 
-    def __init__(self, pya: pyaudio.PyAudio, govde):
+    def __init__(self, tavan: float = AGIZ_TAVAN, acilma: float = 0.65, kapanma: float = 0.30):
+        self.tavan, self.acilma, self.kapanma = tavan, acilma, kapanma
+        self.deger = 0.0
+
+    def __call__(self, ses_siddeti: float) -> float:
+        hedef = max(0.0, min(1.0, (ses_siddeti - AGIZ_TABAN) / (self.tavan - AGIZ_TABAN)))
+        hedef = hedef ** 0.7  # sessiz hecelerde de ağız biraz açılsın
+        katsayi = self.acilma if hedef > self.deger else self.kapanma
+        self.deger += (hedef - self.deger) * katsayi
+        return self.deger
+
+
+class Hoparlor:
+    """Kendi iş parçacığında çalar; ağız açıklığını sesin gerçekten duyulduğu ana göre bildirir.
+
+    Ses kartına yazılan ses, işletim sisteminin tamponu yüzünden ~100-200 ms sonra duyulur.
+    Ağız hareketleri bu gecikme kadar ertelenir (+ NIMBUS_AGIZ_KAYDIR_MS ile ince ayar).
+    """
+
+    def __init__(self, pya: pyaudio.PyAudio, govde, kaydir_ms: int = 0):
         self.govde = govde
         self.konusuyor_bitis = 0.0  # yarım dubleks için: son sesin bitiş zamanı
-        self.calinan_bayt = 0  # şimdiye kadar hoparlöre gerçekten yazılan ses (kesilme oranı için)
+        self.calinan_bayt = 0  # şimdiye kadar ses kartına yazılan ses (kesilme oranı için)
         self._kuyruk: queue.Queue[bytes] = queue.Queue()
+        self._agiz_kuyrugu: queue.Queue[tuple[float, float]] = queue.Queue()
         self._kesildi = threading.Event()
-        self._akis = pya.open(format=FORMAT, channels=KANAL, rate=CIKIS_HIZI, output=True)
+        self._akis = pya.open(format=FORMAT, channels=KANAL, rate=CIKIS_HIZI, output=True,
+                              frames_per_buffer=AGIZ_PENCERE // 2)
+        self.cikis_gecikmesi = self._akis.get_output_latency() + kaydir_ms / 1000
         self._calis = True
         self._is = threading.Thread(target=self._dongu, daemon=True)
+        self._agiz_is = threading.Thread(target=self._agiz_dongusu, daemon=True)
         self._is.start()
+        self._agiz_is.start()
 
     def cal(self, veri: bytes) -> None:
         self._kuyruk.put(veri)
 
     def sustur(self) -> None:
-        """Söz kesildiğinde: kuyruktaki ve çalmakta olan sesi bırak."""
+        """Söz kesildiğinde: kuyruktaki ve çalmakta olan sesi bırak, ağzı kapat."""
         self._kesildi.set()
-        while not self._kuyruk.empty():
-            try:
-                self._kuyruk.get_nowait()
-            except queue.Empty:
-                break
+        for k in (self._kuyruk, self._agiz_kuyrugu):
+            while not k.empty():
+                try:
+                    k.get_nowait()
+                except queue.Empty:
+                    break
+        self._agiz_kuyrugu.put((0.0, 0.0))
 
     def _dongu(self) -> None:
-        agiz_acik = False
+        yumusat = AgizYumusatici()
         while self._calis:
             try:
                 veri = self._kuyruk.get(timeout=0.06)
             except queue.Empty:
-                if agiz_acik:
-                    self.govde.agiz(0)
-                    agiz_acik = False
+                if yumusat.deger > 0:
+                    yumusat.deger = 0.0
+                    self._agiz_kuyrugu.put((time.monotonic() + self.cikis_gecikmesi, 0.0))
                 continue
             self._kesildi.clear()
             for i in range(0, len(veri), AGIZ_PENCERE):
                 if self._kesildi.is_set():
                     break
                 dilim = veri[i : i + AGIZ_PENCERE]
-                # Ağzı sesten bir pencere (~20 ms) önce hareket ettir: servo gecikmesini telafi eder
-                self.govde.agiz(agiz_seviyesi(rms(dilim)))
-                agiz_acik = True
-                self.konusuyor_bitis = time.monotonic() + len(dilim) / 2 / CIKIS_HIZI
+                aciklik = yumusat(rms(dilim))
                 self._akis.write(dilim)
                 self.calinan_bayt += len(dilim)
+                simdi = time.monotonic()
+                self.konusuyor_bitis = simdi + self.cikis_gecikmesi
+                # Bu dilim, tampondaki sesten sonra, yaklaşık cikis_gecikmesi kadar sonra duyulacak
+                self._agiz_kuyrugu.put((simdi + self.cikis_gecikmesi, aciklik))
+
+    def _agiz_dongusu(self) -> None:
+        """Ağız değerlerini zamanı gelince gövdeye iletir."""
+        while self._calis:
+            try:
+                zaman, aciklik = self._agiz_kuyrugu.get(timeout=0.2)
+            except queue.Empty:
+                continue
+            bekle = zaman - time.monotonic()
+            if bekle > 0:
+                time.sleep(bekle)
+            self.govde.agiz(aciklik)
 
     def kapat(self) -> None:
         self._calis = False
         self._is.join(timeout=1)
+        self._agiz_is.join(timeout=1)
         self._akis.close()
