@@ -47,7 +47,7 @@ def birlestir(onceki: str, parca: str) -> str:
     return onceki + parca
 
 
-def duyulan_kisim(metin: str, oran: float) -> str:
+def duyulan_kisim(metin: str, oran: float, uc: str = "…") -> str:
     """Söz kesildiğinde metnin yaklaşık olarak gerçekten seslendirilen kısmı (kelime sınırında)."""
     metin = metin.strip()
     if oran >= 0.97 or not metin:
@@ -56,7 +56,7 @@ def duyulan_kisim(metin: str, oran: float) -> str:
     kesik = metin[:sinir]
     if sinir < len(metin) and " " in kesik:
         kesik = kesik.rsplit(" ", 1)[0]  # yarım kelime bırakma
-    return kesik.rstrip(" ,.;:") + "…"
+    return kesik.rstrip(" ,.;:") + uc
 
 
 class Oturum:
@@ -93,6 +93,8 @@ class Oturum:
         # Söz kesilince metni de kesmek için: bu turda gelen ses ve tur başında çalınmış miktar
         self.tur_alinan_bayt = 0
         self.tur_baslangic_calinan = 0
+        # Canlı altyazının takip ettiği tur: metin, gelen ses, başlangıç, kesildi mi
+        self.altyazi_turu: dict | None = None
 
     # ---------- Live ayarları ----------
     def live_ayari(self) -> types.LiveConnectConfig:
@@ -197,21 +199,29 @@ class Oturum:
                                 self.yanit_basladi = True
                                 self.tur_alinan_bayt = 0
                                 self.tur_baslangic_calinan = self.hoparlor.calinan_bayt
+                                self.altyazi_turu = {"metin": "", "alinan": 0, "kesildi": False,
+                                                     "baslangic": self.tur_baslangic_calinan}
                                 self._sen_yaz()
                                 self._gecikme_yaz()
                             self.tur_alinan_bayt += len(parca.inline_data.data)
+                            if self.altyazi_turu:
+                                self.altyazi_turu["alinan"] = self.tur_alinan_bayt
                             self.hoparlor.cal(parca.inline_data.data)
                             if self.durum == Durum.VEDA:
                                 self.veda_sesi_geldi = True
 
                 if icerik.output_transcription and icerik.output_transcription.text:
                     self.nimbus_tampon = birlestir(self.nimbus_tampon, icerik.output_transcription.text)
+                    if self.altyazi_turu and not self.altyazi_turu["kesildi"]:
+                        self.altyazi_turu["metin"] = self.nimbus_tampon
 
                 if icerik.interrupted:
                     calinan = self.hoparlor.calinan_bayt - self.tur_baslangic_calinan
                     self.hoparlor.sustur()
                     if self.tur_alinan_bayt:
                         self.nimbus_tampon = duyulan_kisim(self.nimbus_tampon, calinan / self.tur_alinan_bayt)
+                    if self.altyazi_turu:
+                        self.altyazi_turu.update(metin=self.nimbus_tampon, kesildi=True)
                     self._nimbus_yaz(kesildi=True)
 
                 if icerik.turn_complete:
@@ -238,6 +248,27 @@ class Oturum:
         if yanitlar:
             await live.send_tool_response(function_responses=yanitlar)
 
+    async def canli_altyazi(self) -> None:
+        """Nimbus konuşurken altyazıyı sesin çalınan kısmına göre kelime kelime ilerletir."""
+        son = ""
+        while True:
+            await asyncio.sleep(0.12)
+            tur = self.altyazi_turu
+            if not tur or not tur["alinan"] or not tur["metin"]:
+                continue
+            if tur["kesildi"]:
+                metin, bitti = tur["metin"], True  # zaten duyulan kısma kadar kesilmiş
+            else:
+                oran = (self.hoparlor.calinan_bayt - tur["baslangic"]) / tur["alinan"]
+                bitti = oran >= 0.99 and not self.yanit_basladi  # tur bitti ve ses tamamen çalındı
+                metin = tur["metin"] if bitti else duyulan_kisim(tur["metin"], oran, uc="")
+            if metin and metin != son:
+                son = metin
+                self.govde.altyazi("nimbus", metin, self.persona.ad)
+            if bitti and self.altyazi_turu is tur:
+                self.altyazi_turu = None
+                son = ""
+
     async def konusma_komutlari(self) -> None:
         """Konuşma sürerken operatör komutları."""
         while True:
@@ -260,7 +291,8 @@ class Oturum:
             async with self.istemci.aio.live.connect(model=self.a.model, config=self.live_ayari()) as live:
                 self.live = live
                 await self.sahne_mesaji(f"Karşına biri geldi. {self.persona.karsilama}")
-                gorevler = [asyncio.create_task(self.al(live)), asyncio.create_task(self.konusma_komutlari())]
+                gorevler = [asyncio.create_task(self.al(live)), asyncio.create_task(self.konusma_komutlari()),
+                            asyncio.create_task(self.canli_altyazi())]
                 bitis = asyncio.create_task(self.bitti.wait())
                 await asyncio.wait([bitis, *gorevler], return_when=asyncio.FIRST_COMPLETED)
                 for g in [bitis, *gorevler]:
@@ -305,7 +337,8 @@ class Oturum:
         if metin:
             ek = f" {GRI}✋ (sözü kesildi){SIFIRLA}" if kesildi else ""
             print(f"{SARI}{self.persona.ad}:{SIFIRLA} {metin}{ek}\n", flush=True)
-            self.govde.altyazi("nimbus", metin, self.persona.ad)
+            # Altyazıyı burada değil canli_altyazi gönderiyor: metin sesten önce geldiği için
+            # burada göndermek altyazıyı sesin önüne geçirirdi.
             self._kaydet("nimbus", metin, kesildi=kesildi,
                          gecikme_ms=round(self.gecikmeler[-1]) if self.gecikmeler else None)
         self.nimbus_tampon = ""

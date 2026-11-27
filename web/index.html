@@ -30,7 +30,7 @@
             animation: pirilti 4s ease-in-out infinite; }
   @keyframes pirilti { 50% { opacity: .1; } }
 
-  #sahne { width: min(80vw, 760px); aspect-ratio: 760 / 520; position: relative; }
+  #sahne { width: min(80vw, 760px); aspect-ratio: 760 / 520; position: relative; margin-bottom: 12vh; }
   svg { width: 100%; height: 100%; overflow: visible; }
 
   /* Süzülme */
@@ -85,10 +85,12 @@
   }
 
   /* Altyazı */
+  /* Altyazı ekranın altına sabit: uzunluğu bulutun yerini değiştirmez */
   #altyazi {
-    min-height: 3.2em; max-width: min(86vw, 900px); margin-top: 1.5vh;
+    position: fixed; left: 50%; bottom: 7vh; transform: translateX(-50%);
+    width: min(86vw, 900px);
     font-size: clamp(18px, 2.4vw, 30px); line-height: 1.35; text-align: center;
-    text-shadow: 0 2px 12px rgba(0,0,0,.6); transition: opacity .4s;
+    text-shadow: 0 2px 12px rgba(0,0,0,.6);
   }
   #altyazi .kim { color: #9fb6ff; font-weight: 600; margin-right: .4em; }
   #altyazi.sen .kim { color: #ffd38a; }
@@ -239,16 +241,22 @@ setInterval(() => {
 
 // ---------- Altyazı ----------
 let altyaziZamanlayici = null;
+let altyaziKim = null, altyaziMetin = null;
 function altyaziGoster(veri) {
   clearTimeout(altyaziZamanlayici);
-  if (!veri || !veri.metin) { altyazi.innerHTML = ""; return; }
-  altyazi.className = veri.kim === "sen" ? "sen" : "";
-  altyazi.innerHTML = "";
-  const kim = document.createElement("span");
-  kim.className = "kim";
-  kim.textContent = veri.kim === "sen" ? "Sen:" : (veri.ad || "Nimbus") + ":";
-  altyazi.append(kim, document.createTextNode(veri.metin));
-  altyaziZamanlayici = setTimeout(() => altyazi.innerHTML = "", 9000);
+  if (!veri || !veri.metin) { altyazi.innerHTML = ""; altyaziKim = null; return; }
+  if (veri.kim !== altyaziKim || !altyaziMetin || !altyazi.contains(altyaziMetin)) {
+    altyazi.className = veri.kim === "sen" ? "sen" : "";
+    altyazi.innerHTML = "";
+    const kim = document.createElement("span");
+    kim.className = "kim";
+    kim.textContent = veri.kim === "sen" ? "Sen:" : (veri.ad || "Nimbus") + ":";
+    altyaziMetin = document.createTextNode("");
+    altyazi.append(kim, altyaziMetin);
+    altyaziKim = veri.kim;
+  }
+  altyaziMetin.nodeValue = veri.metin;
+  altyaziZamanlayici = setTimeout(() => { altyazi.innerHTML = ""; altyaziKim = null; }, 9000);
 }
 
 // ---------- Sunucu bağlantısı ----------
