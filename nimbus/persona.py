@@ -27,6 +27,7 @@ class Persona:
     ornekler: list[dict] = field(default_factory=list)  # [{"kisi": "...", "nimbus": "..."}]
     karsilama: str = ""
     veda: str = ""
+    bilgi_dosyasi: str = ""  # proje köküne göre; içeriği talimata "bildiklerin" olarak eklenir
 
     @classmethod
     def yukle(cls, yol: Path) -> "Persona":
@@ -51,6 +52,16 @@ class Persona:
 
         if self.kurallar:
             parcalar.append("Kurallar:\n" + "\n".join(f"- {k}" for k in self.kurallar))
+
+        if self.bilgi_dosyasi:
+            from .ayarlar import KOK
+
+            yol = KOK / self.bilgi_dosyasi
+            if yol.exists():
+                parcalar.append(
+                    "Bildiğin bilgiler (bunlara dayan; burada olmayan bir tarih, yer, isim ya da etkinlik uydurma):\n\n"
+                    + yol.read_text(encoding="utf-8").strip()
+                )
 
         if self.ornekler:
             satirlar = [f"Karşındaki: {o['kisi']}\n{self.ad}: {o['nimbus']}" for o in self.ornekler]

@@ -16,7 +16,7 @@ ORNEK_SESLER = ["Charon", "Puck", "Kore", "Fenrir", "Aoede", "Leda", "Orus", "Ze
 
 def main() -> None:
     p = argparse.ArgumentParser(prog="nimbus", description="Nimbus: buluttan objelere ruh üfler")
-    p.add_argument("--persona", default=str(KOK / "personas" / "nimbus.yaml"), help="Persona YAML dosyası")
+    p.add_argument("--persona", help="Persona YAML dosyası (varsayılan: .env NIMBUS_PERSONA ya da personas/nimbus.yaml)")
     p.add_argument("--ses", help=f"Persona'daki sesi geçersiz kıl. Örnekler: {', '.join(ORNEK_SESLER)}")
     p.add_argument("--mikrofon", help="Mikrofon numarası ya da isim parçası (.env: NIMBUS_MIKROFON)")
     p.add_argument("--yarim-dubleks", action="store_true", help="Nimbus konuşurken mikrofonu sustur")
@@ -57,7 +57,7 @@ def main() -> None:
         from .ses_dinle import ses_dinle
         return ses_dinle(a.ses_dinle, a.cumle)
 
-    persona = Persona.yukle(Path(a.persona))
+    persona = Persona.yukle(Path(a.persona) if a.persona else ayarlar.persona)
     if a.ses:
         persona.ses = a.ses
 

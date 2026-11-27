@@ -134,7 +134,8 @@ tests/          otomatik testler (pytest, sahte Gemini)
   govde.py      gövde arayüzü (konsol -> sanal yüz -> servo)
   web.py        bulut yüz sunucusu (HTTP + WebSocket)
 web/index.html  bulut yüz (SVG + CSS + JS, harici bağımlılık yok)
-personas/       karakter dosyaları
+personas/       karakter dosyaları (nimbus.yaml genel, gdg-konya.yaml GDG Cloud Konya)
+bilgi/          kişiliğe eklenen bilgi dosyaları (topluluk, etkinlikler)
 spike/          Faz 0 deneme scripti (arşiv)
 ```
 

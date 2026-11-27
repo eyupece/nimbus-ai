@@ -28,3 +28,10 @@ def test_sistem_talimati(dosya):
     assert f"Senin adın {p.ad}" in t
     assert all(k.split()[0] in t for k in p.kurallar)
     assert 300 < len(t) < 6000
+
+
+def test_gdg_personasi_bilgiyi_icerir():
+    p = Persona.yukle(KOK / "personas" / "gdg-konya.yaml")
+    t = p.sistem_talimati()
+    assert "GDG Cloud Konya" in t and "21 Kasım 2026" in t and "uydurma" in t
+    assert (KOK / p.bilgi_dosyasi).exists()

@@ -194,11 +194,12 @@ async def degerlendir(istemci, persona: Persona, senaryo: dict, oturumlar: list[
 
 
 # ---------- Ana akış ----------
-async def calistir(dosya: Path, sadece: set[str] | None, kayit_klasoru: Path | None = None) -> Path:
+async def calistir(dosya: Path, sadece: set[str] | None, kayit_klasoru: Path | None = None,
+                   persona_yolu: Path | None = None) -> Path:
     a = Ayarlar.yukle()
     if kayit_klasoru:
         a.kayit_klasoru = kayit_klasoru
-    persona = Persona.yukle(KOK / "personas" / "nimbus.yaml")
+    persona = Persona.yukle(persona_yolu or a.persona)
     istemci, arka_uc = istemci_olustur(a)
     oturum = Oturum(a, persona, SenaryoGovde())  # Live ayarlarını ve araç işleyicilerini kullanmak için
 
@@ -295,10 +296,11 @@ def main() -> None:
     p = argparse.ArgumentParser(prog="nimbus.senaryo", description="Nimbus senaryo testleri (gerçek Gemini, sessiz)")
     p.add_argument("--dosya", default=str(KOK / "senaryolar" / "temel.yaml"))
     p.add_argument("--sadece", help="Sadece bu senaryolar (virgülle)")
+    p.add_argument("--persona", help="Persona dosyası (varsayılan: .env NIMBUS_PERSONA)")
     a = p.parse_args()
     sadece = {x.strip() for x in a.sadece.split(",")} if a.sadece else None
     try:
-        asyncio.run(calistir(Path(a.dosya), sadece))
+        asyncio.run(calistir(Path(a.dosya), sadece, persona_yolu=Path(a.persona) if a.persona else None))
     except KeyboardInterrupt:
         sys.exit("\nİptal edildi.")
 

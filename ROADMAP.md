@@ -7,7 +7,7 @@
 Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şey (🎬) çıkar.
 
 ## 📍 Şu an neredeyiz
-- **Son güncelleme:** 27 Kasım 2026
+- **Son güncelleme:** 28 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
 - **Şimdi:** Faz 1.5 yazılımı tamam (hafıza, görme, eylem) → senaryo/canlı test; paralelde Faz 2 alışveriş listesi
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
@@ -190,6 +190,7 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 | 27.11.2026 | PO rolü Claude'da (ROADMAP.md ile), Eyüp karar verir | Eyüp yönlendirilmek istiyor; ayrı rol yapan agent ekibi bu boyutta fazla yük |
 | 28.11.2026 | İsim teyidi örtük (adı cevapta söyle), açık soru sadece tuhaf isimlerde | Her yeni kişiye "X mi dedin?" sahnede yapay; ad söylenince kişi yanlışsa zaten düzeltir |
 | 27.11.2026 | Commit'leri Claude atar (Eyüp adına), push'u Eyüp yapar | Bu oturumun GitHub yazma yetkisi yok; Eyüp kod/komutla uğraşmak istemiyor |
+| 28.11.2026 | Nimbus = GDG Cloud Konya ekip üyesi (`personas/gdg-konya.yaml`), genel kişilik de duruyor | Eyüp ana organizatör, marka kullanımında sorun yok; tema bağımsızlık bozulmasın diye ayrı persona + ayrı bilgi dosyası |
 
 ## Fikir havuzu (ertelenenler)
 - **Karar modu senaryoları** (SORGU → KARAR): Nimbus 3-4 soru sorup kişi hakkında dramatik bir karar açıklar.

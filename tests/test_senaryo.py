@@ -40,7 +40,8 @@ def test_senaryo_raporu(tmp_path, monkeypatch):
     ], not_cevabi=["İzmirli, kedisi var."])
     monkeypatch.setattr(S, "istemci_olustur", lambda a: (istemci, "sahte"))
 
-    rapor = asyncio.run(S.calistir(dosya, None, kayit_klasoru=tmp_path / "logs"))
+    rapor = asyncio.run(S.calistir(dosya, None, kayit_klasoru=tmp_path / "logs",
+                                   persona_yolu=tmp_path / "personas" / "nimbus.yaml"))
     metin = rapor.read_text(encoding="utf-8")
     assert "1/2 senaryo geçti" in metin
     assert "| tanisma | ✅" in metin and "| sizinti | ❌" in metin

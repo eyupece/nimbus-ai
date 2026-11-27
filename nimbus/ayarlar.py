@@ -23,6 +23,7 @@ class Ayarlar:
     konum: str | None  # modele söylenecek konum, örn. "Konya"
     kamera: int | None  # kamera indeksi; None = kamera kapalı
     ilk_bakis: bool  # uyanınca bir kez bakıp görünüşe laf soksun mu
+    persona: Path  # varsayılan persona dosyası
     kayit_klasoru: Path
 
     @classmethod
@@ -41,5 +42,6 @@ class Ayarlar:
             konum=os.getenv("NIMBUS_KONUM") or None,
             kamera=int(os.environ["NIMBUS_KAMERA"]) if os.getenv("NIMBUS_KAMERA", "").strip().isdigit() else None,
             ilk_bakis=os.getenv("NIMBUS_ILK_BAKIS", "1") != "0",
+            persona=KOK / os.getenv("NIMBUS_PERSONA", "personas/nimbus.yaml"),
             kayit_klasoru=KOK / "logs",
         )
