@@ -289,6 +289,7 @@ class Oturum:
         if metin:
             print(f"{MAVI}Sen:{SIFIRLA} {metin}", flush=True)
             self._kaydet("sen", metin)
+            self.govde.altyazi("sen", metin)
         self.sen_tampon = ""
 
     def _gecikme_yaz(self) -> None:
@@ -304,6 +305,7 @@ class Oturum:
         if metin:
             ek = f" {GRI}✋ (sözü kesildi){SIFIRLA}" if kesildi else ""
             print(f"{SARI}{self.persona.ad}:{SIFIRLA} {metin}{ek}\n", flush=True)
+            self.govde.altyazi("nimbus", metin, self.persona.ad)
             self._kaydet("nimbus", metin, kesildi=kesildi,
                          gecikme_ms=round(self.gecikmeler[-1]) if self.gecikmeler else None)
         self.nimbus_tampon = ""
@@ -329,6 +331,8 @@ class Oturum:
 
         print(f"☁️  {arka_uc} | Model: {self.a.model} | Persona: {self.persona.ad} ({self.persona.ses})")
         print(f"🎙  Mikrofon: {self.mikrofon.ad}")
+        if hasattr(self.govde, "baslat"):
+            await self.govde.baslat()
         operator_dinle(self.komutlar, asyncio.get_running_loop())
         self.govde.durum(Durum.UYKU.value)
         print(f"{GRI}💤 Uykuda. {komut_yardimi()}{SIFIRLA}", flush=True)

@@ -25,6 +25,9 @@ class Govde(Protocol):
     def durum(self, ad: str) -> None:
         """Konuşma durumu değişti: uyku, karsilama, sohbet, veda..."""
 
+    def altyazi(self, kim: str, metin: str, ad: str = "Nimbus") -> None:
+        """Söylenen cümle: kim = "sen" ya da "nimbus"."""
+
 
 class SessizGovde:
     """Hiçbir şey yapmayan gövde (sadece ses)."""
@@ -36,6 +39,9 @@ class SessizGovde:
         pass
 
     def durum(self, ad: str) -> None:
+        pass
+
+    def altyazi(self, kim: str, metin: str, ad: str = "Nimbus") -> None:
         pass
 
 

@@ -55,6 +55,10 @@ python -m nimbus --yarim-dubleks                 # kulaklık yoksa (yankıyı ö
 python -m nimbus --dil-ipucu                     # modele Türkçe dil ipucu ver
 ```
 
+Çalıştırınca tarayıcıda **bulut yüz** açılır (http://localhost:8765): ağız sesle senkron hareket eder,
+jestler yüzde canlanır, konuşmalar altyazı olarak görünür. Sadece terminal için `--govde konsol`,
+tarayıcının otomatik açılmaması için `--tarayici-acma`. Sunucusuz önizleme: `web/index.html?demo`.
+
 Nimbus **uykuda** başlar. Terminalde operatör komutları (yazıp Enter):
 
 | Komut | Ne yapar |
@@ -85,6 +89,8 @@ nimbus/
   durum.py      durumlar ve operatör komutları
   araclar.py    modelin çağırdığı fonksiyonlar (jest, uykuya_don)
   govde.py      gövde arayüzü (konsol -> sanal yüz -> servo)
+  web.py        bulut yüz sunucusu (HTTP + WebSocket)
+web/index.html  bulut yüz (SVG + CSS + JS, harici bağımlılık yok)
 personas/       karakter dosyaları
 spike/          Faz 0 deneme scripti (arşiv)
 ```

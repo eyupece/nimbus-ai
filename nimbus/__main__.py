@@ -9,6 +9,7 @@ from .govde import KonsolGovde, SessizGovde
 from .oturum import Oturum
 from .persona import Persona
 from .ses import cihazlari_listele, mikrofon_testi
+from .web import WebGovde
 
 ORNEK_SESLER = ["Charon", "Puck", "Kore", "Fenrir", "Aoede", "Leda", "Orus", "Zephyr"]
 
@@ -20,7 +21,10 @@ def main() -> None:
     p.add_argument("--mikrofon", help="Mikrofon numarası ya da isim parçası (.env: NIMBUS_MIKROFON)")
     p.add_argument("--yarim-dubleks", action="store_true", help="Nimbus konuşurken mikrofonu sustur")
     p.add_argument("--dil-ipucu", action="store_true", help="Modele persona dilini (tr-TR) açıkça bildir")
-    p.add_argument("--govde", choices=["konsol", "sessiz"], default="konsol", help="Gövde arka ucu")
+    p.add_argument("--govde", choices=["web", "konsol", "sessiz"], default="web",
+                   help="web: tarayıcıda bulut yüz (varsayılan), konsol: sadece terminal")
+    p.add_argument("--port", type=int, default=8765, help="Bulut yüz sunucusunun portu")
+    p.add_argument("--tarayici-acma", action="store_true", help="Tarayıcıyı otomatik açma")
     p.add_argument("--cihazlar", action="store_true", help="Giriş cihazlarını listele ve çık")
     p.add_argument("--mikrofon-testi", action="store_true", help="API'siz mikrofon seviyesi testi")
     a = p.parse_args()
@@ -38,7 +42,12 @@ def main() -> None:
     if a.ses:
         persona.ses = a.ses
 
-    govde = KonsolGovde() if a.govde == "konsol" else SessizGovde()
+    if a.govde == "web":
+        govde = WebGovde(port=a.port, tarayici_ac=not a.tarayici_acma, konsol=KonsolGovde())
+    elif a.govde == "konsol":
+        govde = KonsolGovde()
+    else:
+        govde = SessizGovde()
     oturum = Oturum(ayarlar, persona, govde, yarim_dubleks=a.yarim_dubleks, dil_ipucu=a.dil_ipucu)
     try:
         asyncio.run(oturum.calistir())

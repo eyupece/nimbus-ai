@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 27 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Faz 1 → durum makinesi + jestler + operatör komutları çalışıyor (canlı test ✓), sıradaki: tarayıcıda bulut yüz
+- **Şimdi:** Faz 1 → bulut yüz hazır (canlı test bekliyor), sıradaki: jest gecikmesi + persona ince ayarı, sonra 🎬 ilk demo videosu
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -91,7 +91,7 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] Ses genliğinden ağız senkronu (4 seviye, 20 ms pencere, bir pencere önden) → gövdeye bildiriliyor
 - [ ] Jest gecikmesi: jestleri seyrekleştir ya da sık ifadeleri lokal üret (örn. "Hımm" → düşün) ve fonksiyonu büyük anlara bırak
 - [ ] Persona ince ayarı: daha az felsefe, daha az "evlat", daha çok espri
-- [ ] Sanal yüz: **bulut karakter**, lokal web sunucusu + WebSocket + SVG
+- [x] Sanal yüz: **bulut karakter** (`web/index.html`), lokal HTTP + WebSocket sunucusu, ağız senkronu, 6 jest, uyku animasyonu, altyazı
 - [x] Operatör komutları: Enter/u uyandır, v veda, s sıfırla, q çık
 - [x] Konuşma kaydı (`logs/*.jsonl`)
 - [ ] 🎬 İlk demo videosu

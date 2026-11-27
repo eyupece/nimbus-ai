@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nimbus</title>
+<style>
+  :root {
+    --gok-ust: #0b1026;
+    --gok-alt: #23305e;
+    --bulut: #f4f7ff;
+    --bulut-golge: #c9d4f2;
+    --goz: #1d2340;
+    --yanak: #ff9fb7;
+    --parilti: rgba(150, 190, 255, .55);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body {
+    background: radial-gradient(ellipse at 50% 30%, var(--gok-alt), var(--gok-ust) 70%);
+    font-family: "Segoe UI", system-ui, sans-serif;
+    color: #e8ecff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: background 1.2s;
+  }
+  body.uyku { --gok-alt: #151b38; }
+
+  /* Yıldızlar */
+  .yildiz { position: fixed; width: 2px; height: 2px; border-radius: 50%; background: #fff; opacity: .5;
+            animation: pirilti 4s ease-in-out infinite; }
+  @keyframes pirilti { 50% { opacity: .1; } }
+
+  #sahne { width: min(80vw, 760px); aspect-ratio: 760 / 520; position: relative; }
+  svg { width: 100%; height: 100%; overflow: visible; }
+
+  /* Süzülme */
+  #bulut-grubu { animation: suzul 6s ease-in-out infinite; transform-origin: 380px 280px; }
+  @keyframes suzul { 50% { transform: translateY(-14px); } }
+  body.uyku #bulut-grubu { animation-duration: 10s; }
+
+  #bulut-govde { filter: drop-shadow(0 0 34px var(--parilti)); transition: filter 1s, opacity 1s; }
+  body.uyku #bulut-govde { filter: drop-shadow(0 0 10px rgba(120,140,200,.25)); }
+  #bulut-grubu > * { transition: filter 1s; }
+  body.uyku #bulut-grubu > :not(.uyku-z) { filter: brightness(.78) saturate(.6); }
+  body.kizgin #bulut-govde .govde-dolgu { fill: #dcd6ec; }
+
+  /* Gözler */
+  .goz-kapak { transition: transform .09s ease-in; transform-box: fill-box; transform-origin: center; }
+  .goz { transform-box: fill-box; transform-origin: center; transition: transform .25s; }
+  .gozbebegi { transition: transform .35s ease-out; }
+  .kirp .goz-kapak, .kapali .goz-kapak { transform: scaleY(1); }
+  .goz-kapak { transform: scaleY(0); }
+  body.uyku .goz-kapak { transform: scaleY(1); }
+  .goz-acik { transform-box: fill-box; transform-origin: center; transition: transform .2s, opacity .2s; }
+  body.gozleri_kis .goz-acik { transform: scaleY(.38); }
+  body.saskin .goz { transform: scale(1.25); }
+  body.gul .goz-acik { opacity: 0; }
+  .goz-gulen { opacity: 0; transition: opacity .2s; }
+  body.gul .goz-gulen { opacity: 1; }
+
+  /* Kaşlar */
+  .kas { transition: transform .3s; transform-box: fill-box; transform-origin: center; opacity: .0; }
+  body.saskin .kas, body.kizgin .kas, body.dusun .kas { opacity: .85; }
+  body.saskin .kas { transform: translateY(-14px); }
+  body.kizgin #kas-sol { transform: rotate(18deg) translateY(4px); }
+  body.kizgin #kas-sag { transform: rotate(-18deg) translateY(4px); }
+  body.dusun #kas-sag { transform: translateY(-10px) rotate(-8deg); }
+
+  /* Yanaklar */
+  .yanak { fill: var(--yanak); opacity: .25; transition: opacity .3s; }
+  body.gul .yanak { opacity: .7; }
+
+  /* Ağız: seviye 0-3 */
+  #agiz { transition: ry .06s linear, rx .06s linear; }
+
+  /* Uyku zzz */
+  .z { font-weight: 700; fill: #dfe6ff; opacity: 0; }
+  body.uyku .z { animation: zzz 3.6s ease-in-out infinite; }
+  body.uyku .z:nth-of-type(2) { animation-delay: 1.2s; }
+  body.uyku .z:nth-of-type(3) { animation-delay: 2.4s; }
+  @keyframes zzz {
+    0% { opacity: 0; transform: translate(0, 0); }
+    30% { opacity: .9; }
+    100% { opacity: 0; transform: translate(40px, -70px); }
+  }
+
+  /* Altyazı */
+  #altyazi {
+    min-height: 3.2em; max-width: min(86vw, 900px); margin-top: 1.5vh;
+    font-size: clamp(18px, 2.4vw, 30px); line-height: 1.35; text-align: center;
+    text-shadow: 0 2px 12px rgba(0,0,0,.6); transition: opacity .4s;
+  }
+  #altyazi .kim { color: #9fb6ff; font-weight: 600; margin-right: .4em; }
+  #altyazi.sen .kim { color: #ffd38a; }
+
+  #baglanti { position: fixed; bottom: 12px; right: 16px; font-size: 12px; opacity: .45; }
+  #baglanti.kopuk { color: #ff8a8a; opacity: .9; }
+  #durum-etiketi { position: fixed; bottom: 12px; left: 16px; font-size: 12px; opacity: .45; letter-spacing: .08em; }
+</style>
+</head>
+<body class="uyku">
+<div id="sahne">
+  <svg viewBox="0 0 760 520" aria-label="Nimbus">
+    <defs>
+      <radialGradient id="bulut-renk" cx="45%" cy="35%" r="75%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="70%" stop-color="var(--bulut)"/>
+        <stop offset="100%" stop-color="var(--bulut-golge)"/>
+      </radialGradient>
+    </defs>
+    <g id="bulut-grubu">
+      <!-- Bulut gövdesi: üst üste binen daireler -->
+      <g id="bulut-govde">
+        <g class="govde-dolgu" fill="url(#bulut-renk)">
+          <circle cx="230" cy="300" r="120"/>
+          <circle cx="360" cy="215" r="150"/>
+          <circle cx="510" cy="250" r="125"/>
+          <circle cx="600" cy="330" r="95"/>
+          <circle cx="150" cy="360" r="80"/>
+          <rect x="150" y="300" width="460" height="140" rx="70"/>
+        </g>
+      </g>
+
+      <!-- Yanaklar -->
+      <ellipse class="yanak" cx="255" cy="350" rx="30" ry="16"/>
+      <ellipse class="yanak" cx="505" cy="350" rx="30" ry="16"/>
+
+      <!-- Kaşlar -->
+      <path id="kas-sol" class="kas" d="M268 232 q32 -16 64 0" stroke="var(--goz)" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path id="kas-sag" class="kas" d="M428 232 q32 -16 64 0" stroke="var(--goz)" stroke-width="9" fill="none" stroke-linecap="round"/>
+
+      <!-- Gözler -->
+      <g id="goz-sol" class="goz">
+        <g class="goz-acik">
+          <ellipse cx="300" cy="290" rx="30" ry="38" fill="var(--goz)"/>
+          <g class="gozbebegi"><circle cx="310" cy="276" r="10" fill="#fff"/></g>
+        </g>
+        <path class="goz-gulen" d="M272 296 q28 -30 56 0" stroke="var(--goz)" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <rect class="goz-kapak" x="266" y="250" width="68" height="80" rx="34" fill="#f5f7ff"/>
+        <path class="goz-kapak" d="M272 292 q28 14 56 0" stroke="var(--goz)" stroke-width="7" fill="none" stroke-linecap="round"/>
+      </g>
+      <g id="goz-sag" class="goz">
+        <g class="goz-acik">
+          <ellipse cx="460" cy="290" rx="30" ry="38" fill="var(--goz)"/>
+          <g class="gozbebegi"><circle cx="470" cy="276" r="10" fill="#fff"/></g>
+        </g>
+        <path class="goz-gulen" d="M432 296 q28 -30 56 0" stroke="var(--goz)" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <rect class="goz-kapak" x="426" y="250" width="68" height="80" rx="34" fill="#f5f7ff"/>
+        <path class="goz-kapak" d="M432 292 q28 14 56 0" stroke="var(--goz)" stroke-width="7" fill="none" stroke-linecap="round"/>
+      </g>
+
+      <!-- Ağız -->
+      <ellipse id="agiz" cx="380" cy="368" rx="26" ry="4" fill="var(--goz)"/>
+
+      <!-- Uyku -->
+      <g class="uyku-z" transform="translate(560 170)">
+        <text class="z" x="0" y="0" font-size="34">z</text>
+        <text class="z" x="18" y="-10" font-size="26">z</text>
+        <text class="z" x="32" y="-18" font-size="20">z</text>
+      </g>
+    </g>
+  </svg>
+</div>
+<div id="altyazi"></div>
+<div id="durum-etiketi">UYKU</div>
+<div id="baglanti">bağlanıyor…</div>
+
+<script>
+// ---------- Yıldızlar ----------
+for (let i = 0; i < 70; i++) {
+  const y = document.createElement("div");
+  y.className = "yildiz";
+  y.style.left = Math.random() * 100 + "vw";
+  y.style.top = Math.random() * 100 + "vh";
+  y.style.animationDelay = (Math.random() * 4) + "s";
+  document.body.appendChild(y);
+}
+
+const govde = document.body;
+const agiz = document.getElementById("agiz");
+const altyazi = document.getElementById("altyazi");
+const durumEtiketi = document.getElementById("durum-etiketi");
+const baglanti = document.getElementById("baglanti");
+const gozbebekleri = document.querySelectorAll(".gozbebegi");
+
+// ---------- Ağız ----------
+const AGIZ = [ {rx: 26, ry: 4}, {rx: 24, ry: 10}, {rx: 22, ry: 17}, {rx: 20, ry: 25} ];
+function agizAyarla(seviye) {
+  const a = AGIZ[Math.max(0, Math.min(3, seviye))];
+  agiz.setAttribute("rx", a.rx);
+  agiz.setAttribute("ry", a.ry);
+}
+
+// ---------- Durum ----------
+let durum = "uyku";
+const JEST_SINIFLARI = ["goz_kirp", "gozleri_kis", "saskin", "dusun", "gul", "kizgin"];
+function durumAyarla(ad) {
+  durum = ad;
+  govde.classList.toggle("uyku", ad === "uyku");
+  durumEtiketi.textContent = ad.toUpperCase();
+  if (ad === "uyku") { agizAyarla(0); altyaziGoster(null); }
+}
+
+// ---------- Jestler ----------
+let jestZamanlayici = null;
+function jestYap(ad) {
+  clearTimeout(jestZamanlayici);
+  JEST_SINIFLARI.forEach(j => govde.classList.remove(j));
+  if (ad === "goz_kirp") {
+    const kapak = document.querySelectorAll("#goz-sag .goz-kapak");
+    kapak.forEach(k => k.style.transform = "scaleY(1)");
+    setTimeout(() => kapak.forEach(k => k.style.transform = ""), 380);
+    return;
+  }
+  if (ad === "dusun") bakis(8, -12);
+  govde.classList.add(ad);
+  jestZamanlayici = setTimeout(() => { govde.classList.remove(ad); bakis(0, 0); }, ad === "gul" ? 1800 : 1500);
+}
+
+// ---------- Göz kırpma ve bakış (canlılık) ----------
+function kirp() {
+  if (durum !== "uyku") {
+    const kapaklar = document.querySelectorAll(".goz-kapak");
+    kapaklar.forEach(k => { if (!k.style.transform) k.style.transform = "scaleY(1)"; });
+    setTimeout(() => kapaklar.forEach(k => { if (k.style.transform === "scaleY(1)") k.style.transform = ""; }), 120);
+  }
+  setTimeout(kirp, 2500 + Math.random() * 4000);
+}
+setTimeout(kirp, 2000);
+
+function bakis(x, y) {
+  gozbebekleri.forEach(g => g.style.transform = `translate(${x}px, ${y}px)`);
+}
+setInterval(() => {
+  if (durum !== "uyku" && !govde.classList.contains("dusun")) {
+    bakis((Math.random() - .5) * 10, (Math.random() - .5) * 8);
+  }
+}, 2200);
+
+// ---------- Altyazı ----------
+let altyaziZamanlayici = null;
+function altyaziGoster(veri) {
+  clearTimeout(altyaziZamanlayici);
+  if (!veri || !veri.metin) { altyazi.innerHTML = ""; return; }
+  altyazi.className = veri.kim === "sen" ? "sen" : "";
+  altyazi.innerHTML = "";
+  const kim = document.createElement("span");
+  kim.className = "kim";
+  kim.textContent = veri.kim === "sen" ? "Sen:" : (veri.ad || "Nimbus") + ":";
+  altyazi.append(kim, document.createTextNode(veri.metin));
+  altyaziZamanlayici = setTimeout(() => altyazi.innerHTML = "", 9000);
+}
+
+// ---------- Sunucu bağlantısı ----------
+function baglan() {
+  const ws = new WebSocket(`ws://${location.host}/canli`);
+  ws.onopen = () => { baglanti.textContent = "● canlı"; baglanti.classList.remove("kopuk"); };
+  ws.onclose = () => {
+    baglanti.textContent = "bağlantı yok, tekrar deneniyor…"; baglanti.classList.add("kopuk");
+    setTimeout(baglan, 1500);
+  };
+  ws.onmessage = (e) => {
+    const m = JSON.parse(e.data);
+    if (m.tip === "agiz") agizAyarla(m.seviye);
+    else if (m.tip === "jest") jestYap(m.ad);
+    else if (m.tip === "durum") durumAyarla(m.ad);
+    else if (m.tip === "altyazi") altyaziGoster(m);
+  };
+}
+baglan();
+
+// Sunucu yokken (dosyayı doğrudan açınca) önizleme: ?demo
+if (location.search.includes("demo")) {
+  durumAyarla("sohbet");
+  setInterval(() => agizAyarla(Math.floor(Math.random() * 4)), 90);
+  let i = 0;
+  setInterval(() => jestYap(JEST_SINIFLARI[i++ % JEST_SINIFLARI.length]), 2500);
+}
+</script>
+</body>
+</html>
