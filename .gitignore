@@ -1,0 +1,21 @@
+# Gizli bilgiler
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Hafıza / yüz verisi (Faz 1.5) - asla repo'ya girmez
+data/
+
+# Kayıtlar
+logs/
+*.wav
+
+# Editör / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
