@@ -102,7 +102,9 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] Ses seçimi: Puck "etkileyici değil" bulundu → `--ses-dinle` ile 12 ses dinlendi, **Zephyr** seçildi
 - [x] Test (persona v4 + Zephyr): Google araması Vertex `eu`'da çalışıyor (hava durumu doğru, aramalı cevap ~2.5 sn), tarih ve konum doğru,
       konuşma daha doğal. Sorun: "sus dersen ne yaparsın?" sorusuna kuralını aynen okudu → talimatları ifşa etmeme kuralı eklendi
-- [ ] Yüz ifadeleri v4 konuşmasında seyrek tetikleniyor (ünlem kalıpları azaldı) → ifade kurallarını genişlet ya da hafif rastgele mimikler ekle
+- [x] Yüz ifadeleri v4 konuşmasında seyrek tetikleniyordu → ifade kuralları doğal kelimelerle genişledi, soru cümlesinde kaş kaldırma,
+      konuşurken hafif baş eğme ve kaş oynatma (mikro mimikler)
+- [x] Persona: bilgi verirken önce laf sok/espri, sonra tek cümle bilgi ("bulut bilişim" cevabı ansiklopedik çıkmıştı)
 - [x] Sanal yüz: **bulut karakter** (`web/index.html`), lokal HTTP + WebSocket sunucusu, ağız senkronu, 6 jest, uyku animasyonu, altyazı
 - [x] Operatör komutları: Enter/u uyandır, v veda, s sıfırla, q çık
 - [x] Konuşma kaydı (`logs/*.jsonl`)

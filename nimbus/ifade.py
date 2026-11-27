@@ -9,15 +9,17 @@ import time
 
 # (jest, düzenli ifade) — ilk eşleşen kazanır, sıra önemlidir
 KURALLAR: list[tuple[str, re.Pattern]] = [
-    ("saskin", re.compile(r"\b(vay|yok artık|ne\?!|nasıl yani|olamaz|hayret|inanılmaz|cidden mi|ciddi misin|oha)", re.I)),
-    ("kizgin", re.compile(r"\b(saygısız|terbiyesiz|yeter artık|hiç hoş değil|sinir|alındım|küstüm)", re.I)),
-    ("gul", re.compile(r"\b(haha|ahah|hah|güzel|sevindim|harika|hoşuma|tatlı|aferin|şahane|keyif|efsane)", re.I)),
-    ("goz_kirp", re.compile(r"\b(aramızda|sır|şaka|belki de|kim bilir|bak sen|demiştim|herkes bilir)", re.I)),
-    ("gozleri_kis", re.compile(r"\b(emin misin|gerçekten mi|bakalım|şüpheli|hmm+\?|of+\b|abartma|eski kafa|cringe)", re.I)),
-    ("dusun", re.compile(r"\b(hı+mm+|düşüneyim|bir saniye|dur bakalım|ilginç|yani bence)", re.I)),
+    ("saskin", re.compile(r"\b(vay|yok artık|ne\?!|nasıl yani|olamaz|hayret|inanılmaz|cidden mi|ciddi misin|oha|hadi ya|aa+\b|şaka mı)", re.I)),
+    ("kizgin", re.compile(r"\b(saygısız|terbiyesiz|yeter artık|hiç hoş değil|sinir|alındım|küstüm|ayıp)", re.I)),
+    ("gul", re.compile(r"\b(haha|ahah|hah|güzel|sevindim|harika|hoşuma|tatlı|aferin|şahane|keyif|efsane|süper|bayıldım|eğlenceli)", re.I)),
+    ("goz_kirp", re.compile(r"\b(aramızda|sır|şaka|belki de|kim bilir|bak sen|demiştim|herkes bilir|tabii ki|basit|bana güven|ben bilirim)", re.I)),
+    ("gozleri_kis", re.compile(r"\b(emin misin|gerçekten mi|bakalım|şüpheli|hmm+\?|of+\b|abartma|eski kafa|cringe|bilmiyor musun|hiç sanmam|pek sanmıyorum)", re.I)),
+    ("dusun", re.compile(r"\b(hı+mm+|düşüneyim|bir saniye|dur bakalım|ilginç|yani bence|bence|galiba|sanırım|baktım|aradım)", re.I)),
+    # En düşük öncelik: soru soruyorsa kaşlarını hafifçe kaldırır
+    ("kas_kaldir", re.compile(r"\?")),
 ]
 
-ARALIK_SN = 3.5  # iki jest arasında en az bu kadar süre (bir cümlede tek ifade)
+ARALIK_SN = 3.0  # iki jest arasında en az bu kadar süre
 
 
 class IfadeOkuyucu:

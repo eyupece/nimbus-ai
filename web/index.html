@@ -60,7 +60,12 @@
 
   /* Kaşlar */
   .kas { transition: transform .3s; transform-box: fill-box; transform-origin: center; opacity: .0; }
-  body.saskin .kas, body.kizgin .kas, body.dusun .kas { opacity: .85; }
+  body.saskin .kas, body.kizgin .kas, body.dusun .kas, body.kas_kaldir .kas, body.mimik .kas { opacity: .85; }
+  body.kas_kaldir .kas { transform: translateY(-9px); }
+  body.mimik #kas-sol { transform: translateY(-6px); }
+
+  /* Konuşurken hafif baş eğme */
+  #egim { transform-box: view-box; transform-origin: 380px 320px; transition: transform .9s ease-in-out; }
   body.saskin .kas { transform: translateY(-14px); }
   body.kizgin #kas-sol { transform: rotate(18deg) translateY(4px); }
   body.kizgin #kas-sag { transform: rotate(-18deg) translateY(4px); }
@@ -110,7 +115,7 @@
         <stop offset="100%" stop-color="var(--bulut-golge)"/>
       </radialGradient>
     </defs>
-    <g id="bulut-grubu">
+    <g id="bulut-grubu"><g id="egim">
       <!-- Bulut gövdesi: üst üste binen daireler -->
       <g id="bulut-govde">
         <g class="govde-dolgu" fill="url(#bulut-renk)">
@@ -160,7 +165,7 @@
         <text class="z" x="18" y="-10" font-size="26">z</text>
         <text class="z" x="32" y="-18" font-size="20">z</text>
       </g>
-    </g>
+    </g></g>
   </svg>
 </div>
 <div id="altyazi"></div>
@@ -186,15 +191,17 @@ const baglanti = document.getElementById("baglanti");
 const gozbebekleri = document.querySelectorAll(".gozbebegi");
 
 // ---------- Ağız: açıklık 0.0 - 1.0 ----------
+let sonKonusma = 0;
 function agizAyarla(aciklik) {
   const a = Math.max(0, Math.min(1, aciklik));
+  if (a > 0.08) sonKonusma = performance.now();
   agiz.setAttribute("rx", (26 - 7 * a).toFixed(1));  // açıldıkça biraz daralır ("o" şekli)
   agiz.setAttribute("ry", (4 + 22 * a).toFixed(1));
 }
 
 // ---------- Durum ----------
 let durum = "uyku";
-const JEST_SINIFLARI = ["goz_kirp", "gozleri_kis", "saskin", "dusun", "gul", "kizgin"];
+const JEST_SINIFLARI = ["goz_kirp", "gozleri_kis", "saskin", "dusun", "gul", "kizgin", "kas_kaldir"];
 function durumAyarla(ad) {
   durum = ad;
   govde.classList.toggle("uyku", ad === "uyku");
@@ -237,6 +244,23 @@ setInterval(() => {
     bakis((Math.random() - .5) * 10, (Math.random() - .5) * 8);
   }
 }, 2200);
+
+// ---------- Konuşurken mikro mimikler: yüz donuk kalmasın ----------
+const egim = document.getElementById("egim");
+function mikroMimik() {
+  const konusuyor = durum !== "uyku" && performance.now() - sonKonusma < 400;
+  if (konusuyor) {
+    egim.style.transform = `rotate(${(Math.random() - .5) * 7}deg)`;
+    if (Math.random() < .35 && !JEST_SINIFLARI.some(j => govde.classList.contains(j))) {
+      govde.classList.add("mimik");
+      setTimeout(() => govde.classList.remove("mimik"), 500);
+    }
+  } else if (performance.now() - sonKonusma > 1500) {
+    egim.style.transform = "";
+  }
+  setTimeout(mikroMimik, 1200 + Math.random() * 1600);
+}
+setTimeout(mikroMimik, 1500);
 
 // ---------- Altyazı ----------
 let altyaziZamanlayici = null;
