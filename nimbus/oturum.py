@@ -18,6 +18,7 @@ from .araclar import ARACLAR, SAHNE_ONEKI, SAHNE_TALIMATI, sessiz_yanit, yanit
 from .ayarlar import Ayarlar
 from .durum import Durum, komut_yardimi, operator_dinle
 from .govde import JESTLER, Govde
+from .ifade import IfadeOkuyucu
 from .persona import Persona
 from .ses import GIRIS_HIZI, Hoparlor, Mikrofon, rms
 
@@ -95,6 +96,7 @@ class Oturum:
         self.tur_baslangic_calinan = 0
         # Canlı altyazının takip ettiği tur: metin, gelen ses, başlangıç, kesildi mi
         self.altyazi_turu: dict | None = None
+        self.ifade = IfadeOkuyucu()  # söylenen metinden gecikmesiz jest
 
     # ---------- Live ayarları ----------
     def live_ayari(self) -> types.LiveConnectConfig:
@@ -201,6 +203,7 @@ class Oturum:
                                 self.tur_baslangic_calinan = self.hoparlor.calinan_bayt
                                 self.altyazi_turu = {"metin": "", "alinan": 0, "kesildi": False,
                                                      "baslangic": self.tur_baslangic_calinan}
+                                self.ifade.yeni_tur()
                                 self._sen_yaz()
                                 self._gecikme_yaz()
                             self.tur_alinan_bayt += len(parca.inline_data.data)
@@ -265,6 +268,10 @@ class Oturum:
             if metin and metin != son:
                 son = metin
                 self.govde.altyazi("nimbus", metin, self.persona.ad)
+                jest = self.ifade.oku(metin + (" " if bitti else ""))
+                if jest:
+                    self.govde.jest(jest)
+                    self._kaydet("jest", jest)
             if bitti and self.altyazi_turu is tur:
                 self.altyazi_turu = None
                 son = ""

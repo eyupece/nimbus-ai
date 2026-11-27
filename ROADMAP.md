@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 27 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Faz 1 → bulut yüz hazır (canlı test bekliyor), sıradaki: jest gecikmesi + persona ince ayarı, sonra 🎬 ilk demo videosu
+- **Şimdi:** Faz 1 → bulut yüz + ağız senkronu v2 + yerel jestler + persona v2.1 (canlı test bekliyor), sıradaki: 🎬 ilk demo videosu
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -91,8 +91,8 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] Ses genliğinden ağız senkronu → gövdeye bildiriliyor
 - [x] Ağız senkronu v2: ses kartı gecikmesi kadar erteleme (ağız sesin önüne geçiyordu), 4 basamak yerine 0-1 sürekli açıklık,
       hızlı açılma / yavaş kapanma yumuşatması; ince ayar `NIMBUS_AGIZ_KAYDIR_MS` (servoda mekanik gecikme için de kullanılacak)
-- [ ] Jest gecikmesi: jestleri seyrekleştir ya da sık ifadeleri lokal üret (örn. "Hımm" → düşün) ve fonksiyonu büyük anlara bırak
-- [ ] Persona ince ayarı: daha az felsefe, daha az "evlat", daha çok espri
+- [x] Jest gecikmesi: jestler artık modelden değil söylenen metinden yerelde üretiliyor (`ifade.py`), kelime duyulduğu an yüzde beliriyor
+- [x] Persona v2.1: daha az felsefe, "Hımm"/"evlat" en fazla beş cevapta bir, daha çok espri (canlı test bekliyor)
 - [x] Sanal yüz: **bulut karakter** (`web/index.html`), lokal HTTP + WebSocket sunucusu, ağız senkronu, 6 jest, uyku animasyonu, altyazı
 - [x] Operatör komutları: Enter/u uyandır, v veda, s sıfırla, q çık
 - [x] Konuşma kaydı (`logs/*.jsonl`)
@@ -140,6 +140,8 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 | 27.11.2026 | İlk demoda karar modu yok | Önce sohbet + yüz; karar senaryosu sonra seçilecek |
 | 27.11.2026 | Her kişi için ayrı Live bağlantısı (uyandır → bağlan, veda → kapat) | Bağlam temiz kalır, oturum süre sınırına takılmaz, uykuda maliyet yok |
 | 27.11.2026 | Operatör yönlendirmesi `[Sahne yönetimi]` önekli metin mesajıyla | Model sesli cevap verir, operatörden bahsetmez; ayrı bir kanal gerekmez |
+| 27.11.2026 | Jestler model fonksiyonu değil, metinden yerel kural | BLOCKING jest cevabı 0.5-2.5 sn geciktiriyordu (bir seferinde 3.9 sn); NON_BLOCKING'de model susuyordu |
+| 27.11.2026 | Ağız ses kartı gecikmesi kadar ertelenir, 0-1 sürekli açıklık | Ağız sesin ~100-200 ms önünden gidiyordu, 4 basamak kaba görünüyordu |
 | 27.11.2026 | Commit'leri Claude atar (Eyüp adına), push'u Eyüp yapar | Bu oturumun GitHub yazma yetkisi yok; Eyüp kod/komutla uğraşmak istemiyor |
 
 ## Fikir havuzu (ertelenenler)

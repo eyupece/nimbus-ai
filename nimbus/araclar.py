@@ -1,8 +1,11 @@
-"""Modelin çağırabileceği fonksiyonlar (araçlar): jestler ve konuşma akışı."""
+"""Modelin çağırabileceği fonksiyonlar (araçlar).
+
+Not: Jestler önceden bir fonksiyondu (jest(ad)); BLOCKING olunca cevabı ~0.5-2.5 sn geciktiriyor,
+NON_BLOCKING olunca model jestle turu bitirip susuyordu. Artık jestleri `ifade.py` söylenen
+metinden gecikmesiz üretiyor. JEST_ACIKLAMALARI belgeleme için duruyor.
+"""
 
 from google.genai import types
-
-from .govde import JESTLER
 
 JEST_ACIKLAMALARI = {
     "goz_kirp": "göz kırpma (şaka, ima)",
@@ -16,23 +19,6 @@ JEST_ACIKLAMALARI = {
 ARACLAR = [
     types.Tool(
         function_declarations=[
-            types.FunctionDeclaration(
-                name="jest",
-                description=(
-                    "Yüzünle bir ifade yap. Duygunun belirgin olduğu cevaplarda, konuşmaya başlamadan "
-                    "hemen önce çağır; her cevapta değil, bir cevapta en fazla bir kez. Çağırdıktan sonra "
-                    "cevabını sesli söylemeye devam et, sadece jestle yetinme. İfadeler: "
-                    + ", ".join(f"{k} = {v}" for k, v in JEST_ACIKLAMALARI.items())
-                ),
-                parameters=types.Schema(
-                    type=types.Type.OBJECT,
-                    properties={"ad": types.Schema(type=types.Type.STRING, enum=list(JESTLER))},
-                    required=["ad"],
-                ),
-                # BLOCKING: model yanıtı alınca aynı turda konuşmaya devam eder.
-                # (NON_BLOCKING + SILENT denendi: model jestle turu bitirip susuyordu.)
-                behavior=types.Behavior.BLOCKING,
-            ),
             types.FunctionDeclaration(
                 name="uykuya_don",
                 description=(
