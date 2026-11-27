@@ -9,12 +9,12 @@ import time
 
 # (jest, düzenli ifade) — ilk eşleşen kazanır, sıra önemlidir
 KURALLAR: list[tuple[str, re.Pattern]] = [
-    ("saskin", re.compile(r"\b(vay|ne\?!|nasıl yani|olamaz|hayret|inanılmaz|cidden mi)", re.I)),
-    ("kizgin", re.compile(r"\b(saygısız|terbiyesiz|yeter artık|hiç hoş değil|sinir)", re.I)),
-    ("gul", re.compile(r"\b(haha|hah|güzel|sevindim|harika|hoşuma|tatlı|aferin|şahane|keyif)", re.I)),
-    ("goz_kirp", re.compile(r"\b(aramızda|sır|şaka|belki de|kim bilir|bak sen)", re.I)),
-    ("gozleri_kis", re.compile(r"\b(emin misin|gerçekten mi|bakalım|şüpheli|hmm+\?)", re.I)),
-    ("dusun", re.compile(r"\b(hı+mm+|düşüneyim|bir saniye|dur bakalım|ilginç)", re.I)),
+    ("saskin", re.compile(r"\b(vay|yok artık|ne\?!|nasıl yani|olamaz|hayret|inanılmaz|cidden mi|ciddi misin|oha)", re.I)),
+    ("kizgin", re.compile(r"\b(saygısız|terbiyesiz|yeter artık|hiç hoş değil|sinir|alındım|küstüm)", re.I)),
+    ("gul", re.compile(r"\b(haha|ahah|hah|güzel|sevindim|harika|hoşuma|tatlı|aferin|şahane|keyif|efsane)", re.I)),
+    ("goz_kirp", re.compile(r"\b(aramızda|sır|şaka|belki de|kim bilir|bak sen|demiştim|herkes bilir)", re.I)),
+    ("gozleri_kis", re.compile(r"\b(emin misin|gerçekten mi|bakalım|şüpheli|hmm+\?|of+\b|abartma|eski kafa|cringe)", re.I)),
+    ("dusun", re.compile(r"\b(hı+mm+|düşüneyim|bir saniye|dur bakalım|ilginç|yani bence)", re.I)),
 ]
 
 ARALIK_SN = 2.5  # iki jest arasında en az bu kadar süre

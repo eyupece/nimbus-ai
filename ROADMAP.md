@@ -92,7 +92,8 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] Ağız senkronu v2: ses kartı gecikmesi kadar erteleme (ağız sesin önüne geçiyordu), 4 basamak yerine 0-1 sürekli açıklık,
       hızlı açılma / yavaş kapanma yumuşatması; ince ayar `NIMBUS_AGIZ_KAYDIR_MS` (servoda mekanik gecikme için de kullanılacak)
 - [x] Jest gecikmesi: jestler artık modelden değil söylenen metinden yerelde üretiliyor (`ifade.py`), kelime duyulduğu an yüzde beliriyor
-- [x] Persona v2.1: daha az felsefe, "Hımm"/"evlat" en fazla beş cevapta bir, daha çok espri (canlı test bekliyor)
+- [x] Persona v2.1: daha az felsefe, "Hımm"/"evlat" seyrek, daha çok espri → `personas/bulut-dede.yaml` olarak arşivlendi
+- [x] Persona v3 (varsayılan): **ergen bulut**, çok bilmiş ve şımarık, ses Puck (canlı test bekliyor)
 - [x] Sanal yüz: **bulut karakter** (`web/index.html`), lokal HTTP + WebSocket sunucusu, ağız senkronu, 6 jest, uyku animasyonu, altyazı
 - [x] Operatör komutları: Enter/u uyandır, v veda, s sıfırla, q çık
 - [x] Konuşma kaydı (`logs/*.jsonl`)
@@ -142,6 +143,7 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 | 27.11.2026 | Operatör yönlendirmesi `[Sahne yönetimi]` önekli metin mesajıyla | Model sesli cevap verir, operatörden bahsetmez; ayrı bir kanal gerekmez |
 | 27.11.2026 | Jestler model fonksiyonu değil, metinden yerel kural | BLOCKING jest cevabı 0.5-2.5 sn geciktiriyordu (bir seferinde 3.9 sn); NON_BLOCKING'de model susuyordu |
 | 27.11.2026 | Ağız ses kartı gecikmesi kadar ertelenir, 0-1 sürekli açıklık | Ağız sesin ~100-200 ms önünden gidiyordu, 4 basamak kaba görünüyordu |
+| 27.11.2026 | Nimbus'un karakteri: ergen bulut (çok bilmiş, şımarık), ses Puck | Sahnede daha komik, seyirciyle rahat dalga geçer; dede persona ayrı dosyada duruyor |
 | 27.11.2026 | Commit'leri Claude atar (Eyüp adına), push'u Eyüp yapar | Bu oturumun GitHub yazma yetkisi yok; Eyüp kod/komutla uğraşmak istemiyor |
 
 ## Fikir havuzu (ertelenenler)
