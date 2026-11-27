@@ -24,6 +24,7 @@ class Persona:
     hikaye: str = ""
     ozellikler: dict[str, int] = field(default_factory=dict)
     kurallar: list[str] = field(default_factory=list)
+    ornekler: list[dict] = field(default_factory=list)  # [{"kisi": "...", "nimbus": "..."}]
     karsilama: str = ""
     veda: str = ""
 
@@ -50,5 +51,13 @@ class Persona:
 
         if self.kurallar:
             parcalar.append("Kurallar:\n" + "\n".join(f"- {k}" for k in self.kurallar))
+
+        if self.ornekler:
+            satirlar = [f"Karşındaki: {o['kisi']}\n{self.ad}: {o['nimbus']}" for o in self.ornekler]
+            parcalar.append(
+                "Konuşma tarzı örnekleri. Bu cümleleri ASLA aynen tekrarlama; sadece tonu, doğallığı ve "
+                "espri anlayışını yakala, her seferinde yeni ve bağlama özel cümleler kur:\n\n"
+                + "\n\n".join(satirlar)
+            )
 
         return "\n\n".join(parcalar)

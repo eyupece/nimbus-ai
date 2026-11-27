@@ -27,6 +27,9 @@ def main() -> None:
     p.add_argument("--tarayici-acma", action="store_true", help="Tarayıcıyı otomatik açma")
     p.add_argument("--cihazlar", action="store_true", help="Giriş cihazlarını listele ve çık")
     p.add_argument("--mikrofon-testi", action="store_true", help="API'siz mikrofon seviyesi testi")
+    p.add_argument("--ses-dinle", nargs="?", const="", metavar="SESLER",
+                   help="Sesleri art arda dinle: boş = önerilenler, 'hepsi' ya da 'Puck,Fenrir'")
+    p.add_argument("--cumle", help="--ses-dinle ile okunacak cümle")
     a = p.parse_args()
 
     ayarlar = Ayarlar.yukle()
@@ -37,6 +40,9 @@ def main() -> None:
         return cihazlari_listele()
     if a.mikrofon_testi:
         return mikrofon_testi(ayarlar.mikrofon)
+    if a.ses_dinle is not None:
+        from .ses_dinle import ses_dinle
+        return ses_dinle(a.ses_dinle, a.cumle)
 
     persona = Persona.yukle(Path(a.persona))
     if a.ses:

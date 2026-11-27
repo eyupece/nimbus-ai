@@ -31,6 +31,9 @@ ARACLAR = [
     )
 ]
 
+# Gerçek dünya bilgisi: hava durumu, maç, haber, genel bilgi
+ARAMA = types.Tool(google_search=types.GoogleSearch())
+
 # Sahne yönetimi: operatörün gönderdiği mesajlar bu önekle gelir
 SAHNE_ONEKI = "[Sahne yönetimi]"
 SAHNE_TALIMATI = (

@@ -14,7 +14,7 @@ import pyaudio
 from google import genai
 from google.genai import types
 
-from .araclar import ARACLAR, SAHNE_ONEKI, SAHNE_TALIMATI, sessiz_yanit, yanit
+from .araclar import ARACLAR, ARAMA, SAHNE_ONEKI, SAHNE_TALIMATI, sessiz_yanit, yanit
 from .ayarlar import Ayarlar
 from .durum import Durum, komut_yardimi, operator_dinle
 from .govde import JESTLER, Govde
@@ -53,6 +53,20 @@ def istemci_olustur(a: Ayarlar) -> tuple[genai.Client, str]:
     return istemci, "gemini-api"
 
 
+AYLAR = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+GUNLER = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
+
+
+def zaman_bilgisi(konum: str | None) -> str:
+    """Modelin bugünü ve saati bilmesi için (Jarvis hissi)."""
+    simdi = datetime.now()
+    metin = (f"Şu an {simdi.day} {AYLAR[simdi.month - 1]} {simdi.year}, {GUNLER[simdi.weekday()]}, "
+             f"saat {simdi:%H:%M}.")
+    if konum:
+        metin += f" Bulunduğun yer: {konum}."
+    return metin
+
+
 def birlestir(onceki: str, parca: str) -> str:
     """Yazıya döküm parçalarını birleştirir; cümle sonu ile yeni cümle arasına boşluk koyar."""
     if onceki and onceki[-1] in ".?!," and parca and not parca[0].isspace():
@@ -80,6 +94,7 @@ class Oturum:
         self.govde = govde
         self.yarim_dubleks = yarim_dubleks
         self.dil_ipucu = dil_ipucu
+        self.arama_acik = ayarlar.arama  # Google araması (desteklenmezse otomatik kapanır)
 
         self.pya = pyaudio.PyAudio()
         self.istemci: genai.Client | None = None
@@ -121,9 +136,11 @@ class Oturum:
         )
         return types.LiveConnectConfig(
             response_modalities=["AUDIO"],
-            system_instruction=self.persona.sistem_talimati() + "\n\n" + SAHNE_TALIMATI,
+            system_instruction="\n\n".join([
+                self.persona.sistem_talimati(), SAHNE_TALIMATI, zaman_bilgisi(self.a.konum)
+            ]),
             speech_config=konusma,
-            tools=ARACLAR,
+            tools=ARACLAR + ([ARAMA] if self.arama_acik else []),
             input_audio_transcription=types.AudioTranscriptionConfig(),
             output_audio_transcription=types.AudioTranscriptionConfig(),
             realtime_input_config=types.RealtimeInputConfig(
@@ -322,6 +339,12 @@ class Oturum:
                     if isinstance(sonuc, Exception) and not isinstance(sonuc, asyncio.CancelledError):
                         print(f"⚠️  Bağlantı hatası: {sonuc}", flush=True)
         except Exception as hata:
+            if self.arama_acik and not self.live:
+                # Bazı model/bölge kombinasyonları aramayı desteklemeyebilir: aramasız tekrar dene
+                print(f"⚠️  Google araması ile bağlanılamadı ({str(hata)[:80]}); aramasız deneniyor.", flush=True)
+                self.arama_acik = False
+                self.live = None
+                return await self.konusma()
             print(f"⚠️  Bağlantı kurulamadı: {hata}", flush=True)
         finally:
             self.live = None
