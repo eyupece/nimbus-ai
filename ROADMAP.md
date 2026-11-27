@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 28 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Faz 1.5 yazılımı tamam (hafıza, görme, eylem) → senaryo/canlı test; paralelde Faz 2 alışveriş listesi
+- **Şimdi:** Faz 1.5 yazılımı tamam (hafıza, görme, eylem); Nimbus artık GDG Cloud Konya ekip üyesi (varsayılan kişilik). Faz 2 mimari onayı bekleniyor
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -146,6 +146,17 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
       (kamera açılışı bekleniyordu → bağlantıyla paralel açılış + 0.7 sn ısınma), "Bu ne?" sorusunda bakmadı → talimat genişledi.
 - [ ] **Ek özellik (opsiyonel, varsayılan kapalı):** lokal yüz tanıma (embedding'ler cihazda kalır, README'de açık rıza notu)
 - [ ] 🎬 "Seni gördü ve hatırladı" videosu
+
+## GDG Cloud Konya kimliği (28.11.2026)
+- [x] Kişilik: [`personas/gdg-konya.yaml`](personas/gdg-konya.yaml), ergen Nimbus "GDG Cloud Konya'nın bulutu" olarak; `.env` → `NIMBUS_PERSONA` ile varsayılan.
+      Genel kişilik (`personas/nimbus.yaml`) tema bağımsızlık için duruyor.
+- [x] Bilgi dosyası: [`bilgi/gdg-cloud-konya.md`](bilgi/gdg-cloud-konya.md), sadece topluluk sayfasından doğrulanan bilgiler
+      (organizatörler, geçmiş etkinlikler, DevFest Konya'26). Persona'daki `bilgi_dosyasi` alanıyla talimata eklenir.
+- [x] Senaryolar: [`senaryolar/gdg.yaml`](senaryolar/gdg.yaml) (kimlik, etkinlik bilgisi, uydurma tuzağı) → 3/3 ✓, ilk ses ~0.6 sn.
+      Bulgular: örnek diyaloglar sık sorulan soruların aynısı olunca model kelimesi kelimesine kopyaladı → örnekler değişti;
+      "maalesef bilgim yok" gibi resmi kalıp ve tanıtım cümlesi tekrarı → iki kişiliğe de kural eklendi.
+- [ ] Daha fazla detay (Eyüp verecek): kuruluş yılı, üye sayısı, sosyal medya hesapları, ekip üyeleri, yaklaşan etkinlikler.
+      Yeni etkinlik oldukça `bilgi/gdg-cloud-konya.md`'ye bir satır eklemek yeterli.
 
 ## Faz 2: Donanım
 - [ ] Mimari kararı: öneri **ESP32-S3 ince istemci** (beyin dizüstünde kalır; gerekçe ALISVERIS.md'de) — Eyüp onayı bekliyor
