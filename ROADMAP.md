@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 27 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Faz 1 → bulut yüz + ağız senkronu v2 + yerel jestler + persona v2.1 (canlı test bekliyor), sıradaki: 🎬 ilk demo videosu
+- **Şimdi:** Faz 1 neredeyse tamam (bulut yüz, ağız senkronu, yerel jestler, ergen persona çalışıyor) → sıradaki: 🎬 ilk demo videosu
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -66,6 +66,7 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
   Sessizlik algılama 400 ms, hassasiyet yüksek.
 - **Söz kesme:** sorunsuz.
 - **Karakter:** persona talimatlarına tutarlı uyuyor ("Hımm...", "evlat", kısa cevap + karşı soru).
+- **Not (Faz 1):** Türkçe isimler yazıya dökümde şaşabiliyor ("Eyüp" → "Elif"); hafıza (Faz 1.5) için isim doğrulama/teyit gerekecek.
 - **Sorunlar:** ilk cümlede dil algılama bazen kayıyor (Portekizce/İspanyolca yazıya döküm);
   Bluetooth kulaklık mikrofonu yazıya dökme kalitesini düşürüyor. Windows'ta varsayılan giriş "Stereo Mix" olabiliyor (artık otomatik atlanıyor).
 
@@ -93,7 +94,8 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
       hızlı açılma / yavaş kapanma yumuşatması; ince ayar `NIMBUS_AGIZ_KAYDIR_MS` (servoda mekanik gecikme için de kullanılacak)
 - [x] Jest gecikmesi: jestler artık modelden değil söylenen metinden yerelde üretiliyor (`ifade.py`), kelime duyulduğu an yüzde beliriyor
 - [x] Persona v2.1: daha az felsefe, "Hımm"/"evlat" seyrek, daha çok espri → `personas/bulut-dede.yaml` olarak arşivlendi
-- [x] Persona v3 (varsayılan): **ergen bulut**, çok bilmiş ve şımarık, ses Puck (canlı test bekliyor)
+- [x] Persona v3 (varsayılan): **ergen bulut**, çok bilmiş ve şımarık, ses Puck. Test: karakter çok iyi, gecikme ~1.35 sn sabit
+- [x] Persona v3.1: kalıp tekrarı sınırı ("yok artık" 6 kez geçiyordu), ifade örnekleri çeşitlendi; jest aralığı 3.5 sn
 - [x] Sanal yüz: **bulut karakter** (`web/index.html`), lokal HTTP + WebSocket sunucusu, ağız senkronu, 6 jest, uyku animasyonu, altyazı
 - [x] Operatör komutları: Enter/u uyandır, v veda, s sıfırla, q çık
 - [x] Konuşma kaydı (`logs/*.jsonl`)

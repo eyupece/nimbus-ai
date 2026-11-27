@@ -17,7 +17,7 @@ KURALLAR: list[tuple[str, re.Pattern]] = [
     ("dusun", re.compile(r"\b(hı+mm+|düşüneyim|bir saniye|dur bakalım|ilginç|yani bence)", re.I)),
 ]
 
-ARALIK_SN = 2.5  # iki jest arasında en az bu kadar süre
+ARALIK_SN = 3.5  # iki jest arasında en az bu kadar süre (bir cümlede tek ifade)
 
 
 class IfadeOkuyucu:
