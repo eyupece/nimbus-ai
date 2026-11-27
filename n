@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Nimbus kısayolu: sanal ortamı etkinleştirmeye gerek yok.
+#   ./n                      -> python -m nimbus
+#   ./n --kamera --sunum     -> python -m nimbus --kamera --sunum
+#   ./n senaryo [...]        -> python -m nimbus.senaryo [...]
+#   ./n test                 -> pytest
+cd "$(dirname "$0")" || exit 1
+PY=.venv/Scripts/python.exe
+[ -x "$PY" ] || PY=.venv/bin/python
+if [ ! -x "$PY" ]; then
+  echo "Sanal ortam yok. Önce: python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt"
+  exit 1
+fi
+case "$1" in
+  senaryo) shift; exec "$PY" -m nimbus.senaryo "$@" ;;
+  test)    shift; exec "$PY" -m pytest "$@" ;;
+  *)       exec "$PY" -m nimbus "$@" ;;
+esac

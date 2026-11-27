@@ -19,6 +19,9 @@ pip install -r requirements.txt
 cp .env.example .env            # sadece ilk kurulumda!
 ```
 
+**Kısayol:** sanal ortamı etkinleştirmeden `./n` kullanabilirsin: `./n` (= `python -m nimbus`),
+`./n --kamera`, `./n senaryo --sadece hava_durumu`, `./n test`.
+
 ### Arka uç seçimi (`.env`)
 
 **A) Vertex AI (önerilen, Google Cloud kredisiyle çalışır)**
