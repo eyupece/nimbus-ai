@@ -22,16 +22,17 @@ ARACLAR = [
             types.FunctionDeclaration(
                 name="kisiyi_tani",
                 description=(
-                    "Karşındaki kişi adını söylediği anda çağır. Onu daha önce tanıyıp tanımadığını ve onun hakkında "
-                    "hatırladıklarını döndürür. Çağırırken konuşmana devam et; sonuç gelince ona göre tepki ver."
+                    "Karşındaki kişi adını söylediği anda, cevap vermeden önce çağır. Onu daha önce tanıyıp "
+                    "tanımadığını ve onun hakkında hatırladıklarını döndürür; cevabını buna göre ver."
                 ),
                 parameters=types.Schema(
                     type=types.Type.OBJECT,
                     properties={"ad": types.Schema(type=types.Type.STRING, description="Kişinin söylediği adı")},
                     required=["ad"],
                 ),
-                # Konuşmayı bekletmez; sonuç model boşa çıkınca (WHEN_IDLE) iletilir
-                behavior=types.Behavior.NON_BLOCKING,
+                # BLOCKING: model sonucu alıp tek seferde konuşur. NON_BLOCKING + WHEN_IDLE denendi:
+                # cümle yarıda kesiliyor ve devamı sonraki tura karışıyordu (senaryo testi, 27.11.2026).
+                behavior=types.Behavior.BLOCKING,
             ),
             types.FunctionDeclaration(
                 name="uykuya_don",

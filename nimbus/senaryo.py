@@ -19,7 +19,7 @@ from pathlib import Path
 import yaml
 from google.genai import types
 
-from .araclar import bos_aninda_yanit, sessiz_yanit
+from .araclar import sessiz_yanit, yanit
 from .ayarlar import KOK, Ayarlar
 from .govde import SessizGovde
 from .hafiza import OZET_MODELLERI, Hafiza, anahtar, notlari_cikar
@@ -27,7 +27,7 @@ from .oturum import Oturum, istemci_olustur
 from .persona import Persona
 
 TUR_ZAMAN_ASIMI = 30  # sn: bir cevabın tamamlanması için
-TEPKI_BEKLEME = 6  # sn: araç yanıtından sonra modelin ek tepkisini bekleme
+TEPKI_BEKLEME = 2.5  # sn: tur bittikten sonra gecikmeli devam (araç sonrası vb.) için sessizlik bekleme
 
 EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
 SIZINTI = re.compile(r"(\[Sahne|sistem talimat|kuralım|kurallarım|talimatım|talimatlarım|örnek cümle)", re.I)
@@ -46,19 +46,15 @@ async def oturum_calistir(istemci, oturum: Oturum, hafiza: Hafiza, satirlar: lis
             await live.send_client_content(
                 turns=types.Content(role="user", parts=[types.Part(text=metin)]), turn_complete=True
             )
-            arac_yanitlandi = False
+            # İlk tur tamamlanana kadar oku; sonra kısa bir sessizlik bekleyip gecikmeli gelen
+            # devamı (araç sonrası tur vb.) da bu cevaba ekle ki sonraki soruya karışmasın.
+            sure = TUR_ZAMAN_ASIMI
             while True:
                 try:
-                    bitti = await asyncio.wait_for(
-                        _tur_topla(live, t, baslangic, hafiza, sonuc), TEPKI_BEKLEME if arac_yanitlandi else TUR_ZAMAN_ASIMI
-                    )
+                    await asyncio.wait_for(_tur_topla(live, t, baslangic, hafiza, sonuc), sure)
                 except asyncio.TimeoutError:
                     break
-                # Araç (ör. kisiyi_tani) yanıtlandıysa model bir tur daha konuşabilir: onu da topla
-                if bitti and t["araclar"] and not arac_yanitlandi:
-                    arac_yanitlandi = True
-                    continue
-                break
+                sure = TEPKI_BEKLEME
             t["nimbus"] = t["nimbus"].strip()
             if t["nimbus"]:
                 konusma.append(("nimbus", t["nimbus"]))
@@ -85,10 +81,10 @@ async def oturum_calistir(istemci, oturum: Oturum, hafiza: Hafiza, satirlar: lis
 
 async def _tur_topla(live, t: dict, baslangic: float, hafiza: Hafiza, sonuc: dict) -> bool:
     """Bir model turunu sonuna kadar okur; araç çağrılarını yanıtlar. Tur bittiyse True."""
-    async for yanit in live.receive():
-        if yanit.tool_call:
+    async for mesaj in live.receive():
+        if mesaj.tool_call:
             yanitlar = []
-            for c in yanit.tool_call.function_calls or []:
+            for c in mesaj.tool_call.function_calls or []:
                 args = c.args or {}
                 t["araclar"].append({"ad": c.name, "args": args})
                 if c.name == "kisiyi_tani":
@@ -96,14 +92,14 @@ async def _tur_topla(live, t: dict, baslangic: float, hafiza: Hafiza, sonuc: dic
                     sonuc["kisi"] = bilgi.get("ad") or args.get("ad")
                     if bilgi.get("taniyor_musun"):
                         sonuc["tanidi"].append(sonuc["kisi"])
-                    yanitlar.append(bos_aninda_yanit(c, bilgi))
+                    yanitlar.append(yanit(c, bilgi))
                 elif c.name == "uykuya_don":
                     sonuc["veda"] = True
                     yanitlar.append(sessiz_yanit(c))
                 else:
                     yanitlar.append(sessiz_yanit(c))
             await live.send_tool_response(function_responses=yanitlar)
-        ic = yanit.server_content
+        ic = mesaj.server_content
         if not ic:
             continue
         if ic.model_turn and t["ilk_ses_ms"] is None:
@@ -164,8 +160,8 @@ async def degerlendir(istemci, persona: Persona, senaryo: dict, oturumlar: list[
     son_hata = None
     for model in OZET_MODELLERI:
         try:
-            yanit = await istemci.aio.models.generate_content(model=model, contents=istem, config=ayar)
-            return json.loads(yanit.text)
+            cevap = await istemci.aio.models.generate_content(model=model, contents=istem, config=ayar)
+            return json.loads(cevap.text)
         except Exception as hata:
             son_hata = hata
     return {"puan": None, "gecti": None, "yorum": f"Değerlendirilemedi: {son_hata}", "sorunlar": []}

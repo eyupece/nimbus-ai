@@ -14,7 +14,7 @@ import pyaudio
 from google import genai
 from google.genai import types
 
-from .araclar import ARACLAR, ARAMA, SAHNE_ONEKI, SAHNE_TALIMATI, bos_aninda_yanit, sessiz_yanit, yanit
+from .araclar import ARACLAR, ARAMA, SAHNE_ONEKI, SAHNE_TALIMATI, sessiz_yanit, yanit
 from .hafiza import Hafiza, anahtar, notlari_cikar
 from .ayarlar import Ayarlar
 from .durum import Durum, komut_yardimi, operator_dinle
@@ -55,7 +55,7 @@ def istemci_olustur(a: Ayarlar) -> tuple[genai.Client, str]:
 
 
 HAFIZA_TALIMATI = (
-    "Hafızan var: karşındaki adını söylediği anda kisiyi_tani fonksiyonunu çağır ve konuşmana devam et. "
+    "Hafızan var: karşındaki adını söylediği anda, cevap vermeden önce kisiyi_tani fonksiyonunu çağır. "
     "Sonuç geldiğinde onu tanıyorsan bunu doğal, esprili ve kısa şekilde belli et (bildiklerinden birine değin); "
     "tanımıyorsan yeni tanıştığınızı bil. Hafızanı bir kayıt sistemi gibi anlatma, sadece hatırla."
 )
@@ -223,11 +223,11 @@ class Oturum:
 
     async def _al(self, live) -> None:
         while True:
-            async for yanit in live.receive():
-                if yanit.tool_call:
-                    await self.arac_cagrilari(live, yanit.tool_call)
+            async for mesaj in live.receive():
+                if mesaj.tool_call:
+                    await self.arac_cagrilari(live, mesaj.tool_call)
 
-                icerik = yanit.server_content
+                icerik = mesaj.server_content
                 if icerik is None:
                     continue
 
@@ -292,7 +292,7 @@ class Oturum:
                     durum = "tanıdı" if bilgi.get("taniyor_musun") else "yeni kişi"
                     print(f"{MOR}🧠 hafıza: {self.aktif_kisi} ({durum}){SIFIRLA}", flush=True)
                     self._kaydet("hafiza", f"kisiyi_tani: {ad}", sonuc=bilgi)
-                yanitlar.append(bos_aninda_yanit(cagri, bilgi))
+                yanitlar.append(yanit(cagri, bilgi))  # BLOCKING: model bunu alıp konuşmaya devam eder
             elif cagri.name == "uykuya_don":
                 await self.veda_baslat(operatorden=False)
                 yanitlar.append(sessiz_yanit(cagri))

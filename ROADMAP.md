@@ -116,13 +116,15 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
       Her değişiklikten sonra Claude çalıştırır.
 - [x] Senaryo koşucusu `python -m nimbus.senaryo`: gerçek Gemini ile yazılı senaryolar + kural kontrolleri + değerlendirici
       model; rapor `logs/senaryo-*.md`. Eyüp tek komut çalıştırır, raporu Claude okur.
-- [ ] İlk senaryo koşusu (7 senaryo: tanışma/hatırlama, hava, bilgi+karakter, talimat sızdırma, sus, kaba kullanıcı, özellik iddiası)
+- [x] İlk senaryo koşusu: **6/7** (hava, bilgi, talimat sızdırma, sus, kaba kullanıcı, özellik iddiası 5/5).
+      Metin girişinde ilk ses ortanca 684 ms. Tek hata hafızada: NON_BLOCKING kisiyi_tani cümleyi yarıda kesip
+      devamını sonraki tura karıştırıyordu → BLOCKING'e alındı; koşucu gecikmeli devamları toplayacak şekilde sağlamlaştırıldı.
 
 ## Faz 1.5: Jarvis yetenekleri
 - [ ] **Eylem:** sonuç ekranı, LED (WLED), slayt kontrolü
 - [x] **Hafıza:** `kisiyi_tani(ad)` (NON_BLOCKING + WHEN_IDLE: konuşmayı bekletmez), konuşma bitince ayrı metin modeliyle
       not çıkarma (konuşma sırasında fonksiyonla not almak jestlerdeki gibi akışı bozardı), benzer isim ipucu,
-      `--hafiza` / `--unut AD`; kayıtlar yerelde `data/hafiza.json` (canlı test bekliyor)
+      `--hafiza` / `--unut AD`; kayıtlar yerelde `data/hafiza.json`. Not: kisiyi_tani artık BLOCKING (senaryo testi bulgusu)
 - [ ] **Görme:** `bak()` ile istek üzerine tek kare; bağlam sıkıştırma + oturum devamı
 - [ ] **Ek özellik (opsiyonel, varsayılan kapalı):** lokal yüz tanıma (embedding'ler cihazda kalır, README'de açık rıza notu)
 - [ ] 🎬 "Seni gördü ve hatırladı" videosu

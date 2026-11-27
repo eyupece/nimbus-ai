@@ -79,7 +79,7 @@ def test_hafiza_tanisma_ve_tekrar_gelis(ortam):
     asyncio.run(operator(o, ["", "v", "", "v", "q"], bekle=0.4, zaman_asimi=20))
     ilk = istemci.liveler[0].arac_yanitlari[0]
     ikinci = istemci.liveler[1].arac_yanitlari[0]
-    assert ilk.scheduling == types.FunctionResponseScheduling.WHEN_IDLE
+    assert ilk.scheduling is None  # BLOCKING: model sonucu bekleyip tek seferde konuşur
     assert ilk.response["taniyor_musun"] is False
     assert ikinci.response["taniyor_musun"] is True and "Konyalı." in ikinci.response["bildiklerin"]
     kayit = json.loads(dosya.read_text(encoding="utf-8"))["kisiler"]["eyüp"]
