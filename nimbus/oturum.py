@@ -199,8 +199,9 @@ class Oturum:
     def karsilama_mesaji(self, goruntu_var: bool) -> str:
         metin = f"Karşına biri geldi. {self.persona.karsilama}"
         if goruntu_var:
-            metin += (" Kameradan onu görüyorsun: görünüşündeki bir şeye (kıyafet, aksesuar, elindeki eşya, ortam) "
-                      "kısa ve nazik bir şekilde laf sok.")
+            metin += (" Az önce kameradan baktın. Görüntüde gerçekten gördüğün bir şeye kısaca değin: karşında biri "
+                      "varsa kıyafeti, aksesuarı ya da elindeki eşya; kimse görünmüyorsa ortam ya da masadaki bir şey. "
+                      "Görüntüde olmayan hiçbir şeyi söyleme; emin değilsen görüntüye hiç değinme.")
         return metin
 
     async def veda_baslat(self, operatorden: bool) -> None:

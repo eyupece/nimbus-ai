@@ -56,9 +56,13 @@ BAK = types.Tool(function_declarations=[types.FunctionDeclaration(
     behavior=types.Behavior.BLOCKING,
 )])
 GORME_TALIMATI = (
-    "Bir kameran var. Görmen gereken bir şey olunca bak fonksiyonunu çağır; görmediğin bir şeyi asla uydurma. "
+    "Bir kameran var. Görmen gereken bir şey olunca bak fonksiyonunu çağır. Sadece görüntüde gerçekten olanı söyle; "
+    "görüntüde kimse yoksa birini görüyormuş gibi davranma, görmediğin bir şeyi asla uydurma. "
     "Görünüşe dair sadece kıyafet, aksesuar, elindeki eşyalar, ortam ve yüz ifadesi gibi şeylere değin; "
-    "vücut, kilo, ten rengi, yaş, güzellik/çirkinlik gibi kişisel özelliklere asla yorum yapma."
+    "vücut, kilo, ten rengi, yaş, güzellik/çirkinlik gibi kişisel özelliklere asla yorum yapma. "
+    "Biri bunları sorarsa yargıya girmeden ama karakterinden de çıkmadan, ergen tarzı bir espriyle konuyu çevir "
+    "(örneğin 'Ben bulutum, moda danışmanı değil' gibi); 'aura', 'iç enerji', 'özgüven' gibi kişisel gelişim "
+    "klişelerine girme."
 )
 
 # Gerçek dünya bilgisi: hava durumu, maç, haber, genel bilgi

@@ -55,7 +55,8 @@ def test_ilk_bakis_ve_bak(ortam):
     assert "asla yorum yapma" in c.system_instruction  # kişisel özellik yasağı
     assert len(live.gonderilen_goruntuler) == 2  # ilk bakış + bak()
     assert live.gonderilen_goruntuler[0].mime_type == "image/jpeg"
-    assert "Kameradan onu görüyorsun" in live.gonderilen_metinler[0]
+    assert "Az önce kameradan baktın" in live.gonderilen_metinler[0]
+    assert "olmayan hiçbir şeyi söyleme" in live.gonderilen_metinler[0]  # uydurma yasağı (senaryo bulgusu)
     bak_yaniti = [y for y in live.arac_yanitlari if y.name == "bak"][0]
     assert bak_yaniti.response["tamam"] and bak_yaniti.scheduling is None  # BLOCKING
     assert ("jest", "bak") in govde.olaylar
@@ -67,7 +68,7 @@ def test_ilk_bakis_kapatilabilir(ortam, monkeypatch):
     o, istemci, _, _ = ortam([[tanitim()]], kamera=SabitGorsel(RESIM))
     asyncio.run(operator(o, ["", "s", "q"]))
     assert not istemci.liveler[0].gonderilen_goruntuler
-    assert "Kameradan onu görüyorsun" not in istemci.liveler[0].gonderilen_metinler[0]
+    assert "kameradan baktın" not in istemci.liveler[0].gonderilen_metinler[0]
 
 
 def test_kamera_hatasi_cokertmez(ortam):
