@@ -65,6 +65,9 @@ async def oturum_calistir(istemci, oturum: Oturum, hafiza: Hafiza, satirlar: lis
             konusma.append(("sen", satir))
             sonuc["turlar"].append(await tur(satir, "kisi"))
             if sonuc["veda"]:
+                # Gerçek akıştaki gibi: model uykuya_don'u konuşmadan çağırdıysa ona veda cümlesi söylet
+                if not sonuc["turlar"][-1]["nimbus"]:
+                    sonuc["turlar"].append(await tur(f"[Sahne yönetimi] {oturum.persona.veda}", "sahne"))
                 break
 
     # Konuşma sonrası hafıza notu (gerçek akıştaki gibi)

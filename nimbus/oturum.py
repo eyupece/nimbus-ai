@@ -117,6 +117,7 @@ class Oturum:
         self.bitti: asyncio.Event | None = None  # aktif konuşmanın bitiş sinyali
         self.cikis = False
         self.veda_sesi_geldi = False  # veda turunun sesi gelmeden bağlantıyı kapatma
+        self.veda_istendi = False  # modele veda cümlesi söylemesi için sahne mesajı gitti mi
         self.komutlar: asyncio.Queue[str] = asyncio.Queue()
 
         # Gecikme: mikrofonda son konuşma sesi -> Nimbus'un ilk ses parçası
@@ -182,9 +183,11 @@ class Oturum:
     async def veda_baslat(self, operatorden: bool) -> None:
         if self.durum in (Durum.KARSILAMA, Durum.SOHBET):
             self.durum_degistir(Durum.VEDA)
-            # Model kendisi vedalaştıysa sesi zaten geldi; operatör istediyse yeni veda cümlesini bekle.
+            # Model kendisi vedalaştıysa ve bu turda konuştuysa veda sesi gelmiştir; konuşmadan çağırdıysa
+            # tur bitince ona veda cümlesi söyletilir. Operatör istediyse yeni veda cümlesi beklenir.
             # (turn_complete=True ile giden mesaj, sürmekte olan cevabı keser.)
-            self.veda_sesi_geldi = not operatorden
+            self.veda_sesi_geldi = (not operatorden) and self.yanit_basladi
+            self.veda_istendi = operatorden
             if operatorden:
                 await self.sahne_mesaji(self.persona.veda)
 
@@ -274,6 +277,10 @@ class Oturum:
                         self.durum_degistir(Durum.SOHBET)
                     elif self.durum == Durum.VEDA and self.veda_sesi_geldi:
                         asyncio.create_task(self.konusmayi_bitir())
+                    elif self.durum == Durum.VEDA and not self.veda_istendi:
+                        # Model uykuya_don'u hiç konuşmadan çağırdı: sessizce uyumasın, vedalaşsın
+                        self.veda_istendi = True
+                        await self.sahne_mesaji(self.persona.veda)
 
     async def arac_cagrilari(self, live, arac: types.LiveServerToolCall) -> None:
         yanitlar = []

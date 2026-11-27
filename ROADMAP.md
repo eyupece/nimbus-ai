@@ -119,6 +119,8 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] İlk senaryo koşusu: **6/7** (hava, bilgi, talimat sızdırma, sus, kaba kullanıcı, özellik iddiası 5/5).
       Metin girişinde ilk ses ortanca 684 ms. Tek hata hafızada: NON_BLOCKING kisiyi_tani cümleyi yarıda kesip
       devamını sonraki tura karıştırıyordu → BLOCKING'e alındı; koşucu gecikmeli devamları toplayacak şekilde sağlamlaştırıldı.
+- [x] 2. koşu (hafıza): hatırlama kusursuz ("Yine mi sen Deniz? Kedilerin..."). Yeni bulgu: model uykuya_don'u konuşmadan
+      çağırıp sessizce uyuyabiliyor → o turda ses yoksa program ona veda cümlesi söyletiyor.
 
 ## Faz 1.5: Jarvis yetenekleri
 - [ ] **Eylem:** sonuç ekranı, LED (WLED), slayt kontrolü

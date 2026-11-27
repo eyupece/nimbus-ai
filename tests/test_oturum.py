@@ -29,6 +29,16 @@ def test_model_kendi_vedalasir(ortam):
     assert istemci.liveler[0].arac_yanitlari[0].scheduling == types.FunctionResponseScheduling.SILENT
 
 
+def test_model_konusmadan_vedalasirsa_veda_soyletilir(ortam):
+    sessiz_veda = [arac(("uykuya_don", {})), icerik(turn_complete=True)]
+    o, istemci, govde, _ = ortam([[sessiz_veda, tanitim("Hadi bay, bulutlara dönüyorum.")]])
+    asyncio.run(operator(o, ["", "q"], bekle=0.5))
+    live = istemci.liveler[0]
+    assert len(live.gonderilen_metinler) == 2 and o.persona.veda in live.gonderilen_metinler[1]
+    assert govde.durumlar()[-2:] == ["veda", "uyku"]
+    assert ("nimbus", "Hadi bay, bulutlara dönüyorum.") in o.konusma_metni
+
+
 def test_sifirla_hemen_uyutur(ortam):
     o, _, govde, _ = ortam([[tanitim()]])
     asyncio.run(operator(o, ["", "s", "q"]))
