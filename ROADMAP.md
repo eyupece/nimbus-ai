@@ -73,7 +73,7 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - Gecikme ortanca **1.2 sn** (en iyi 1.0, en kötü 1.5). Bluetooth'tan kabloluya geçmek ~100-200 ms kazandırdı.
 - Yazıya döküm 9/9 doğru; dil kayması görülmedi.
 - "Sus" kuralı çalışıyor: "Peki... susuyorum."
-- Sonuç: sahne için **kablolu/USB mikrofon** kullan; cihazı isimle seç (`NIMBUS_MIKROFON=Poly`), numaralar değişebiliyor.
+- Not: kablolu kulaklık sadece bu test içindi, zorunlu değil. Bluetooth mikrofonlar telefon moduna düşüp kaliteyi/gecikmeyi kötüleştirebiliyor; sahne mikrofonu Faz 4'te seçilecek. Cihazı isimle seç (`NIMBUS_MIKROFON=...`), numaralar değişebiliyor.
 
 ## Faz 1: Çekirdek ve sanal yüz
 - [ ] Gecikmeyi 1 sn altına indirme denemeleri: ~~kablolu mikrofon~~ (1.2 sn ✓), sessizlik süresi ayarı, dolgu replikleri
