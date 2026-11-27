@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 27 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Faz 1 → ses seçimi + doğal konuşma (persona v4) + arama; ses ve konuşma iyileşince 🎬 ilk demo videosu
+- **Şimdi:** Faz 1 tamam (demo videosu ertelendi) → sıradaki: Faz 1.5 (hafıza ya da görme)
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -108,7 +108,7 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] Sanal yüz: **bulut karakter** (`web/index.html`), lokal HTTP + WebSocket sunucusu, ağız senkronu, 6 jest, uyku animasyonu, altyazı
 - [x] Operatör komutları: Enter/u uyandır, v veda, s sıfırla, q çık
 - [x] Konuşma kaydı (`logs/*.jsonl`)
-- [ ] 🎬 İlk demo videosu
+- [ ] 🎬 İlk demo videosu (acelesi yok, ertelendi; ses/konuşma oturunca)
 
 ## Faz 1.5: Jarvis yetenekleri
 - [ ] **Eylem:** sonuç ekranı, LED (WLED), slayt kontrolü
