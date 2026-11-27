@@ -6,6 +6,13 @@
 
 Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şey (🎬) çıkar.
 
+## 📍 Şu an neredeyiz
+- **Son güncelleme:** 27 Kasım 2026
+- **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
+- **Şimdi:** Faz 1 başlıyor → ilk adım: deneme scriptini pakete bölmek (ses / oturum / persona / durum / gövde)
+- **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
+- **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
+
 ---
 
 ## Mimari
@@ -36,6 +43,8 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
                                KARAR + gerekçe ─► VEDA ─► UYKU
 ```
 
+> İlk demoda **SORGU → KARAR kısmı yok**: akış UYKU → KARŞILAMA → SOHBET → VEDA. Karar modu fikir havuzunda.
+
 - **Tetik:** önce klavye tuşu, Faz 2'de başa takma/kaldırma sensörü.
 - **Operatör kontrolü her zaman var:** uyandır, karar zamanı, sıfırla.
 - **Persona dosyası (YAML):** ad, üslup, ses, özellik yüzdeleri, kategoriler, soru havuzu, yasaklar, karar formatı. Tema değişince sadece bu dosya değişir.
@@ -63,12 +72,12 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 ## Faz 1: Çekirdek ve sanal yüz
 - [ ] Gecikmeyi 1 sn altına indirme denemeleri: kablolu/dahili mikrofon, sessizlik süresi ayarı, dolgu replikleri
 - [ ] Dil algılama kaymasına çözüm: Türkçe dil ipucu (`language_code=tr-TR`) dene
-- [ ] Karar anı için `gemini-3.8-live-extended-thinking` değerlendirmesi
-- [ ] Persona YAML + yükleyici
-- [ ] Durum makinesi + mod fonksiyonları
-- [ ] Gövde fonksiyon tanımları
+- [ ] Deneme scriptini pakete böl: ses / oturum / persona / durum / gövde
+- [ ] Persona YAML v2 + yükleyici
+- [ ] Durum makinesi (UYKU → KARŞILAMA → SOHBET → VEDA) + mod fonksiyonları
+- [ ] Gövde fonksiyon tanımları (jestler)
 - [ ] Ses genliğinden ağız senkronu (4 seviye, 20 ms pencere, servoya göre hafif önden gitme)
-- [ ] Sanal yüz: lokal web sunucusu + WebSocket + SVG yüz
+- [ ] Sanal yüz: **bulut karakter**, lokal web sunucusu + WebSocket + SVG
 - [ ] Operatör klavye kısayolları
 - [ ] Konuşma kaydı (transcript log)
 - [ ] 🎬 İlk demo videosu
@@ -100,6 +109,29 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 
 ---
 
+## Karar günlüğü
+| Tarih | Karar | Neden |
+|---|---|---|
+| 27.11.2026 | Ürün tema bağımsız bir "konuşan obje" kiti olacak | DevFest teması her yıl değişiyor, teknoloji aynı kalıyor |
+| 27.11.2026 | Beyin: Gemini Live (Claude yok) | Ses + model + araç çağrısı tek bağlantıda, düşük gecikme, Google kredileri, DevFest uyumu |
+| 27.11.2026 | Marka adı **Nimbus**, repo `eyupece/nimbus-ai` | Bulut (Google Cloud) + hale/ruh + Nimbus 2000 göndermesi |
+| 27.11.2026 | Repo baştan public, şimdilik doğrudan `main` | Görünürlük, IP riskini azaltma; çekirdek oturunca branch + PR düzeni |
+| 27.11.2026 | Yüz tanıma opsiyonel ek özellik, varsayılan kapalı | Ana özellik değil; alanda KVKK izinleri hazır ama public repo başka ortamlarda kullanılacak |
+| 27.11.2026 | Arka uç: Vertex AI (`devfest-konya-2026`, `eu`) | AI Studio prepay hatası; Vertex Cloud kredisiyle çalışıyor, veriler eğitimde kullanılmıyor |
+| 27.11.2026 | Faz 0 sonucu: Gemini Live yeterli, B planı yok | Karakter tutarlı, söz kesme sorunsuz, gecikme ~1.3 sn (iyileştirilecek) |
+| 27.11.2026 | Faz 1: düz `google-genai` SDK (ADK yok) | Faz 0 kodu çalışıyor; ses akışı ve gecikme tamamen bizim kontrolümüzde |
+| 27.11.2026 | Sanal yüz: bulut karakter | Nimbus markasıyla bütünleşik; temaya göre sonra değişir |
+| 27.11.2026 | İlk demoda karar modu yok | Önce sohbet + yüz; karar senaryosu sonra seçilecek |
+
+## Fikir havuzu (ertelenenler)
+- **Karar modu senaryoları** (SORGU → KARAR): Nimbus 3-4 soru sorup kişi hakkında dramatik bir karar açıklar.
+  1. **GDG teknoloji evleri:** Cloud / Android / Web / AI. *"Hımm… gece yarısı kod yazan ama her şeyi ölçeklemek isteyen bir ruh… CLOUD!"* DevFest'e birebir uyar, fotoğraf anı yaratır.
+  2. **Geliştirici kişilik tipleri:** Kaşif / Mimar / Sanatçı / Hacker. Teknolojiden bağımsız, eğlenceli.
+  3. **Kehanet:** kategori yok, kişiye özel komik bir kehanet. En serbest, her seferinde farklı.
+- **Trend radarı agent'ı:** haftalık kaynak tarama + proje adayları + Türkçe bülten (şapkadan sonraki "çılgın projeyi" bulan araç).
+- **Claude'u ikinci beyin olarak eklemek:** Gemini Live konuşur, ağır kararlarda araç çağrısıyla Claude'a danışır.
+- **Diğer "beklenmedik cihaza AI" fikirleri:** çevirmeli telefon, daktilo, fiş yazıcısı, konuşan saksı.
+
 ## Bilinen riskler
 - **Yankı ve salon gürültüsü:** ilk testler kulaklıkla; hoparlörde `--yarim-dubleks`.
 - **Salon interneti:** Live API tamamen bulutta; yedek bağlantı şart.
@@ -116,5 +148,5 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 | [amazing8bits/talking-skull](https://github.com/amazing8bits/talking-skull) | Kişiyi fark edip bakma, düşünürken göz jestleri, çenenin sesin önünden gitmesi |
 | [madebyparth/nova-ai](https://github.com/madebyparth/nova-ai) (MIT) | En sade ESP32 + FastAPI + Gemini Live örneği |
 | [ElatoAI](https://github.com/ImPapaGhost/ElatoAI) | B planı: ElevenLabs / çoklu sağlayıcı ESP32 |
-| [ADK bidi-streaming](https://adk.dev/streaming/dev-guide/part1) | Faz 1'de çerçeve olarak değerlendirilecek |
+| [ADK bidi-streaming](https://adk.dev/streaming/dev-guide/part1) | Değerlendirildi, şimdilik düz SDK tercih edildi (Karar günlüğü) |
 | ghelfyfx (Instagram) | İlham: büyülü görünen animatronik objeler |
