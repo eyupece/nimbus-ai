@@ -32,6 +32,8 @@ def main() -> None:
     p.add_argument("--cumle", help="--ses-dinle ile okunacak cümle")
     p.add_argument("--kamera", nargs="?", const=0, type=int, metavar="INDEKS",
                    help="Kamerayla çalıştır (görme). Varsayılan kamera 0. .env: NIMBUS_KAMERA")
+    p.add_argument("--sunum", action="store_true",
+                   help="Sunum modu: 'sonraki slayt' gibi komutlarla ön plandaki pencereye ok tuşu gönderir")
     p.add_argument("--kamera-testi", nargs="?", const=0, type=int, metavar="INDEKS", help="Kamera çalışıyor mu")
     p.add_argument("--hafiza", action="store_true", help="Nimbus'un hatırladığı kişileri listele")
     p.add_argument("--unut", metavar="AD", help="Bir kişiyi hafızadan tamamen sil")
@@ -70,7 +72,10 @@ def main() -> None:
     if kamera_indeksi is not None:
         from .kamera import Kamera
         kamera = Kamera(kamera_indeksi)
-    oturum = Oturum(ayarlar, persona, govde, yarim_dubleks=a.yarim_dubleks, dil_ipucu=a.dil_ipucu, kamera=kamera)
+    oturum = Oturum(ayarlar, persona, govde, yarim_dubleks=a.yarim_dubleks, dil_ipucu=a.dil_ipucu, kamera=kamera,
+                    sunum=a.sunum)
+    if a.sunum:
+        print("🖥  Sunum modu: slayt komutları ön plandaki pencereye ok tuşu gönderir (sunumu öne al).")
     try:
         asyncio.run(oturum.calistir())
     except KeyboardInterrupt:

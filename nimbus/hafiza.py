@@ -64,12 +64,16 @@ class Hafiza:
                 "ipucu": "Onu tanıdığını doğal ve esprili şekilde belli et; bildiklerinden birine kısaca değin.",
             }
         benzer = difflib.get_close_matches(k, self.kisiler.keys(), n=2, cutoff=0.6)
-        sonuc = {"taniyor_musun": False, "ad": ad.strip(), "ipucu": "Yeni tanışıyorsunuz."}
+        sonuc = {
+            "taniyor_musun": False, "ad": ad.strip(),
+            "ipucu": ("Yeni tanışıyorsunuz. Konuşma tanıma isimleri sık yanlış duyar: adını cevabında doğal şekilde bir kez "
+                      f"teyit et (örneğin '{ad.strip()} mi dedin?'). Farklı bir ad söylerse kisiyi_tani'yi doğru adla tekrar çağır."),
+        }
         if benzer:
             adlar = [self.kisiler[b]["ad"] for b in benzer]
             sonuc["benzer_isimler"] = adlar
             sonuc["ipucu"] = (f"İsim yanlış duyulmuş olabilir; tanıdığın biri olabilir: {', '.join(adlar)}. "
-                              "Emin değilsen kısaca sor (örneğin 'Sen ... değil misin?').")
+                              f"Kısaca sor (örneğin 'Sen {adlar[0]} değil misin?'); evet derse kisiyi_tani'yi o adla tekrar çağır.")
         return sonuc
 
     # ---------- Konuşma bitince ----------

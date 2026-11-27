@@ -70,6 +70,16 @@ Nimbus **uykuda** başlar. Terminalde operatör komutları (yazıp Enter):
 
 Karşındaki "görüşürüz" derse Nimbus kendisi de vedalaşıp uykuya döner.
 
+### Sunum modu ve bilgi kartları
+
+```bash
+python -m nimbus --sunum     # "Nimbus, sonraki slayt" → ön plandaki pencereye sağ ok tuşu
+```
+
+Sunumu (PowerPoint, Google Slaytlar, PDF) öne al; Nimbus "sonraki slayt", "geri dön", "başa dön"
+komutlarında ok tuşu gönderir ve araya kısa laf atar. Bulut yüzün sağ üstünde, Nimbus gerektiğinde
+ya da "ekranda göster" denince **bilgi kartı** açar (hava durumu, kısa liste...).
+
 ### Görme (kamera)
 
 ```bash
@@ -114,6 +124,7 @@ nimbus/
   ifade.py      söylenen metinden yüz ifadesi
   ses_dinle.py  sesleri art arda dinleme aracı
   kamera.py     görme: istek üzerine tek kare (OpenCV)
+  eylem.py      ekranda bilgi kartı, sunum modunda slayt kontrolü
   senaryo.py    senaryo koşucusu (gerçek Gemini, sessiz, raporlu)
 senaryolar/     test senaryoları (YAML)
 tests/          otomatik testler (pytest, sahte Gemini)

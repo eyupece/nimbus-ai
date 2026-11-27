@@ -22,6 +22,12 @@ from google.genai import types
 from .araclar import sessiz_yanit, yanit
 from .ayarlar import KOK, Ayarlar
 from .govde import SessizGovde
+
+
+class SenaryoGovde(SessizGovde):
+    """Ekranı varmış gibi davranır (ekranda_goster aracı açılsın), kartları rapora yazar."""
+
+    ekran_var = True
 from .hafiza import OZET_MODELLERI, Hafiza, anahtar, notlari_cikar
 from .kamera import SabitGorsel
 from .oturum import Oturum, istemci_olustur
@@ -104,10 +110,11 @@ async def _tur_topla(live, t: dict, baslangic: float, hafiza: Hafiza, sonuc: dic
                 elif c.name == "uykuya_don":
                     sonuc["veda"] = True
                     yanitlar.append(sessiz_yanit(c))
-                elif c.name == "bak":
-                    gonderildi = await t["_oturum"].goruntu_gonder(live)
-                    yanitlar.append(yanit(c, {"tamam": True, "not": "Kameradan son görüntü gönderildi, ona bakarak cevap ver."}
-                                          if gonderildi else {"hata": "Kamera çalışmıyor"}))
+                elif c.name in ("bak", "ekranda_goster", "slayt"):
+                    # Gerçek uygulamadaki işleyiciyi kullan (kamera yerine resim, gövde kartları kaydeder)
+                    yanitlar.append(await t["_oturum"]._arac_isle(live, c))
+                    if c.name == "ekranda_goster":
+                        t["kart"] = f"{args.get('baslik', '')}: {args.get('metin', '')}"
                 else:
                     yanitlar.append(sessiz_yanit(c))
             await live.send_tool_response(function_responses=yanitlar)
@@ -186,7 +193,7 @@ async def calistir(dosya: Path, sadece: set[str] | None, kayit_klasoru: Path | N
         a.kayit_klasoru = kayit_klasoru
     persona = Persona.yukle(KOK / "personas" / "nimbus.yaml")
     istemci, arka_uc = istemci_olustur(a)
-    oturum = Oturum(a, persona, SessizGovde())  # sadece Live ayarlarını üretmek için
+    oturum = Oturum(a, persona, SenaryoGovde())  # Live ayarlarını ve araç işleyicilerini kullanmak için
 
     hafiza_dosyasi = KOK / "data" / "senaryo_hafiza.json"
     hafiza_dosyasi.unlink(missing_ok=True)  # her koşu temiz başlar
@@ -265,6 +272,8 @@ def rapor_yaz(sonuclar: list[dict], persona: Persona, a: Ayarlar) -> Path:
                 araclar = f" `[{', '.join(x['ad'] for x in t['araclar'])}]`" if t["araclar"] else ""
                 gecikme = f" _({t['ilk_ses_ms']} ms)_" if t["ilk_ses_ms"] else ""
                 satirlar.append(f"> **{persona.ad}:** {t['nimbus'] or '(cevap yok)'}{araclar}{gecikme}")
+                if t.get("kart"):
+                    satirlar.append(f"> 🪧 _Kart: {t['kart'].replace(chr(10), ' · ')}_")
     temel.with_suffix(".md").write_text("\n".join(satirlar) + "\n", encoding="utf-8")
     temel.with_suffix(".json").write_text(
         json.dumps(sonuclar, ensure_ascii=False, indent=2, default=str), encoding="utf-8")

@@ -29,6 +29,9 @@ class Govde(Protocol):
     def altyazi(self, kim: str, metin: str, ad: str = "Nimbus") -> None:
         """Söylenen cümle: kim = "sen" ya da "nimbus"."""
 
+    def kart(self, baslik: str, metin: str) -> None:
+        """Ekranda bilgi kartı (ekranı olan gövdeler)."""
+
 
 class SessizGovde:
     """Hiçbir şey yapmayan gövde (sadece ses)."""
@@ -45,6 +48,9 @@ class SessizGovde:
     def altyazi(self, kim: str, metin: str, ad: str = "Nimbus") -> None:
         pass
 
+    def kart(self, baslik: str, metin: str) -> None:
+        pass
+
 
 class KonsolGovde(SessizGovde):
     """Jest ve durum değişikliklerini terminale yazar (hata ayıklama için)."""
@@ -54,3 +60,6 @@ class KonsolGovde(SessizGovde):
 
     def durum(self, ad: str) -> None:
         print(f"\033[95m🔄 durum: {ad}\033[0m", flush=True)
+
+    def kart(self, baslik: str, metin: str) -> None:
+        print(f"\033[96m🪧 [{baslik}] {metin.replace(chr(10), ' · ')}\033[0m", flush=True)

@@ -173,6 +173,11 @@ class KayitGovde:
     def altyazi(self, kim, metin, ad="Nimbus"):
         self.olaylar.append(("altyazi", kim, metin))
 
+    ekran_var = True
+
+    def kart(self, baslik, metin):
+        self.olaylar.append(("kart", baslik, metin))
+
     def durumlar(self):
         return [o[1] for o in self.olaylar if o[0] == "durum"]
 
@@ -190,13 +195,13 @@ def ortam(tmp_path, monkeypatch):
     hafiza_dosyasi = tmp_path / "hafiza.json"
     monkeypatch.setattr(O, "Hafiza", lambda: H.Hafiza(hafiza_dosyasi))
 
-    def kur(senaryolar, kamera=None, **istemci_ayar):
+    def kur(senaryolar, kamera=None, sunum=False, **istemci_ayar):
         istemci = SahteIstemci(senaryolar, **istemci_ayar)
         monkeypatch.setattr(O, "istemci_olustur", lambda a: (istemci, "sahte"))
         a = Ayarlar.yukle()
         a.kayit_klasoru = tmp_path / "logs"
         govde = KayitGovde()
-        o = O.Oturum(a, Persona.yukle(KOK / "personas" / "nimbus.yaml"), govde, kamera=kamera)
+        o = O.Oturum(a, Persona.yukle(KOK / "personas" / "nimbus.yaml"), govde, kamera=kamera, sunum=sunum)
         return o, istemci, govde, hafiza_dosyasi
 
     return kur

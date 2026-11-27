@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 27 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Görme hazır (senaryo + canlı test bekliyor) → sonra: Faz 1.5'in kalanı (eylem: sonuç ekranı/LED/slayt) ya da Faz 2 (donanım)
+- **Şimdi:** Faz 1.5 yazılımı tamam (hafıza, görme, eylem) → senaryo/canlı test; paralelde Faz 2 alışveriş listesi
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -126,7 +126,10 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
       oauth2.googleapis.com) + sadece Vertex AI yetkili ayrı servis hesabı gerekiyor. Şimdilik Eyüp tek komut koşturuyor.
 
 ## Faz 1.5: Jarvis yetenekleri
-- [ ] **Eylem:** sonuç ekranı, LED (WLED), slayt kontrolü
+- [x] **Eylem:** `ekranda_goster` (bulut yüzün yanında bilgi kartı), `--sunum` ile `slayt` (ön plandaki pencereye ok tuşu;
+      DevFest'te Nimbus sunum ortağı). Araç işleyicileri hata verse bile modele her zaman yanıt döner (BLOCKING donması yok).
+      LED (WLED) donanımla birlikte Faz 2'ye kaldı. (senaryo + canlı test bekliyor)
+- [x] İsim teyidi: yeni isim ilk duyulunca "Efe mi dedin?" ("Eyüp" iki kez yanlış duyuldu: Elif, Efe)
 - [x] **Hafıza:** `kisiyi_tani(ad)` (NON_BLOCKING + WHEN_IDLE: konuşmayı bekletmez), konuşma bitince ayrı metin modeliyle
       not çıkarma (konuşma sırasında fonksiyonla not almak jestlerdeki gibi akışı bozardı), benzer isim ipucu,
       `--hafiza` / `--unut AD`; kayıtlar yerelde `data/hafiza.json`. Not: kisiyi_tani artık BLOCKING (senaryo testi bulgusu).

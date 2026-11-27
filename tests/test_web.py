@@ -56,3 +56,17 @@ def test_uzun_altyazi_bulutu_kaydirmaz():
         assert await s.evaluate(kutu) == once
         await b.close(); await p.stop()
     asyncio.run(calis())
+
+
+def test_bilgi_karti():
+    async def calis():
+        g, p, b, s, hatalar = await _sayfa(8793)
+        g.durum("sohbet"); g.kart("Konya", "4°C\nParçalı bulutlu")
+        await asyncio.sleep(0.6)
+        assert "gorunur" in await s.evaluate("document.getElementById('kart').className")
+        assert "Parçalı bulutlu" in await s.inner_text("#kart")
+        g.durum("uyku"); await asyncio.sleep(0.3)
+        assert "gorunur" not in await s.evaluate("document.getElementById('kart').className")
+        await b.close(); await p.stop()
+        assert not hatalar
+    asyncio.run(calis())

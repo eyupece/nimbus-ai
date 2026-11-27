@@ -100,3 +100,10 @@ class WebGovde:
 
     def altyazi(self, kim: str, metin: str, ad: str = "Nimbus") -> None:
         self._gonder({"tip": "altyazi", "kim": kim, "metin": metin, "ad": ad})
+
+    ekran_var = True  # ekranda_goster aracı sadece ekranı olan gövdelerde açılır
+
+    def kart(self, baslik: str, metin: str) -> None:
+        self._gonder({"tip": "kart", "baslik": baslik, "metin": metin})
+        if self.konsol:
+            self.konsol.kart(baslik, metin)

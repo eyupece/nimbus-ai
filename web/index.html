@@ -100,6 +100,17 @@
   #altyazi .kim { color: #9fb6ff; font-weight: 600; margin-right: .4em; }
   #altyazi.sen .kim { color: #ffd38a; }
 
+  /* Bilgi kartı */
+  #kart {
+    position: fixed; top: 6vh; right: 4vw; width: min(32vw, 420px);
+    background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.22); border-radius: 18px;
+    backdrop-filter: blur(10px); padding: 18px 22px; box-shadow: 0 12px 40px rgba(0,0,0,.35);
+    opacity: 0; transform: translateY(-12px); transition: opacity .4s, transform .4s; pointer-events: none;
+  }
+  #kart.gorunur { opacity: 1; transform: none; }
+  #kart h2 { margin: 0 0 8px; font-size: clamp(18px, 1.8vw, 26px); color: #cfe0ff; }
+  #kart p { margin: 0; font-size: clamp(15px, 1.4vw, 20px); line-height: 1.45; white-space: pre-line; }
+
   #baglanti { position: fixed; bottom: 12px; right: 16px; font-size: 12px; opacity: .45; }
   #baglanti.kopuk { color: #ff8a8a; opacity: .9; }
   #durum-etiketi { position: fixed; bottom: 12px; left: 16px; font-size: 12px; opacity: .45; letter-spacing: .08em; }
@@ -169,6 +180,7 @@
   </svg>
 </div>
 <div id="altyazi"></div>
+<div id="kart"><h2></h2><p></p></div>
 <div id="durum-etiketi">UYKU</div>
 <div id="baglanti">bağlanıyor…</div>
 
@@ -206,7 +218,7 @@ function durumAyarla(ad) {
   durum = ad;
   govde.classList.toggle("uyku", ad === "uyku");
   durumEtiketi.textContent = ad.toUpperCase();
-  if (ad === "uyku") { agizAyarla(0); altyaziGoster(null); }
+  if (ad === "uyku") { agizAyarla(0); altyaziGoster(null); kart && kart.classList.remove("gorunur"); }
 }
 
 // ---------- Jestler ----------
@@ -283,6 +295,17 @@ function altyaziGoster(veri) {
   altyaziZamanlayici = setTimeout(() => { altyazi.innerHTML = ""; altyaziKim = null; }, 9000);
 }
 
+// ---------- Bilgi kartı ----------
+const kart = document.getElementById("kart");
+let kartZamanlayici = null;
+function kartGoster(baslik, metin) {
+  clearTimeout(kartZamanlayici);
+  kart.querySelector("h2").textContent = baslik || "";
+  kart.querySelector("p").textContent = metin || "";
+  kart.classList.add("gorunur");
+  kartZamanlayici = setTimeout(() => kart.classList.remove("gorunur"), 20000);
+}
+
 // ---------- Sunucu bağlantısı ----------
 function baglan() {
   const ws = new WebSocket(`ws://${location.host}/canli`);
@@ -297,6 +320,7 @@ function baglan() {
     else if (m.tip === "jest") jestYap(m.ad);
     else if (m.tip === "durum") durumAyarla(m.ad);
     else if (m.tip === "altyazi") altyaziGoster(m);
+    else if (m.tip === "kart") kartGoster(m.baslik, m.metin);
   };
 }
 baglan();

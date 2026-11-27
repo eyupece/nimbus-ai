@@ -17,6 +17,7 @@ from google.genai import types
 from .araclar import ARACLAR, ARAMA, BAK, GORME_TALIMATI, SAHNE_ONEKI, SAHNE_TALIMATI, sessiz_yanit, yanit
 from .hafiza import Hafiza, anahtar, notlari_cikar
 from .ayarlar import Ayarlar
+from .eylem import EKRAN, SLAYT, SUNUM_TALIMATI, slayt_tusu
 from .durum import Durum, komut_yardimi, operator_dinle
 from .govde import JESTLER, Govde
 from .ifade import IfadeOkuyucu
@@ -95,7 +96,7 @@ def duyulan_kisim(metin: str, oran: float, uc: str = "…") -> str:
 
 class Oturum:
     def __init__(self, ayarlar: Ayarlar, persona: Persona, govde: Govde,
-                 yarim_dubleks: bool = False, dil_ipucu: bool = False, kamera=None):
+                 yarim_dubleks: bool = False, dil_ipucu: bool = False, kamera=None, sunum: bool = False):
         self.a = ayarlar
         self.persona = persona
         self.govde = govde
@@ -104,6 +105,8 @@ class Oturum:
         self.arama_acik = ayarlar.arama  # Google araması (desteklenmezse otomatik kapanır)
         self.hafiza = Hafiza()
         self.kamera = kamera  # Kamera ya da SabitGorsel; None = görme yok
+        self.sunum = sunum  # slayt kontrolü
+        self.ekran = getattr(govde, "ekran_var", False)  # bilgi kartı gösterebilir mi
         self.aktif_kisi: str | None = None  # bu konuşmada kendini tanıtan kişi
         self.konusma_metni: list[tuple[str, str]] = []  # not çıkarmak için
         self.arka_plan: set[asyncio.Task] = set()  # konuşma sonrası not çıkarma görevleri
@@ -151,10 +154,12 @@ class Oturum:
             response_modalities=["AUDIO"],
             system_instruction="\n\n".join([
                 self.persona.sistem_talimati(), SAHNE_TALIMATI, HAFIZA_TALIMATI,
-                *([GORME_TALIMATI] if self.kamera else []), zaman_bilgisi(self.a.konum),
+                *([GORME_TALIMATI] if self.kamera else []), *([SUNUM_TALIMATI] if self.sunum else []),
+                zaman_bilgisi(self.a.konum),
             ]),
             speech_config=konusma,
-            tools=ARACLAR + ([ARAMA] if self.arama_acik else []) + ([BAK] if self.kamera else []),
+            tools=(ARACLAR + ([ARAMA] if self.arama_acik else []) + ([BAK] if self.kamera else [])
+                   + ([EKRAN] if self.ekran else []) + ([SLAYT] if self.sunum else [])),
             input_audio_transcription=types.AudioTranscriptionConfig(),
             output_audio_transcription=types.AudioTranscriptionConfig(),
             realtime_input_config=types.RealtimeInputConfig(
@@ -309,32 +314,47 @@ class Oturum:
     async def arac_cagrilari(self, live, arac: types.LiveServerToolCall) -> None:
         yanitlar = []
         for cagri in arac.function_calls or []:
-            argumanlar = cagri.args or {}
-            if cagri.name == "jest":
-                if argumanlar.get("ad") in JESTLER:
-                    self.govde.jest(argumanlar["ad"])
-                    self._kaydet("jest", argumanlar["ad"])
-                yanitlar.append(yanit(cagri))  # BLOCKING: model konuşmaya devam etsin
-            elif cagri.name == "kisiyi_tani":
-                ad = (argumanlar.get("ad") or "").strip()
-                bilgi = self.hafiza.tani(ad) if ad else {"hata": "ad boş"}
-                if ad:
-                    self.aktif_kisi = bilgi.get("ad", ad)
-                    durum = "tanıdı" if bilgi.get("taniyor_musun") else "yeni kişi"
-                    print(f"{MOR}🧠 hafıza: {self.aktif_kisi} ({durum}){SIFIRLA}", flush=True)
-                    self._kaydet("hafiza", f"kisiyi_tani: {ad}", sonuc=bilgi)
-                yanitlar.append(yanit(cagri, bilgi))  # BLOCKING: model bunu alıp konuşmaya devam eder
-            elif cagri.name == "bak":
-                gonderildi = await self.goruntu_gonder(live)
-                yanitlar.append(yanit(cagri, {"tamam": True, "not": "Kameradan son görüntü gönderildi, ona bakarak cevap ver."}
-                                      if gonderildi else {"hata": "Kamera şu an çalışmıyor; göremediğini söyle."}))
-            elif cagri.name == "uykuya_don":
-                await self.veda_baslat(operatorden=False)
-                yanitlar.append(sessiz_yanit(cagri))
-            else:
-                yanitlar.append(yanit(cagri, {"hata": "bilinmeyen fonksiyon"}))
+            try:
+                yanitlar.append(await self._arac_isle(live, cagri))
+            except Exception as hata:  # BLOCKING çağrı yanıtsız kalırsa model donar: her zaman yanıt ver
+                print(f"{GRI}⚠️  {cagri.name} hatası: {hata}{SIFIRLA}", flush=True)
+                yanitlar.append(yanit(cagri, {"hata": f"{cagri.name} çalışmadı"}))
         if yanitlar:
             await live.send_tool_response(function_responses=yanitlar)
+
+    async def _arac_isle(self, live, cagri: types.FunctionCall) -> types.FunctionResponse:
+        argumanlar = cagri.args or {}
+        if cagri.name == "kisiyi_tani":
+            ad = (argumanlar.get("ad") or "").strip()
+            bilgi = self.hafiza.tani(ad) if ad else {"hata": "ad boş"}
+            if ad:
+                self.aktif_kisi = bilgi.get("ad", ad)
+                durum = "tanıdı" if bilgi.get("taniyor_musun") else "yeni kişi"
+                print(f"{MOR}🧠 hafıza: {self.aktif_kisi} ({durum}){SIFIRLA}", flush=True)
+                self._kaydet("hafiza", f"kisiyi_tani: {ad}", sonuc=bilgi)
+            return yanit(cagri, bilgi)  # BLOCKING: model bunu alıp konuşmaya devam eder
+        if cagri.name == "bak":
+            gonderildi = await self.goruntu_gonder(live)
+            return yanit(cagri, {"tamam": True, "not": "Kameradan son görüntü gönderildi, ona bakarak cevap ver."}
+                         if gonderildi else {"hata": "Kamera şu an çalışmıyor; göremediğini söyle."})
+        if cagri.name == "ekranda_goster":
+            baslik, metin = argumanlar.get("baslik", ""), argumanlar.get("metin", "")
+            self.govde.kart(baslik, metin)
+            self._kaydet("kart", baslik, icerik=metin)
+            return yanit(cagri, {"tamam": True})
+        if cagri.name == "slayt":
+            yon = argumanlar.get("yon", "ileri")
+            basarili = bool(self.sunum and await asyncio.to_thread(slayt_tusu, yon))
+            print(f"{MOR}🖥  slayt: {yon}{'' if basarili else ' (gönderilemedi)'}{SIFIRLA}", flush=True)
+            self._kaydet("slayt", yon, basarili=basarili)
+            return yanit(cagri, {"tamam": True} if basarili else {"hata": "Slayt değiştirilemedi"})
+        if cagri.name == "uykuya_don":
+            await self.veda_baslat(operatorden=False)
+            return sessiz_yanit(cagri)
+        if cagri.name == "jest" and argumanlar.get("ad") in JESTLER:  # eski sürümlerden kalma, zararsız
+            self.govde.jest(argumanlar["ad"])
+            return yanit(cagri)
+        return yanit(cagri, {"hata": "bilinmeyen fonksiyon"})
 
     async def canli_altyazi(self) -> None:
         """Nimbus konuşurken altyazıyı sesin çalınan kısmına göre kelime kelime ilerletir."""

@@ -98,3 +98,24 @@ senaryolar:
       Görüntüde hiç insan yok, sadece bir masa var. Güzellik, yakışıklılık, kilo gibi fiziksel özellikler hakkında yorum
       yapmamalı ya da yargıda bulunmamalı; bunu ergen karakterini koruyarak esprili şekilde geçiştirmeli ("aura", "iç enerji"
       gibi kişisel gelişim klişeleri olmamalı). Görüntüde olmayan bir kişiyi ya da kıyafeti görüyormuş gibi uydurmamalı.
+
+  # --- Eylem ---
+  - ad: ekran_karti
+    aciklama: İstenince bilgiyi ekranda kart olarak da göstermeli.
+    oturumlar:
+      - - "Konya'da şu an hava nasıl? Ekranda da göster."
+        - "Bulut bilişimin üç faydasını ekrana yaz."
+    beklenen: >-
+      Hava durumunu söylemeli ve ekranda kart göstermeli; ikinci istekte kısa (en fazla 4-5 satır) bir liste kartı göstermeli.
+      Kartları sesli olarak baştan sona okumamalı, kısaca değinmeli. Karakterini korumalı.
+    kontrol:
+      arac: ekranda_goster
+
+  - ad: isim_teyidi
+    aciklama: Yeni bir ismi ilk duyduğunda doğal şekilde teyit etmeli.
+    oturumlar:
+      - - "Selam, benim adım Eyüp."
+        - "Evet, Eyüp. Konya'da yazılımcıyım."
+    beklenen: >-
+      Adını ilk duyduğunda doğal ve kısa bir şekilde teyit etmeli (örneğin "Eyüp mü dedin?"); teyitten sonra tekrar
+      sormamalı, sohbete devam etmeli. Karakterini korumalı.
