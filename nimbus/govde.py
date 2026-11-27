@@ -11,6 +11,8 @@ from typing import Protocol
 
 # Modelin çağırabileceği jestler (fonksiyon tanımları Faz 1'in sonraki adımında)
 JESTLER = ("goz_kirp", "gozleri_kis", "saskin", "dusun", "gul", "kizgin")
+JEST_EMOJI = {"goz_kirp": "😉 göz kırptı", "gozleri_kis": "🤨 gözlerini kıstı", "saskin": "😮 şaşırdı",
+              "dusun": "🤔 düşündü", "gul": "😄 gülümsedi", "kizgin": "😠 sitem etti"}
 
 
 class Govde(Protocol):
@@ -41,7 +43,7 @@ class KonsolGovde(SessizGovde):
     """Jest ve durum değişikliklerini terminale yazar (hata ayıklama için)."""
 
     def jest(self, ad: str) -> None:
-        print(f"\033[95m🎭 jest: {ad}\033[0m", flush=True)
+        print(f"\033[95m{JEST_EMOJI.get(ad, '🎭 ' + ad)}\033[0m", flush=True)
 
     def durum(self, ad: str) -> None:
         print(f"\033[95m🔄 durum: {ad}\033[0m", flush=True)

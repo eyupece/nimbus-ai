@@ -14,7 +14,7 @@ import pyaudio
 from google import genai
 from google.genai import types
 
-from .araclar import ARACLAR, SAHNE_ONEKI, SAHNE_TALIMATI, sessiz_yanit
+from .araclar import ARACLAR, SAHNE_ONEKI, SAHNE_TALIMATI, sessiz_yanit, yanit
 from .ayarlar import Ayarlar
 from .durum import Durum, komut_yardimi, operator_dinle
 from .govde import JESTLER, Govde
@@ -38,6 +38,13 @@ def istemci_olustur(a: Ayarlar) -> tuple[genai.Client, str]:
     # Live API, Gemini Developer API'de v1beta altında; SDK varsayılanı v1
     istemci = genai.Client(api_key=a.gemini_anahtar, http_options=types.HttpOptions(api_version="v1beta"))
     return istemci, "gemini-api"
+
+
+def birlestir(onceki: str, parca: str) -> str:
+    """Yazıya döküm parçalarını birleştirir; cümle sonu ile yeni cümle arasına boşluk koyar."""
+    if onceki and onceki[-1] in ".?!," and parca and not parca[0].isspace():
+        return onceki + " " + parca
+    return onceki + parca
 
 
 class Oturum:
@@ -146,6 +153,14 @@ class Oturum:
                 pass  # bağlantı kapanırken gelen son parçalar
 
     async def al(self, live) -> None:
+        try:
+            await self._al(live)
+        except Exception as hata:
+            # 1000 = bağlantı normal kapandı (veda, sıfırla, çıkış); hata değil
+            if "1000" not in str(hata):
+                raise
+
+    async def _al(self, live) -> None:
         while True:
             async for yanit in live.receive():
                 if yanit.tool_call:
@@ -156,7 +171,7 @@ class Oturum:
                     continue
 
                 if icerik.input_transcription and icerik.input_transcription.text:
-                    self.sen_tampon += icerik.input_transcription.text
+                    self.sen_tampon = birlestir(self.sen_tampon, icerik.input_transcription.text)
 
                 # Bir olayda birden fazla parça olabilir, hepsini işle
                 if icerik.model_turn:
@@ -171,7 +186,7 @@ class Oturum:
                                 self.veda_sesi_geldi = True
 
                 if icerik.output_transcription and icerik.output_transcription.text:
-                    self.nimbus_tampon += icerik.output_transcription.text
+                    self.nimbus_tampon = birlestir(self.nimbus_tampon, icerik.output_transcription.text)
 
                 if icerik.interrupted:
                     self.hoparlor.sustur()
@@ -188,12 +203,16 @@ class Oturum:
         yanitlar = []
         for cagri in arac.function_calls or []:
             argumanlar = cagri.args or {}
-            if cagri.name == "jest" and argumanlar.get("ad") in JESTLER:
-                self.govde.jest(argumanlar["ad"])
-                self._kaydet("jest", argumanlar["ad"])
+            if cagri.name == "jest":
+                if argumanlar.get("ad") in JESTLER:
+                    self.govde.jest(argumanlar["ad"])
+                    self._kaydet("jest", argumanlar["ad"])
+                yanitlar.append(yanit(cagri))  # BLOCKING: model konuşmaya devam etsin
             elif cagri.name == "uykuya_don":
                 await self.veda_baslat(operatorden=False)
-            yanitlar.append(sessiz_yanit(cagri))
+                yanitlar.append(sessiz_yanit(cagri))
+            else:
+                yanitlar.append(yanit(cagri, {"hata": "bilinmeyen fonksiyon"}))
         if yanitlar:
             await live.send_tool_response(function_responses=yanitlar)
 
@@ -224,10 +243,10 @@ class Oturum:
                 await asyncio.wait([bitis, *gorevler], return_when=asyncio.FIRST_COMPLETED)
                 for g in [bitis, *gorevler]:
                     g.cancel()
-                # Bir görev hatayla bittiyse göster
-                for g in gorevler:
-                    if g.done() and not g.cancelled() and g.exception():
-                        print(f"⚠️  Bağlantı hatası: {g.exception()}", flush=True)
+                sonuclar = await asyncio.gather(*gorevler, return_exceptions=True)
+                for sonuc in sonuclar:  # bir görev gerçek bir hatayla bittiyse göster
+                    if isinstance(sonuc, Exception) and not isinstance(sonuc, asyncio.CancelledError):
+                        print(f"⚠️  Bağlantı hatası: {sonuc}", flush=True)
         except Exception as hata:
             print(f"⚠️  Bağlantı kurulamadı: {hata}", flush=True)
         finally:
