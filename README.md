@@ -55,6 +55,17 @@ python -m nimbus --yarim-dubleks                 # kulaklık yoksa (yankıyı ö
 python -m nimbus --dil-ipucu                     # modele Türkçe dil ipucu ver
 ```
 
+Nimbus **uykuda** başlar. Terminalde operatör komutları (yazıp Enter):
+
+| Komut | Ne yapar |
+|---|---|
+| `Enter` ya da `u` | Uyandır: Nimbus kendini tanıtır, konuşma başlar |
+| `v` | Vedalaş ve uykuya dön |
+| `s` | Sıfırla: hemen sustur, uykuya dön |
+| `q` | Çık |
+
+Karşındaki "görüşürüz" derse Nimbus kendisi de vedalaşıp uykuya döner.
+
 Mikrofonu her seferinde yazmamak için `.env` dosyasına `NIMBUS_MIKROFON=5` ekle.
 Çıkışta (`Ctrl+C`) gecikme özeti yazılır; konuşma kaydı `logs/` klasörüne düşer (git'e girmez).
 
@@ -70,7 +81,9 @@ nimbus/
   ayarlar.py    .env ayarları
   persona.py    persona YAML -> sistem talimatı
   ses.py        mikrofon, hoparlör, ağız senkronu
-  oturum.py     Gemini Live oturumu, yazıya döküm, kayıt
+  oturum.py     durum makinesi + Gemini Live oturumu, yazıya döküm, kayıt
+  durum.py      durumlar ve operatör komutları
+  araclar.py    modelin çağırdığı fonksiyonlar (jest, uykuya_don)
   govde.py      gövde arayüzü (konsol -> sanal yüz -> servo)
 personas/       karakter dosyaları
 spike/          Faz 0 deneme scripti (arşiv)

@@ -1,4 +1,8 @@
-"""Gemini Live oturumu: mikrofon -> model -> hoparlör + gövde, yazıya döküm ve kayıt."""
+"""Nimbus oturumu: durum makinesi + Gemini Live bağlantısı + ses + gövde + kayıt.
+
+Akış: UYKU ─(operatör: Enter/u)─► KARŞILAMA ─► SOHBET ─(operatör: v / model: uykuya_don)─► VEDA ─► UYKU
+Her yeni kişi için ayrı bir Live bağlantısı açılır; böylece bağlam temiz kalır ve oturum süre sınırına takılmaz.
+"""
 
 import asyncio
 import json
@@ -10,14 +14,16 @@ import pyaudio
 from google import genai
 from google.genai import types
 
+from .araclar import ARACLAR, SAHNE_ONEKI, SAHNE_TALIMATI, sessiz_yanit
 from .ayarlar import Ayarlar
-from .govde import Govde
+from .durum import Durum, komut_yardimi, operator_dinle
+from .govde import JESTLER, Govde
 from .persona import Persona
 from .ses import GIRIS_HIZI, Hoparlor, Mikrofon, rms
 
 KONUSMA_ESIGI = 700  # mikrofonda bu RMS'in üstü "konuşuyor" sayılır (gecikme ölçümü için)
 
-MAVI, SARI, GRI, SIFIRLA = "\033[94m", "\033[93m", "\033[90m", "\033[0m"
+MAVI, SARI, GRI, MOR, SIFIRLA = "\033[94m", "\033[93m", "\033[90m", "\033[95m", "\033[0m"
 
 
 def istemci_olustur(a: Ayarlar) -> tuple[genai.Client, str]:
@@ -44,8 +50,16 @@ class Oturum:
         self.dil_ipucu = dil_ipucu
 
         self.pya = pyaudio.PyAudio()
+        self.istemci: genai.Client | None = None
         self.mikrofon: Mikrofon | None = None
         self.hoparlor: Hoparlor | None = None
+
+        self.durum = Durum.UYKU
+        self.live = None  # aktif Live bağlantısı (UYKU'da None)
+        self.bitti: asyncio.Event | None = None  # aktif konuşmanın bitiş sinyali
+        self.cikis = False
+        self.veda_sesi_geldi = False  # veda turunun sesi gelmeden bağlantıyı kapatma
+        self.komutlar: asyncio.Queue[str] = asyncio.Queue()
 
         # Gecikme: mikrofonda son konuşma sesi -> Nimbus'un ilk ses parçası
         self.son_konusma_ani: float | None = None
@@ -67,8 +81,9 @@ class Oturum:
         )
         return types.LiveConnectConfig(
             response_modalities=["AUDIO"],
-            system_instruction=self.persona.sistem_talimati(),
+            system_instruction=self.persona.sistem_talimati() + "\n\n" + SAHNE_TALIMATI,
             speech_config=konusma,
+            tools=ARACLAR,
             input_audio_transcription=types.AudioTranscriptionConfig(),
             output_audio_transcription=types.AudioTranscriptionConfig(),
             realtime_input_config=types.RealtimeInputConfig(
@@ -79,21 +94,63 @@ class Oturum:
             ),
         )
 
+    # ---------- Durum ----------
+    def durum_degistir(self, yeni: Durum) -> None:
+        if yeni != self.durum:
+            self.durum = yeni
+            self.govde.durum(yeni.value)
+            self._kaydet("sistem", f"durum: {yeni.value}")
+            if yeni == Durum.UYKU:
+                print(f"{GRI}💤 Uykuda. {komut_yardimi()}{SIFIRLA}", flush=True)
+
+    async def sahne_mesaji(self, metin: str) -> None:
+        """Operatör yönlendirmesini modele metin olarak iletir; model sesle cevap verir."""
+        if self.live:
+            await self.live.send_client_content(
+                turns=types.Content(role="user", parts=[types.Part(text=f"{SAHNE_ONEKI} {metin}")]),
+                turn_complete=True,
+            )
+
+    async def veda_baslat(self, operatorden: bool) -> None:
+        if self.durum in (Durum.KARSILAMA, Durum.SOHBET):
+            self.durum_degistir(Durum.VEDA)
+            # Model kendisi vedalaştıysa sesi zaten geldi; operatör istediyse yeni veda cümlesini bekle.
+            # (turn_complete=True ile giden mesaj, sürmekte olan cevabı keser.)
+            self.veda_sesi_geldi = not operatorden
+            if operatorden:
+                await self.sahne_mesaji(self.persona.veda)
+
+    async def konusmayi_bitir(self) -> None:
+        """Veda sesi çalınıp bitince bağlantıyı kapat."""
+        while time.monotonic() < self.hoparlor.konusuyor_bitis + 0.2:
+            await asyncio.sleep(0.05)
+        if self.bitti:
+            self.bitti.set()
+
     # ---------- Döngüler ----------
-    async def dinle(self, oturum) -> None:
+    async def dinle(self) -> None:
+        """Mikrofon her zaman okunur; sadece aktif bir konuşma varken modele gönderilir."""
         while True:
             veri = await self.mikrofon.oku()
+            if not self.live or self.durum == Durum.UYKU:
+                continue
             if self.yarim_dubleks and time.monotonic() < self.hoparlor.konusuyor_bitis + 0.3:
                 continue
             if rms(veri) > KONUSMA_ESIGI:
                 self.son_konusma_ani = time.monotonic()
-            await oturum.send_realtime_input(
-                audio=types.Blob(data=veri, mime_type=f"audio/pcm;rate={GIRIS_HIZI}")
-            )
+            try:
+                await self.live.send_realtime_input(
+                    audio=types.Blob(data=veri, mime_type=f"audio/pcm;rate={GIRIS_HIZI}")
+                )
+            except Exception:
+                pass  # bağlantı kapanırken gelen son parçalar
 
-    async def al(self, oturum) -> None:
+    async def al(self, live) -> None:
         while True:
-            async for yanit in oturum.receive():
+            async for yanit in live.receive():
+                if yanit.tool_call:
+                    await self.arac_cagrilari(live, yanit.tool_call)
+
                 icerik = yanit.server_content
                 if icerik is None:
                     continue
@@ -110,6 +167,8 @@ class Oturum:
                                 self._sen_yaz()
                                 self._gecikme_yaz()
                             self.hoparlor.cal(parca.inline_data.data)
+                            if self.durum == Durum.VEDA:
+                                self.veda_sesi_geldi = True
 
                 if icerik.output_transcription and icerik.output_transcription.text:
                     self.nimbus_tampon += icerik.output_transcription.text
@@ -120,6 +179,62 @@ class Oturum:
 
                 if icerik.turn_complete:
                     self._nimbus_yaz()
+                    if self.durum == Durum.KARSILAMA:
+                        self.durum_degistir(Durum.SOHBET)
+                    elif self.durum == Durum.VEDA and self.veda_sesi_geldi:
+                        asyncio.create_task(self.konusmayi_bitir())
+
+    async def arac_cagrilari(self, live, arac: types.LiveServerToolCall) -> None:
+        yanitlar = []
+        for cagri in arac.function_calls or []:
+            argumanlar = cagri.args or {}
+            if cagri.name == "jest" and argumanlar.get("ad") in JESTLER:
+                self.govde.jest(argumanlar["ad"])
+                self._kaydet("jest", argumanlar["ad"])
+            elif cagri.name == "uykuya_don":
+                await self.veda_baslat(operatorden=False)
+            yanitlar.append(sessiz_yanit(cagri))
+        if yanitlar:
+            await live.send_tool_response(function_responses=yanitlar)
+
+    async def konusma_komutlari(self) -> None:
+        """Konuşma sürerken operatör komutları."""
+        while True:
+            komut = await self.komutlar.get()
+            if komut == "v":
+                await self.veda_baslat(operatorden=True)
+            elif komut == "s":
+                self.hoparlor.sustur()
+                self.bitti.set()
+            elif komut == "q":
+                self.cikis = True
+                self.hoparlor.sustur()
+                self.bitti.set()
+
+    async def konusma(self) -> None:
+        """Bir kişiyle baştan sona bir konuşma: bağlan, karşıla, sohbet et, vedalaş."""
+        self.bitti = asyncio.Event()
+        self.durum_degistir(Durum.KARSILAMA)
+        try:
+            async with self.istemci.aio.live.connect(model=self.a.model, config=self.live_ayari()) as live:
+                self.live = live
+                await self.sahne_mesaji(f"Karşına biri geldi. {self.persona.karsilama}")
+                gorevler = [asyncio.create_task(self.al(live)), asyncio.create_task(self.konusma_komutlari())]
+                bitis = asyncio.create_task(self.bitti.wait())
+                await asyncio.wait([bitis, *gorevler], return_when=asyncio.FIRST_COMPLETED)
+                for g in [bitis, *gorevler]:
+                    g.cancel()
+                # Bir görev hatayla bittiyse göster
+                for g in gorevler:
+                    if g.done() and not g.cancelled() and g.exception():
+                        print(f"⚠️  Bağlantı hatası: {g.exception()}", flush=True)
+        except Exception as hata:
+            print(f"⚠️  Bağlantı kurulamadı: {hata}", flush=True)
+        finally:
+            self.live = None
+            self.hoparlor.sustur()
+            self._nimbus_yaz()
+            self.durum_degistir(Durum.UYKU)
 
     # ---------- Çıktı ve kayıt ----------
     def _kaydet(self, kim: str, metin: str, **ek) -> None:
@@ -163,7 +278,7 @@ class Oturum:
 
     # ---------- Çalıştır ----------
     async def calistir(self) -> None:
-        istemci, arka_uc = istemci_olustur(self.a)
+        self.istemci, arka_uc = istemci_olustur(self.a)
         self.mikrofon = Mikrofon(self.pya, self.a.mikrofon)
         self.hoparlor = Hoparlor(self.pya, self.govde)
 
@@ -173,13 +288,20 @@ class Oturum:
 
         print(f"☁️  {arka_uc} | Model: {self.a.model} | Persona: {self.persona.ad} ({self.persona.ses})")
         print(f"🎙  Mikrofon: {self.mikrofon.ad}")
-        print("Konuşmaya başla. Çıkmak için Ctrl+C.\n")
+        operator_dinle(self.komutlar, asyncio.get_running_loop())
+        self.govde.durum(Durum.UYKU.value)
+        print(f"{GRI}💤 Uykuda. {komut_yardimi()}{SIFIRLA}", flush=True)
 
-        async with istemci.aio.live.connect(model=self.a.model, config=self.live_ayari()) as oturum:
-            self.govde.durum("sohbet")
-            async with asyncio.TaskGroup() as tg:
-                tg.create_task(self.dinle(oturum))
-                tg.create_task(self.al(oturum))
+        mikrofon_gorevi = asyncio.create_task(self.dinle())
+        try:
+            while not self.cikis:
+                komut = await self.komutlar.get()
+                if komut in ("", "u"):
+                    await self.konusma()
+                elif komut == "q":
+                    break
+        finally:
+            mikrofon_gorevi.cancel()
 
     def kapat(self) -> None:
         if self.hoparlor:

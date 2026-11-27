@@ -43,9 +43,10 @@ def main() -> None:
     try:
         asyncio.run(oturum.calistir())
     except KeyboardInterrupt:
+        pass
+    finally:
         oturum.ozet_yaz()
         print("\n👋 Görüşürüz.")
-    finally:
         oturum.kapat()
 
 

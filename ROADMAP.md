@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 27 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Faz 1 → paket yapısı kuruldu (`python -m nimbus`), sıradaki: durum makinesi + jest fonksiyonları
+- **Şimdi:** Faz 1 → durum makinesi + jestler + operatör komutları hazır (canlı test bekliyor), sıradaki: tarayıcıda bulut yüz
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -80,11 +80,11 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [ ] Dil algılama kaymasına çözüm: Türkçe dil ipucu dene (`--dil-ipucu` hazır, test edilecek)
 - [x] Deneme scriptini pakete böl: ses / oturum / persona / gövde (`nimbus/`)
 - [x] Persona YAML v2 + yükleyici (özellik yüzdeleri, kurallar, hikâye)
-- [ ] Durum makinesi (UYKU → KARŞILAMA → SOHBET → VEDA) + mod fonksiyonları
-- [ ] Gövde fonksiyon tanımları (jestler)
+- [x] Durum makinesi (UYKU → KARŞILAMA → SOHBET → VEDA), her kişi için ayrı Live bağlantısı
+- [x] Fonksiyonlar: `jest(ad)` (göz kırp, gözleri kıs, şaşkın, düşün, gül, kızgın) ve `uykuya_don()`; sessiz (SILENT) yanıt
 - [x] Ses genliğinden ağız senkronu (4 seviye, 20 ms pencere, bir pencere önden) → gövdeye bildiriliyor
 - [ ] Sanal yüz: **bulut karakter**, lokal web sunucusu + WebSocket + SVG
-- [ ] Operatör klavye kısayolları
+- [x] Operatör komutları: Enter/u uyandır, v veda, s sıfırla, q çık
 - [x] Konuşma kaydı (`logs/*.jsonl`)
 - [ ] 🎬 İlk demo videosu
 
@@ -128,6 +128,9 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 | 27.11.2026 | Faz 1: düz `google-genai` SDK (ADK yok) | Faz 0 kodu çalışıyor; ses akışı ve gecikme tamamen bizim kontrolümüzde |
 | 27.11.2026 | Sanal yüz: bulut karakter | Nimbus markasıyla bütünleşik; temaya göre sonra değişir |
 | 27.11.2026 | İlk demoda karar modu yok | Önce sohbet + yüz; karar senaryosu sonra seçilecek |
+| 27.11.2026 | Her kişi için ayrı Live bağlantısı (uyandır → bağlan, veda → kapat) | Bağlam temiz kalır, oturum süre sınırına takılmaz, uykuda maliyet yok |
+| 27.11.2026 | Operatör yönlendirmesi `[Sahne yönetimi]` önekli metin mesajıyla | Model sesli cevap verir, operatörden bahsetmez; ayrı bir kanal gerekmez |
+| 27.11.2026 | Commit'leri Claude atar (Eyüp adına), push'u Eyüp yapar | Bu oturumun GitHub yazma yetkisi yok; Eyüp kod/komutla uğraşmak istemiyor |
 
 ## Fikir havuzu (ertelenenler)
 - **Karar modu senaryoları** (SORGU → KARAR): Nimbus 3-4 soru sorup kişi hakkında dramatik bir karar açıklar.
