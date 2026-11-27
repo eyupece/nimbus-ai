@@ -124,6 +124,7 @@ class Hoparlor:
     def __init__(self, pya: pyaudio.PyAudio, govde):
         self.govde = govde
         self.konusuyor_bitis = 0.0  # yarım dubleks için: son sesin bitiş zamanı
+        self.calinan_bayt = 0  # şimdiye kadar hoparlöre gerçekten yazılan ses (kesilme oranı için)
         self._kuyruk: queue.Queue[bytes] = queue.Queue()
         self._kesildi = threading.Event()
         self._akis = pya.open(format=FORMAT, channels=KANAL, rate=CIKIS_HIZI, output=True)
@@ -163,6 +164,7 @@ class Hoparlor:
                 agiz_acik = True
                 self.konusuyor_bitis = time.monotonic() + len(dilim) / 2 / CIKIS_HIZI
                 self._akis.write(dilim)
+                self.calinan_bayt += len(dilim)
 
     def kapat(self) -> None:
         self._calis = False

@@ -47,6 +47,18 @@ def birlestir(onceki: str, parca: str) -> str:
     return onceki + parca
 
 
+def duyulan_kisim(metin: str, oran: float) -> str:
+    """Söz kesildiğinde metnin yaklaşık olarak gerçekten seslendirilen kısmı (kelime sınırında)."""
+    metin = metin.strip()
+    if oran >= 0.97 or not metin:
+        return metin
+    sinir = int(len(metin) * max(oran, 0.0))
+    kesik = metin[:sinir]
+    if sinir < len(metin) and " " in kesik:
+        kesik = kesik.rsplit(" ", 1)[0]  # yarım kelime bırakma
+    return kesik.rstrip(" ,.;:") + "…"
+
+
 class Oturum:
     def __init__(self, ayarlar: Ayarlar, persona: Persona, govde: Govde,
                  yarim_dubleks: bool = False, dil_ipucu: bool = False):
@@ -77,6 +89,10 @@ class Oturum:
         self.sen_tampon = ""
         self.nimbus_tampon = ""
         self.kayit = None
+
+        # Söz kesilince metni de kesmek için: bu turda gelen ses ve tur başında çalınmış miktar
+        self.tur_alinan_bayt = 0
+        self.tur_baslangic_calinan = 0
 
     # ---------- Live ayarları ----------
     def live_ayari(self) -> types.LiveConnectConfig:
@@ -179,8 +195,11 @@ class Oturum:
                         if parca.inline_data and parca.inline_data.data:
                             if not self.yanit_basladi:
                                 self.yanit_basladi = True
+                                self.tur_alinan_bayt = 0
+                                self.tur_baslangic_calinan = self.hoparlor.calinan_bayt
                                 self._sen_yaz()
                                 self._gecikme_yaz()
+                            self.tur_alinan_bayt += len(parca.inline_data.data)
                             self.hoparlor.cal(parca.inline_data.data)
                             if self.durum == Durum.VEDA:
                                 self.veda_sesi_geldi = True
@@ -189,7 +208,10 @@ class Oturum:
                     self.nimbus_tampon = birlestir(self.nimbus_tampon, icerik.output_transcription.text)
 
                 if icerik.interrupted:
+                    calinan = self.hoparlor.calinan_bayt - self.tur_baslangic_calinan
                     self.hoparlor.sustur()
+                    if self.tur_alinan_bayt:
+                        self.nimbus_tampon = duyulan_kisim(self.nimbus_tampon, calinan / self.tur_alinan_bayt)
                     self._nimbus_yaz(kesildi=True)
 
                 if icerik.turn_complete:
