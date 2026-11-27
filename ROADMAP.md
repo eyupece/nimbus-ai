@@ -22,7 +22,7 @@ Mikrofon ──► Gemini Live (WebSocket) ──► Hoparlör
 - **Ağız senkronu modelden gelmez:** çıkan sesin genliğinden lokal hesaplanır (gecikmesiz).
 - **Fonksiyon çağrıları jestler içindir:** başı çevir, gözleri kıs, dramatik duraklama, mod değiştir.
 - **Gövde arayüzü tek arayüzdür:** arkasında önce sanal yüz, sonra servo. Kodun geri kalanı farkı bilmez.
-- **Model:** `gemini-3.8-live` (B planı: Gemini metin + Chirp 3 HD / ElevenLabs TTS).
+- **Model:** `gemini-3.8-live`, Vertex AI `eu` bölgesi (B planı: Gemini metin + Chirp 3 HD / ElevenLabs TTS).
 
 ## Konuşma akışı (karışık mod)
 
@@ -42,14 +42,28 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 
 ---
 
-## Faz 0: Keşif
-- [ ] Gemini API anahtarı, Windows'ta Python ortamı, public repo
-- [ ] Minimal döngü: mikrofon → Live → hoparlör (`spike/faz0_ses_dongusu.py`)
-- [ ] Türkçe sesleri karşılaştır, 2-3 aday seç
-- [ ] Gecikme, söz kesme, yankı testi
-- [ ] **Karar:** Live yeterli mi, yoksa B planı mı?
+## Faz 0: Keşif ✅
+- [x] Windows'ta Python ortamı, public repo
+- [x] Minimal döngü: mikrofon → Live → hoparlör (`spike/faz0_ses_dongusu.py`)
+- [ ] Türkçe sesleri karşılaştır, 2-3 aday seç (şimdilik Charon)
+- [x] Gecikme ve söz kesme testi
+- [x] **Karar:** Gemini Live şimdilik yeterli, B planına gerek yok
+
+**Faz 0 bulguları (27 Kasım 2026)**
+- **Arka uç:** Vertex AI, `devfest-konya-2026` projesi, `eu` çoklu bölge, model `gemini-3.8-live`.
+  AI Studio anahtarı hesap düzeyindeki "prepayment credits are depleted" hatasına takıldı; Vertex, Cloud kredileriyle sorunsuz.
+  `gemini-3.8-live` tekil bölgede (örn. `europe-west4`) yok; `eu` veya `us-central1` kullan.
+- **Gecikme** (sen sustuktan sonra ilk ses): `us-central1` ~1.4 sn, `eu` ~1.3 sn. Bluetooth HFP modu dahil.
+  Sessizlik algılama 400 ms, hassasiyet yüksek.
+- **Söz kesme:** sorunsuz.
+- **Karakter:** persona talimatlarına tutarlı uyuyor ("Hımm...", "evlat", kısa cevap + karşı soru).
+- **Sorunlar:** ilk cümlede dil algılama bazen kayıyor (Portekizce/İspanyolca yazıya döküm);
+  Bluetooth kulaklık mikrofonu yazıya dökme kalitesini düşürüyor. Windows'ta varsayılan giriş "Stereo Mix" olabiliyor (artık otomatik atlanıyor).
 
 ## Faz 1: Çekirdek ve sanal yüz
+- [ ] Gecikmeyi 1 sn altına indirme denemeleri: kablolu/dahili mikrofon, sessizlik süresi ayarı, dolgu replikleri
+- [ ] Dil algılama kaymasına çözüm: Türkçe dil ipucu (`language_code=tr-TR`) dene
+- [ ] Karar anı için `gemini-3.8-live-extended-thinking` değerlendirmesi
 - [ ] Persona YAML + yükleyici
 - [ ] Durum makinesi + mod fonksiyonları
 - [ ] Gövde fonksiyon tanımları
@@ -81,7 +95,7 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 ## Faz 4: Sahne ve yayın
 - [ ] Gürültülü salon testi (yönlü mikrofon, yedek bas-konuş modu)
 - [ ] Yedekler: mobil hotspot, kayıtlı demo videosu
-- [ ] Etkinlikte ücretli katman (Vertex AI kredisi): ücretsiz katman verisi Google ürünlerini geliştirmek için kullanılabiliyor
+- [x] Ücretli katman (Vertex AI kredisi) Faz 0'dan beri kullanılıyor
 - [ ] README, blog, konuşma hikâyesi: *"Hareket eden obje → konuşan karakter → seni gören ve hatırlayan Jarvis"*
 
 ---
