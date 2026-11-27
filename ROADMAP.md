@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 27 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Faz 1 tamam (demo videosu ertelendi) → sıradaki: Faz 1.5 (hafıza ya da görme)
+- **Şimdi:** Faz 1.5 → hafıza hazır (canlı test bekliyor), sıradaki: görme (kamera)
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -112,7 +112,9 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 
 ## Faz 1.5: Jarvis yetenekleri
 - [ ] **Eylem:** sonuç ekranı, LED (WLED), slayt kontrolü
-- [ ] **Hafıza:** kişi kaydı, `hatirla` / `kimdi` fonksiyonları, oturum başında özet
+- [x] **Hafıza:** `kisiyi_tani(ad)` (NON_BLOCKING + WHEN_IDLE: konuşmayı bekletmez), konuşma bitince ayrı metin modeliyle
+      not çıkarma (konuşma sırasında fonksiyonla not almak jestlerdeki gibi akışı bozardı), benzer isim ipucu,
+      `--hafiza` / `--unut AD`; kayıtlar yerelde `data/hafiza.json` (canlı test bekliyor)
 - [ ] **Görme:** `bak()` ile istek üzerine tek kare; bağlam sıkıştırma + oturum devamı
 - [ ] **Ek özellik (opsiyonel, varsayılan kapalı):** lokal yüz tanıma (embedding'ler cihazda kalır, README'de açık rıza notu)
 - [ ] 🎬 "Seni gördü ve hatırladı" videosu

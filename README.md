@@ -70,6 +70,16 @@ Nimbus **uykuda** başlar. Terminalde operatör komutları (yazıp Enter):
 
 Karşındaki "görüşürüz" derse Nimbus kendisi de vedalaşıp uykuya döner.
 
+### Hafıza
+
+Nimbus tanıştığı kişileri hatırlar: adını söyleyen kişiyi tanır, konuşma bitince onun hakkında
+kısa notlar çıkarır. Kayıtlar **sadece bu bilgisayarda**, `data/hafiza.json` dosyasında durur (git'e girmez).
+
+```bash
+python -m nimbus --hafiza          # kimleri hatırlıyor
+python -m nimbus --unut Eyüp       # bir kişiyi tamamen unut
+```
+
 Mikrofonu her seferinde yazmamak için `.env` dosyasına `NIMBUS_MIKROFON=5` ekle.
 Çıkışta (`Ctrl+C`) gecikme özeti yazılır; konuşma kaydı `logs/` klasörüne düşer (git'e girmez).
 
@@ -87,7 +97,10 @@ nimbus/
   ses.py        mikrofon, hoparlör, ağız senkronu
   oturum.py     durum makinesi + Gemini Live oturumu, yazıya döküm, kayıt
   durum.py      durumlar ve operatör komutları
-  araclar.py    modelin çağırdığı fonksiyonlar (jest, uykuya_don)
+  araclar.py    modelin çağırdığı fonksiyonlar (kisiyi_tani, uykuya_don) + Google araması
+  hafiza.py     kişileri hatırlama (data/hafiza.json), konuşma sonrası not çıkarma
+  ifade.py      söylenen metinden yüz ifadesi
+  ses_dinle.py  sesleri art arda dinleme aracı
   govde.py      gövde arayüzü (konsol -> sanal yüz -> servo)
   web.py        bulut yüz sunucusu (HTTP + WebSocket)
 web/index.html  bulut yüz (SVG + CSS + JS, harici bağımlılık yok)

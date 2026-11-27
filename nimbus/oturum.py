@@ -14,7 +14,8 @@ import pyaudio
 from google import genai
 from google.genai import types
 
-from .araclar import ARACLAR, ARAMA, SAHNE_ONEKI, SAHNE_TALIMATI, sessiz_yanit, yanit
+from .araclar import ARACLAR, ARAMA, SAHNE_ONEKI, SAHNE_TALIMATI, bos_aninda_yanit, sessiz_yanit, yanit
+from .hafiza import Hafiza, anahtar, notlari_cikar
 from .ayarlar import Ayarlar
 from .durum import Durum, komut_yardimi, operator_dinle
 from .govde import JESTLER, Govde
@@ -52,6 +53,12 @@ def istemci_olustur(a: Ayarlar) -> tuple[genai.Client, str]:
     istemci = genai.Client(api_key=a.gemini_anahtar, http_options=types.HttpOptions(api_version="v1beta"))
     return istemci, "gemini-api"
 
+
+HAFIZA_TALIMATI = (
+    "Hafızan var: karşındaki adını söylediği anda kisiyi_tani fonksiyonunu çağır ve konuşmana devam et. "
+    "Sonuç geldiğinde onu tanıyorsan bunu doğal, esprili ve kısa şekilde belli et (bildiklerinden birine değin); "
+    "tanımıyorsan yeni tanıştığınızı bil. Hafızanı bir kayıt sistemi gibi anlatma, sadece hatırla."
+)
 
 AYLAR = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
 GUNLER = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
@@ -95,6 +102,10 @@ class Oturum:
         self.yarim_dubleks = yarim_dubleks
         self.dil_ipucu = dil_ipucu
         self.arama_acik = ayarlar.arama  # Google araması (desteklenmezse otomatik kapanır)
+        self.hafiza = Hafiza()
+        self.aktif_kisi: str | None = None  # bu konuşmada kendini tanıtan kişi
+        self.konusma_metni: list[tuple[str, str]] = []  # not çıkarmak için
+        self.arka_plan: set[asyncio.Task] = set()  # konuşma sonrası not çıkarma görevleri
 
         self.pya = pyaudio.PyAudio()
         self.istemci: genai.Client | None = None
@@ -137,7 +148,7 @@ class Oturum:
         return types.LiveConnectConfig(
             response_modalities=["AUDIO"],
             system_instruction="\n\n".join([
-                self.persona.sistem_talimati(), SAHNE_TALIMATI, zaman_bilgisi(self.a.konum)
+                self.persona.sistem_talimati(), SAHNE_TALIMATI, HAFIZA_TALIMATI, zaman_bilgisi(self.a.konum)
             ]),
             speech_config=konusma,
             tools=ARACLAR + ([ARAMA] if self.arama_acik else []),
@@ -273,6 +284,15 @@ class Oturum:
                     self.govde.jest(argumanlar["ad"])
                     self._kaydet("jest", argumanlar["ad"])
                 yanitlar.append(yanit(cagri))  # BLOCKING: model konuşmaya devam etsin
+            elif cagri.name == "kisiyi_tani":
+                ad = (argumanlar.get("ad") or "").strip()
+                bilgi = self.hafiza.tani(ad) if ad else {"hata": "ad boş"}
+                if ad:
+                    self.aktif_kisi = bilgi.get("ad", ad)
+                    durum = "tanıdı" if bilgi.get("taniyor_musun") else "yeni kişi"
+                    print(f"{MOR}🧠 hafıza: {self.aktif_kisi} ({durum}){SIFIRLA}", flush=True)
+                    self._kaydet("hafiza", f"kisiyi_tani: {ad}", sonuc=bilgi)
+                yanitlar.append(bos_aninda_yanit(cagri, bilgi))
             elif cagri.name == "uykuya_don":
                 await self.veda_baslat(operatorden=False)
                 yanitlar.append(sessiz_yanit(cagri))
@@ -323,6 +343,8 @@ class Oturum:
     async def konusma(self) -> None:
         """Bir kişiyle baştan sona bir konuşma: bağlan, karşıla, sohbet et, vedalaş."""
         self.bitti = asyncio.Event()
+        self.aktif_kisi = None
+        self.konusma_metni = []
         self.durum_degistir(Durum.KARSILAMA)
         try:
             async with self.istemci.aio.live.connect(model=self.a.model, config=self.live_ayari()) as live:
@@ -351,6 +373,27 @@ class Oturum:
             self.hoparlor.sustur()
             self._nimbus_yaz()
             self.durum_degistir(Durum.UYKU)
+            self._hafizaya_yaz()
+
+    def _hafizaya_yaz(self) -> None:
+        """Konuşma bittikten sonra arka planda: kişi hakkında notları çıkar ve kaydet."""
+        if not self.aktif_kisi or not self.konusma_metni:
+            return
+        ad, konusma = self.aktif_kisi, list(self.konusma_metni)
+        eski = self.hafiza.kisiler.get(anahtar(ad), {}).get("notlar", [])
+
+        async def gorev():
+            try:
+                notlar = await notlari_cikar(self.istemci, ad, eski, konusma)
+            except Exception as hata:
+                print(f"{GRI}⚠️  Hafıza notu çıkarılamadı ({str(hata)[:80]}); sadece görüşme kaydedildi.{SIFIRLA}", flush=True)
+                notlar = eski
+            self.hafiza.gorusmeyi_kaydet(ad, notlar)
+            print(f"{MOR}🧠 {ad} hafızaya yazıldı ({len(notlar)} not){SIFIRLA}", flush=True)
+
+        t = asyncio.create_task(gorev())
+        self.arka_plan.add(t)
+        t.add_done_callback(self.arka_plan.discard)
 
     # ---------- Çıktı ve kayıt ----------
     def _kaydet(self, kim: str, metin: str, **ek) -> None:
@@ -364,6 +407,7 @@ class Oturum:
         if metin:
             print(f"{MAVI}Sen:{SIFIRLA} {metin}", flush=True)
             self._kaydet("sen", metin)
+            self.konusma_metni.append(("sen", metin))
             self.govde.altyazi("sen", metin)
         self.sen_tampon = ""
 
@@ -382,6 +426,7 @@ class Oturum:
             print(f"{SARI}{self.persona.ad}:{SIFIRLA} {metin}{ek}\n", flush=True)
             # Altyazıyı burada değil canli_altyazi gönderiyor: metin sesten önce geldiği için
             # burada göndermek altyazıyı sesin önüne geçirirdi.
+            self.konusma_metni.append(("nimbus", metin))
             self._kaydet("nimbus", metin, kesildi=kesildi,
                          gecikme_ms=round(self.gecikmeler[-1]) if self.gecikmeler else None)
         self.nimbus_tampon = ""
@@ -425,6 +470,9 @@ class Oturum:
                     break
         finally:
             mikrofon_gorevi.cancel()
+            if self.arka_plan:  # yazılmayı bekleyen hafıza notları
+                print(f"{GRI}🧠 Hafıza kaydediliyor...{SIFIRLA}", flush=True)
+                await asyncio.wait(self.arka_plan, timeout=15)
 
     def kapat(self) -> None:
         if self.hoparlor:

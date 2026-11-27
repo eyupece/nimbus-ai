@@ -20,6 +20,20 @@ ARACLAR = [
     types.Tool(
         function_declarations=[
             types.FunctionDeclaration(
+                name="kisiyi_tani",
+                description=(
+                    "Karşındaki kişi adını söylediği anda çağır. Onu daha önce tanıyıp tanımadığını ve onun hakkında "
+                    "hatırladıklarını döndürür. Çağırırken konuşmana devam et; sonuç gelince ona göre tepki ver."
+                ),
+                parameters=types.Schema(
+                    type=types.Type.OBJECT,
+                    properties={"ad": types.Schema(type=types.Type.STRING, description="Kişinin söylediği adı")},
+                    required=["ad"],
+                ),
+                # Konuşmayı bekletmez; sonuç model boşa çıkınca (WHEN_IDLE) iletilir
+                behavior=types.Behavior.NON_BLOCKING,
+            ),
+            types.FunctionDeclaration(
                 name="uykuya_don",
                 description=(
                     "Karşındaki vedalaştığında ya da konuşma doğal olarak bittiğinde, "
@@ -45,6 +59,14 @@ SAHNE_TALIMATI = (
 def yanit(cagri: types.FunctionCall, sonuc: dict | None = None) -> types.FunctionResponse:
     """BLOCKING fonksiyonlar için yanıt: model bunu alınca turuna devam eder."""
     return types.FunctionResponse(id=cagri.id, name=cagri.name, response=sonuc or {"tamam": True})
+
+
+def bos_aninda_yanit(cagri: types.FunctionCall, sonuc: dict) -> types.FunctionResponse:
+    """NON_BLOCKING fonksiyon sonucu: model o anki cümlesini bitirince (WHEN_IDLE) tepki verir."""
+    return types.FunctionResponse(
+        id=cagri.id, name=cagri.name, response=sonuc,
+        scheduling=types.FunctionResponseScheduling.WHEN_IDLE,
+    )
 
 
 def sessiz_yanit(cagri: types.FunctionCall, sonuc: dict | None = None) -> types.FunctionResponse:

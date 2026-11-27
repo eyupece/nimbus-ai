@@ -30,6 +30,8 @@ def main() -> None:
     p.add_argument("--ses-dinle", nargs="?", const="", metavar="SESLER",
                    help="Sesleri art arda dinle: boş = önerilenler, 'hepsi' ya da 'Puck,Fenrir'")
     p.add_argument("--cumle", help="--ses-dinle ile okunacak cümle")
+    p.add_argument("--hafiza", action="store_true", help="Nimbus'un hatırladığı kişileri listele")
+    p.add_argument("--unut", metavar="AD", help="Bir kişiyi hafızadan tamamen sil")
     a = p.parse_args()
 
     ayarlar = Ayarlar.yukle()
@@ -40,6 +42,9 @@ def main() -> None:
         return cihazlari_listele()
     if a.mikrofon_testi:
         return mikrofon_testi(ayarlar.mikrofon)
+    if a.hafiza or a.unut:
+        from .hafiza import hafizayi_listele, kisiyi_unut
+        return kisiyi_unut(a.unut) if a.unut else hafizayi_listele()
     if a.ses_dinle is not None:
         from .ses_dinle import ses_dinle
         return ses_dinle(a.ses_dinle, a.cumle)
