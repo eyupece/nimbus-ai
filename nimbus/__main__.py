@@ -56,7 +56,10 @@ def main() -> None:
     finally:
         oturum.ozet_yaz()
         print("\n👋 Görüşürüz.")
-        oturum.kapat()
+        try:
+            oturum.kapat()
+        except KeyboardInterrupt:
+            pass  # kapanırken tekrar Ctrl+C'ye basıldı; iş parçacıkları zaten arka planda (daemon)
 
 
 if __name__ == "__main__":

@@ -22,7 +22,19 @@ from .ifade import IfadeOkuyucu
 from .persona import Persona
 from .ses import GIRIS_HIZI, Hoparlor, Mikrofon, rms
 
-KONUSMA_ESIGI = 700  # mikrofonda bu RMS'in üstü "konuşuyor" sayılır (gecikme ölçümü için)
+class KonusmaAlgilayici:
+    """Mikrofonun gürültü tabanını öğrenir; konuşmayı ona göre ayırır (kısık/yüksek her mikrofonda çalışır).
+
+    Sadece gecikme ölçümü için kullanılır; asıl konuşma algılamayı Gemini sunucusu yapar.
+    """
+
+    def __init__(self):
+        self.taban = 200.0
+
+    def konusuyor_mu(self, siddet: float) -> bool:
+        # Taban yavaşça yükselir, hızlıca düşer: sessiz anları izler
+        self.taban += (siddet - self.taban) * (0.002 if siddet > self.taban else 0.05)
+        return siddet > max(250.0, self.taban * 3)
 
 MAVI, SARI, GRI, MOR, SIFIRLA = "\033[94m", "\033[93m", "\033[90m", "\033[95m", "\033[0m"
 
@@ -83,6 +95,7 @@ class Oturum:
 
         # Gecikme: mikrofonda son konuşma sesi -> Nimbus'un ilk ses parçası
         self.son_konusma_ani: float | None = None
+        self.konusma_algilayici = KonusmaAlgilayici()
         self.yanit_basladi = False
         self.gecikmeler: list[float] = []
 
@@ -163,7 +176,7 @@ class Oturum:
                 continue
             if self.yarim_dubleks and time.monotonic() < self.hoparlor.konusuyor_bitis + 0.3:
                 continue
-            if rms(veri) > KONUSMA_ESIGI:
+            if self.konusma_algilayici.konusuyor_mu(rms(veri)):
                 self.son_konusma_ani = time.monotonic()
             try:
                 await self.live.send_realtime_input(

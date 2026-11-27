@@ -204,6 +204,7 @@ class Hoparlor:
 
     def kapat(self) -> None:
         self._calis = False
-        self._is.join(timeout=1)
-        self._agiz_is.join(timeout=1)
+        self._agiz_kuyrugu.put((0.0, 0.0))  # ağız iş parçacığını uyandır
+        self._is.join(timeout=0.5)
+        self._agiz_is.join(timeout=0.5)
         self._akis.close()
