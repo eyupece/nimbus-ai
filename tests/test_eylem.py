@@ -35,7 +35,7 @@ def test_sunum_modu_kapaliyken_slayt_yok(ortam):
 
 def test_sunum_modunda_slayt(ortam, monkeypatch):
     basilan = []
-    monkeypatch.setattr(O, "slayt_tusu", lambda yon: basilan.append(yon) or True)
+    monkeypatch.setattr(O, "slayt_tusu", lambda yon, adet=1, numara=None: basilan.append(yon) or True)
     o, istemci, _, _ = ortam([[tur(("slayt", {"yon": "ileri"}), metin="Sıradaki slayt geliyor.")]], sunum=True)
     asyncio.run(operator(o, ["", "s", "q"], bekle=0.4))
     assert "slayt" in arac_adlari(istemci.configler[0])
@@ -45,7 +45,7 @@ def test_sunum_modunda_slayt(ortam, monkeypatch):
 
 
 def test_slayt_basarisizsa_hata_doner(ortam, monkeypatch):
-    monkeypatch.setattr(O, "slayt_tusu", lambda yon: False)
+    monkeypatch.setattr(O, "slayt_tusu", lambda yon, adet=1, numara=None: False)
     o, istemci, _, _ = ortam([[tur(("slayt", {"yon": "geri"}))]], sunum=True)
     asyncio.run(operator(o, ["", "s", "q"], bekle=0.4))
     assert "hata" in istemci.liveler[0].arac_yanitlari[0].response
@@ -60,10 +60,28 @@ def test_yeni_isim_teyit_ipucu(tmp_path):
 
 
 def test_arac_hatasi_modeli_dondurmaz(ortam, monkeypatch):
-    def patla(yon):
+    def patla(yon, adet=1, numara=None):
         raise OSError("tuş gönderilemedi")
     monkeypatch.setattr(O, "slayt_tusu", patla)
     o, istemci, _, _ = ortam([[tur(("slayt", {"yon": "ileri"}))]], sunum=True)
     asyncio.run(operator(o, ["", "s", "q"], bekle=0.4))
     yanitlar = istemci.liveler[0].arac_yanitlari
     assert yanitlar and "hata" in yanitlar[0].response  # hata olsa da model yanıtsız kalmadı
+
+
+def test_slayt_tus_dizisi():
+    from nimbus.eylem import tus_dizisi
+    assert tus_dizisi("ileri") == [0x27]
+    assert tus_dizisi("ileri", adet=3) == [0x27] * 3
+    assert tus_dizisi("geri", adet=99) == [0x25] * 30  # üst sınır
+    assert tus_dizisi("basa", adet=5) == [0x24]
+    assert tus_dizisi("git", numara=17) == [0x31, 0x37, 0x0D]  # '1', '7', Enter
+    assert tus_dizisi("git") == [] and tus_dizisi("uc") == []
+
+
+def test_bilinen_isimler_talimatta(ortam):
+    o, istemci, _, _ = ortam([[tur()]])
+    o.hafiza.gorusmeyi_kaydet("Eyüp", ["Konyalı"])
+    asyncio.run(operator(o, ["", "s", "q"]))
+    t = istemci.configler[0].system_instruction
+    assert "Daha önce tanıştığın kişiler: Eyüp" in t and "Konyalı" not in t  # sadece isim, not yok

@@ -77,6 +77,15 @@ class Hafiza:
                               f"Kısaca sor (örneğin 'Sen {adlar[0]} değil misin?'); evet derse kisiyi_tani'yi o adla tekrar çağır.")
         return sonuc
 
+    def bilinen_isimler_metni(self, en_fazla: int = 40) -> str:
+        """Modelin sesi doğru isimle eşleştirmesine yardım: sadece isimler, en son görülenler önce."""
+        if not self.kisiler:
+            return ""
+        sirali = sorted(self.kisiler.values(), key=lambda k: k.get("son_gorulme", ""), reverse=True)
+        adlar = ", ".join(k["ad"] for k in sirali[:en_fazla])
+        return (f" Daha önce tanıştığın kişiler: {adlar}. Biri adını söylediğinde bu isimlerden birine benziyorsa "
+                "büyük ihtimalle odur.")
+
     # ---------- Konuşma bitince ----------
     def gorusmeyi_kaydet(self, ad: str, yeni_notlar: list[str]) -> None:
         k = anahtar(ad)

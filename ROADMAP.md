@@ -128,7 +128,9 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 ## Faz 1.5: Jarvis yetenekleri
 - [x] **Eylem:** `ekranda_goster` (bulut yüzün yanında bilgi kartı), `--sunum` ile `slayt` (ön plandaki pencereye ok tuşu;
       DevFest'te Nimbus sunum ortağı). Araç işleyicileri hata verse bile modele her zaman yanıt döner (BLOCKING donması yok).
-      LED (WLED) donanımla birlikte Faz 2'ye kaldı. (senaryo + canlı test bekliyor)
+      LED (WLED) donanımla birlikte Faz 2'ye kaldı. Senaryo ✓ (ekran_karti 5/5). Canlı sunum testi ✓ (ileri/geri/başa,
+      art arda geçiş). Sonrası: adetli geçiş ("3 ileri") ve numarayla atlama ("17. slayta git": numara + Enter) eklendi.
+- [x] Hafızadaki isimler (sadece isimler) talimata ekleniyor: model benzer sesi tanıdık isimle eşleştirsin ("Eyüp" 3. kez "Elif" duyuldu)
 - [x] İsim teyidi: **örtük** ("Memnun oldum Eyüp" → yanlışsa kişi düzeltir, Nimbus hafızayı doğru adla günceller);
       sadece tuhaf isimlerde "X mi dedin?" ("Eyüp" iki kez yanlış duyuldu: Elif, Efe). Senaryo: isim_teyidi, isim_duzeltme
 - [x] Senaryo koşucusu: değerlendirici artık ekran kartlarını ve araç çağrılarını da görüyor (kartları göremeyip yanlış başarısız sayıyordu)

@@ -153,7 +153,7 @@ class Oturum:
         return types.LiveConnectConfig(
             response_modalities=["AUDIO"],
             system_instruction="\n\n".join([
-                self.persona.sistem_talimati(), SAHNE_TALIMATI, HAFIZA_TALIMATI,
+                self.persona.sistem_talimati(), SAHNE_TALIMATI, HAFIZA_TALIMATI + self.hafiza.bilinen_isimler_metni(),
                 *([GORME_TALIMATI] if self.kamera else []), *([SUNUM_TALIMATI] if self.sunum else []),
                 zaman_bilgisi(self.a.konum),
             ]),
@@ -344,9 +344,11 @@ class Oturum:
             return yanit(cagri, {"tamam": True})
         if cagri.name == "slayt":
             yon = argumanlar.get("yon", "ileri")
-            basarili = bool(self.sunum and await asyncio.to_thread(slayt_tusu, yon))
-            print(f"{MOR}🖥  slayt: {yon}{'' if basarili else ' (gönderilemedi)'}{SIFIRLA}", flush=True)
-            self._kaydet("slayt", yon, basarili=basarili)
+            adet, numara = argumanlar.get("adet") or 1, argumanlar.get("numara")
+            basarili = bool(self.sunum and await asyncio.to_thread(slayt_tusu, yon, adet, numara))
+            ayrinti = f" → {numara}. slayt" if yon == "git" else (f" ×{adet}" if adet and adet > 1 else "")
+            print(f"{MOR}🖥  slayt: {yon}{ayrinti}{'' if basarili else ' (gönderilemedi)'}{SIFIRLA}", flush=True)
+            self._kaydet("slayt", yon, adet=adet, numara=numara, basarili=basarili)
             return yanit(cagri, {"tamam": True} if basarili else {"hata": "Slayt değiştirilemedi"})
         if cagri.name == "uykuya_don":
             await self.veda_baslat(operatorden=False)

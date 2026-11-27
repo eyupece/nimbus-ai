@@ -205,6 +205,7 @@ async def calistir(dosya: Path, sadece: set[str] | None, kayit_klasoru: Path | N
     hafiza_dosyasi = KOK / "data" / "senaryo_hafiza.json"
     hafiza_dosyasi.unlink(missing_ok=True)  # her koşu temiz başlar
     hafiza = Hafiza(hafiza_dosyasi)
+    oturum.hafiza = hafiza  # talimattaki bilinen isimler de test hafızasından gelsin
 
     senaryolar = yaml.safe_load(dosya.read_text(encoding="utf-8"))["senaryolar"]
     if sadece:

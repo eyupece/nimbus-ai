@@ -31,12 +31,18 @@ EKRAN = types.Tool(function_declarations=[types.FunctionDeclaration(
 SLAYT = types.Tool(function_declarations=[types.FunctionDeclaration(
     name="slayt",
     description=(
-        "Sunumdaki slaytı değiştir. 'Sonraki slayt', 'devam', 'geri dön', 'başa dön' gibi isteklerde çağır; "
-        "çağırdıktan sonra çok kısa bir laf at (bir cümle), slaytı anlatmaya kalkma."
+        "Sunumdaki slaytı değiştir. 'Sonraki slayt', 'devam', 'geri dön', 'başa dön', '3 slayt ileri', "
+        "'17. slayta git' gibi isteklerde çağır. Birden fazla adım için adet ver (tek tek çağırma); "
+        "belirli bir slayta gitmek için yon='git' ve numara ver. Çağırdıktan sonra çok kısa bir laf at (bir cümle), "
+        "slaytı anlatmaya kalkma."
     ),
     parameters=types.Schema(
         type=types.Type.OBJECT,
-        properties={"yon": types.Schema(type=types.Type.STRING, enum=["ileri", "geri", "basa"])},
+        properties={
+            "yon": types.Schema(type=types.Type.STRING, enum=["ileri", "geri", "basa", "git"]),
+            "adet": types.Schema(type=types.Type.INTEGER, description="ileri/geri için kaç slayt (varsayılan 1)"),
+            "numara": types.Schema(type=types.Type.INTEGER, description="yon='git' için hedef slayt numarası"),
+        },
         required=["yon"],
     ),
     behavior=types.Behavior.BLOCKING,
@@ -48,20 +54,36 @@ SUNUM_TALIMATI = (
 )
 
 # Windows sanal tuş kodları
-_TUSLAR = {"ileri": 0x27, "geri": 0x25, "basa": 0x24}  # sağ ok, sol ok, Home
+_TUSLAR = {"ileri": 0x27, "geri": 0x25, "basa": 0x24, "enter": 0x0D}  # sağ ok, sol ok, Home, Enter
+EN_FAZLA_ADET = 30
 
 
-def slayt_tusu(yon: str) -> bool:
-    """Ön plandaki pencereye (PowerPoint, Google Slaytlar, PDF...) ok tuşu gönderir."""
+def tus_dizisi(yon: str, adet: int = 1, numara: int | None = None) -> list[int]:
+    """İstenen slayt hareketi için basılacak tuşlar. 'git': numara yazıp Enter (PowerPoint, Google Slaytlar)."""
+    if yon == "git":
+        if not numara or numara < 1:
+            return []
+        return [0x30 + int(r) for r in str(numara)] + [_TUSLAR["enter"]]  # '1','7', Enter
     kod = _TUSLAR.get(yon)
     if kod is None:
+        return []
+    return [kod] * (1 if yon == "basa" else max(1, min(int(adet or 1), EN_FAZLA_ADET)))
+
+
+def slayt_tusu(yon: str, adet: int = 1, numara: int | None = None) -> bool:
+    """Ön plandaki pencereye (PowerPoint, Google Slaytlar, PDF...) tuş gönderir."""
+    tuslar = tus_dizisi(yon, adet, numara)
+    if not tuslar:
         return False
     if os.name != "nt":
         print(f"⚠️  Slayt kontrolü şimdilik sadece Windows'ta çalışıyor (istenen: {yon})", file=sys.stderr)
         return False
     import ctypes
+    import time
 
     kullanici = ctypes.windll.user32
-    kullanici.keybd_event(kod, 0, 0, 0)  # bas
-    kullanici.keybd_event(kod, 0, 2, 0)  # bırak (KEYEVENTF_KEYUP)
+    for kod in tuslar:
+        kullanici.keybd_event(kod, 0, 0, 0)  # bas
+        kullanici.keybd_event(kod, 0, 2, 0)  # bırak (KEYEVENTF_KEYUP)
+        time.sleep(0.08)  # sunum programı her basışı yakalasın
     return True
