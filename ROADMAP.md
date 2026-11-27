@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 27 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Test altyapısı kuruldu → ilk senaryo koşusu (hafıza dahil), sonra görme (kamera)
+- **Şimdi:** Hafıza tamam, senaryo testleri 7/7 → sıradaki: görme (kamera)
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -121,12 +121,16 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
       devamını sonraki tura karıştırıyordu → BLOCKING'e alındı; koşucu gecikmeli devamları toplayacak şekilde sağlamlaştırıldı.
 - [x] 2. koşu (hafıza): hatırlama kusursuz ("Yine mi sen Deniz? Kedilerin..."). Yeni bulgu: model uykuya_don'u konuşmadan
       çağırıp sessizce uyuyabiliyor → o turda ses yoksa program ona veda cümlesi söyletiyor.
+- [x] 3. koşu (hafıza): 5/5. 4. koşu (tümü, 28.11.2026): **7/7, hepsi 5/5**, metin girişinde ilk ses ortanca 662 ms.
+- [ ] Senaryo testlerini Claude'un kendisinin koşturması: ağ izni (Admin → Capabilities: aiplatform.eu.rep.googleapis.com,
+      oauth2.googleapis.com) + sadece Vertex AI yetkili ayrı servis hesabı gerekiyor. Şimdilik Eyüp tek komut koşturuyor.
 
 ## Faz 1.5: Jarvis yetenekleri
 - [ ] **Eylem:** sonuç ekranı, LED (WLED), slayt kontrolü
 - [x] **Hafıza:** `kisiyi_tani(ad)` (NON_BLOCKING + WHEN_IDLE: konuşmayı bekletmez), konuşma bitince ayrı metin modeliyle
       not çıkarma (konuşma sırasında fonksiyonla not almak jestlerdeki gibi akışı bozardı), benzer isim ipucu,
-      `--hafiza` / `--unut AD`; kayıtlar yerelde `data/hafiza.json`. Not: kisiyi_tani artık BLOCKING (senaryo testi bulgusu)
+      `--hafiza` / `--unut AD`; kayıtlar yerelde `data/hafiza.json`. Not: kisiyi_tani artık BLOCKING (senaryo testi bulgusu).
+      Senaryo testiyle doğrulandı ✓
 - [ ] **Görme:** `bak()` ile istek üzerine tek kare; bağlam sıkıştırma + oturum devamı
 - [ ] **Ek özellik (opsiyonel, varsayılan kapalı):** lokal yüz tanıma (embedding'ler cihazda kalır, README'de açık rıza notu)
 - [ ] 🎬 "Seni gördü ve hatırladı" videosu
