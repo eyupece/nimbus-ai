@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 27 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Faz 1 → durum makinesi + jestler + operatör komutları hazır (canlı test bekliyor), sıradaki: tarayıcıda bulut yüz
+- **Şimdi:** Faz 1 → durum makinesi + jestler + operatör komutları çalışıyor (canlı test ✓), sıradaki: tarayıcıda bulut yüz
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -73,6 +73,12 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - Gecikme ortanca **1.2 sn** (en iyi 1.0, en kötü 1.5). Bluetooth'tan kabloluya geçmek ~100-200 ms kazandırdı.
 - Yazıya döküm 9/9 doğru; dil kayması görülmedi.
 - "Sus" kuralı çalışıyor: "Peki... susuyorum."
+
+**Durum makinesi testi (27 Kasım 2026)**
+- Uyandırma → jest + anında kendini tanıtma ✓; "Uyusak mı?" deyince model kendisi vedalaşıp uykuya döndü ✓ (`uykuya_don`).
+- Jestler BLOCKING: jestsiz cevaplar ~1.0-1.3 sn, **jestli cevaplar ~1.8-2.1 sn** (fonksiyon gidiş-dönüşü ~0.7 sn ekliyor).
+  NON_BLOCKING + SILENT denendi: model jestle turu bitirip susuyordu.
+- Karakter fazla felsefi ve "evlat" tekrarı çok; persona ince ayarı gerekecek.
 - Not: kablolu kulaklık sadece bu test içindi, zorunlu değil. Bluetooth mikrofonlar telefon moduna düşüp kaliteyi/gecikmeyi kötüleştirebiliyor; sahne mikrofonu Faz 4'te seçilecek. Cihazı isimle seç (`NIMBUS_MIKROFON=...`), numaralar değişebiliyor.
 
 ## Faz 1: Çekirdek ve sanal yüz
@@ -83,6 +89,8 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] Durum makinesi (UYKU → KARŞILAMA → SOHBET → VEDA), her kişi için ayrı Live bağlantısı
 - [x] Fonksiyonlar: `jest(ad)` (göz kırp, gözleri kıs, şaşkın, düşün, gül, kızgın) ve `uykuya_don()`; sessiz (SILENT) yanıt
 - [x] Ses genliğinden ağız senkronu (4 seviye, 20 ms pencere, bir pencere önden) → gövdeye bildiriliyor
+- [ ] Jest gecikmesi: jestleri seyrekleştir ya da sık ifadeleri lokal üret (örn. "Hımm" → düşün) ve fonksiyonu büyük anlara bırak
+- [ ] Persona ince ayarı: daha az felsefe, daha az "evlat", daha çok espri
 - [ ] Sanal yüz: **bulut karakter**, lokal web sunucusu + WebSocket + SVG
 - [x] Operatör komutları: Enter/u uyandır, v veda, s sıfırla, q çık
 - [x] Konuşma kaydı (`logs/*.jsonl`)
