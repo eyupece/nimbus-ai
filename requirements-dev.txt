@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest>=8
+# İsteğe bağlı: bulut yüz testleri için (yoksa atlanır)
+# playwright>=1.45  ve  python -m playwright install chromium

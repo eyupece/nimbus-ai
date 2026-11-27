@@ -101,12 +101,34 @@ nimbus/
   hafiza.py     kişileri hatırlama (data/hafiza.json), konuşma sonrası not çıkarma
   ifade.py      söylenen metinden yüz ifadesi
   ses_dinle.py  sesleri art arda dinleme aracı
+  senaryo.py    senaryo koşucusu (gerçek Gemini, sessiz, raporlu)
+senaryolar/     test senaryoları (YAML)
+tests/          otomatik testler (pytest, sahte Gemini)
   govde.py      gövde arayüzü (konsol -> sanal yüz -> servo)
   web.py        bulut yüz sunucusu (HTTP + WebSocket)
 web/index.html  bulut yüz (SVG + CSS + JS, harici bağımlılık yok)
 personas/       karakter dosyaları
 spike/          Faz 0 deneme scripti (arşiv)
 ```
+
+## Testler
+
+**Otomatik testler** (mikrofon ve internet gerekmez; sahte Gemini ile):
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+**Senaryo testleri** (gerçek Gemini ile, sesi atlayarak, yazılı konuşmalar):
+
+```bash
+python -m nimbus.senaryo                        # senaryolar/temel.yaml'daki tüm senaryolar
+python -m nimbus.senaryo --sadece hava_durumu   # bazıları
+```
+
+Her cevap kurallarla (uzunluk, emoji, talimat sızıntısı...) ve bir değerlendirici modelle puanlanır.
+Rapor `logs/senaryo-*.md` dosyasına yazılır. Gerçek hafızaya dokunmaz.
 
 ## Gizlilik notu
 Kamera, hafıza ve (opsiyonel) yüz tanıma özellikleri kişisel veri işler.

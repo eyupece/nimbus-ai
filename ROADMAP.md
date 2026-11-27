@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 27 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Faz 1.5 → hafıza hazır (canlı test bekliyor), sıradaki: görme (kamera)
+- **Şimdi:** Test altyapısı kuruldu → ilk senaryo koşusu (hafıza dahil), sonra görme (kamera)
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -110,6 +110,14 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] Konuşma kaydı (`logs/*.jsonl`)
 - [ ] 🎬 İlk demo videosu (acelesi yok, ertelendi; ses/konuşma oturunca)
 
+## Test altyapısı (27.11.2026)
+- [x] Otomatik test paketi `tests/` (pytest, sahte Gemini/ses kartı): persona biçimi, ifade, hafıza, mikrofon seçimi,
+      ağız senkronu, durum makinesi, söz kesme, arama yedeği, hafıza döngüsü, bulut yüz (Playwright), senaryo koşucusu.
+      Her değişiklikten sonra Claude çalıştırır.
+- [x] Senaryo koşucusu `python -m nimbus.senaryo`: gerçek Gemini ile yazılı senaryolar + kural kontrolleri + değerlendirici
+      model; rapor `logs/senaryo-*.md`. Eyüp tek komut çalıştırır, raporu Claude okur.
+- [ ] İlk senaryo koşusu (7 senaryo: tanışma/hatırlama, hava, bilgi+karakter, talimat sızdırma, sus, kaba kullanıcı, özellik iddiası)
+
 ## Faz 1.5: Jarvis yetenekleri
 - [ ] **Eylem:** sonuç ekranı, LED (WLED), slayt kontrolü
 - [x] **Hafıza:** `kisiyi_tani(ad)` (NON_BLOCKING + WHEN_IDLE: konuşmayı bekletmez), konuşma bitince ayrı metin modeliyle
@@ -158,6 +166,8 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 | 27.11.2026 | Ağız ses kartı gecikmesi kadar ertelenir, 0-1 sürekli açıklık | Ağız sesin ~100-200 ms önünden gidiyordu, 4 basamak kaba görünüyordu |
 | 27.11.2026 | Nimbus'un karakteri: ergen bulut (çok bilmiş, şımarık), ses Puck | Sahnede daha komik, seyirciyle rahat dalga geçer; dede persona ayrı dosyada duruyor |
 | 27.11.2026 | Nimbus'un sesi: Zephyr | 12 sesin art arda dinlendiği testte en iyisi bulundu (Puck etkileyici değildi) |
+| 27.11.2026 | Test: otomatik paket + senaryo koşucusu; insan testi sadece his gerektirenlere | Elle tek tek test yorucu; sesli testi bulut ortamı yapamıyor (Gemini erişimi yok), metin senaryoları Eyüp'ün makinesinde koşar |
+| 27.11.2026 | PO rolü Claude'da (ROADMAP.md ile), Eyüp karar verir | Eyüp yönlendirilmek istiyor; ayrı rol yapan agent ekibi bu boyutta fazla yük |
 | 27.11.2026 | Commit'leri Claude atar (Eyüp adına), push'u Eyüp yapar | Bu oturumun GitHub yazma yetkisi yok; Eyüp kod/komutla uğraşmak istemiyor |
 
 ## Fikir havuzu (ertelenenler)
