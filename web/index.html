@@ -53,7 +53,7 @@
   body.uyku .goz-kapak { transform: scaleY(1); }
   .goz-acik { transform-box: fill-box; transform-origin: center; transition: transform .2s, opacity .2s; }
   body.gozleri_kis .goz-acik { transform: scaleY(.38); }
-  body.saskin .goz { transform: scale(1.25); }
+  body.saskin .goz, body.bak .goz { transform: scale(1.25); }
   body.gul .goz-acik { opacity: 0; }
   .goz-gulen { opacity: 0; transition: opacity .2s; }
   body.gul .goz-gulen { opacity: 1; }
@@ -201,7 +201,7 @@ function agizAyarla(aciklik) {
 
 // ---------- Durum ----------
 let durum = "uyku";
-const JEST_SINIFLARI = ["goz_kirp", "gozleri_kis", "saskin", "dusun", "gul", "kizgin", "kas_kaldir"];
+const JEST_SINIFLARI = ["goz_kirp", "gozleri_kis", "saskin", "dusun", "gul", "kizgin", "kas_kaldir", "bak"];
 function durumAyarla(ad) {
   durum = ad;
   govde.classList.toggle("uyku", ad === "uyku");
@@ -221,6 +221,7 @@ function jestYap(ad) {
     return;
   }
   if (ad === "dusun") bakis(8, -12);
+  if (ad === "bak") bakis(0, 6);  // kameraya / karşıdakine odaklan
   govde.classList.add(ad);
   jestZamanlayici = setTimeout(() => { govde.classList.remove(ad); bakis(0, 0); }, ad === "gul" ? 1800 : 1500);
 }

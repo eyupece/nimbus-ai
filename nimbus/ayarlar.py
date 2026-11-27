@@ -21,6 +21,8 @@ class Ayarlar:
     agiz_kaydir_ms: int  # ağız senkronu ince ayarı: + geciktirir, - öne alır
     arama: bool  # Google araması (hava, haber, maç...)
     konum: str | None  # modele söylenecek konum, örn. "Konya"
+    kamera: int | None  # kamera indeksi; None = kamera kapalı
+    ilk_bakis: bool  # uyanınca bir kez bakıp görünüşe laf soksun mu
     kayit_klasoru: Path
 
     @classmethod
@@ -37,5 +39,7 @@ class Ayarlar:
             agiz_kaydir_ms=int(os.getenv("NIMBUS_AGIZ_KAYDIR_MS", "0")),
             arama=os.getenv("NIMBUS_ARAMA", "1") != "0",
             konum=os.getenv("NIMBUS_KONUM") or None,
+            kamera=int(os.environ["NIMBUS_KAMERA"]) if os.getenv("NIMBUS_KAMERA", "").strip().isdigit() else None,
+            ilk_bakis=os.getenv("NIMBUS_ILK_BAKIS", "1") != "0",
             kayit_klasoru=KOK / "logs",
         )

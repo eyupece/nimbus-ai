@@ -30,6 +30,9 @@ def main() -> None:
     p.add_argument("--ses-dinle", nargs="?", const="", metavar="SESLER",
                    help="Sesleri art arda dinle: boş = önerilenler, 'hepsi' ya da 'Puck,Fenrir'")
     p.add_argument("--cumle", help="--ses-dinle ile okunacak cümle")
+    p.add_argument("--kamera", nargs="?", const=0, type=int, metavar="INDEKS",
+                   help="Kamerayla çalıştır (görme). Varsayılan kamera 0. .env: NIMBUS_KAMERA")
+    p.add_argument("--kamera-testi", nargs="?", const=0, type=int, metavar="INDEKS", help="Kamera çalışıyor mu")
     p.add_argument("--hafiza", action="store_true", help="Nimbus'un hatırladığı kişileri listele")
     p.add_argument("--unut", metavar="AD", help="Bir kişiyi hafızadan tamamen sil")
     a = p.parse_args()
@@ -42,6 +45,9 @@ def main() -> None:
         return cihazlari_listele()
     if a.mikrofon_testi:
         return mikrofon_testi(ayarlar.mikrofon)
+    if a.kamera_testi is not None:
+        from .kamera import kamera_testi
+        return kamera_testi(a.kamera_testi)
     if a.hafiza or a.unut:
         from .hafiza import hafizayi_listele, kisiyi_unut
         return kisiyi_unut(a.unut) if a.unut else hafizayi_listele()
@@ -59,7 +65,12 @@ def main() -> None:
         govde = KonsolGovde()
     else:
         govde = SessizGovde()
-    oturum = Oturum(ayarlar, persona, govde, yarim_dubleks=a.yarim_dubleks, dil_ipucu=a.dil_ipucu)
+    kamera_indeksi = a.kamera if a.kamera is not None else ayarlar.kamera
+    kamera = None
+    if kamera_indeksi is not None:
+        from .kamera import Kamera
+        kamera = Kamera(kamera_indeksi)
+    oturum = Oturum(ayarlar, persona, govde, yarim_dubleks=a.yarim_dubleks, dil_ipucu=a.dil_ipucu, kamera=kamera)
     try:
         asyncio.run(oturum.calistir())
     except KeyboardInterrupt:

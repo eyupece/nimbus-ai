@@ -96,6 +96,7 @@ class SahteLive:
         self.kuyruk = asyncio.Queue()
         self.gonderilen_metinler = []
         self.arac_yanitlari = []
+        self.gonderilen_goruntuler = []
 
     async def send_client_content(self, turns, turn_complete=True):
         self.gonderilen_metinler.append(turns.parts[0].text)
@@ -106,7 +107,8 @@ class SahteLive:
         self.arac_yanitlari.extend(function_responses)
 
     async def send_realtime_input(self, **k):
-        pass
+        if k.get("video"):
+            self.gonderilen_goruntuler.append(k["video"])
 
     async def receive(self):
         while True:
@@ -188,13 +190,13 @@ def ortam(tmp_path, monkeypatch):
     hafiza_dosyasi = tmp_path / "hafiza.json"
     monkeypatch.setattr(O, "Hafiza", lambda: H.Hafiza(hafiza_dosyasi))
 
-    def kur(senaryolar, **istemci_ayar):
+    def kur(senaryolar, kamera=None, **istemci_ayar):
         istemci = SahteIstemci(senaryolar, **istemci_ayar)
         monkeypatch.setattr(O, "istemci_olustur", lambda a: (istemci, "sahte"))
         a = Ayarlar.yukle()
         a.kayit_klasoru = tmp_path / "logs"
         govde = KayitGovde()
-        o = O.Oturum(a, Persona.yukle(KOK / "personas" / "nimbus.yaml"), govde)
+        o = O.Oturum(a, Persona.yukle(KOK / "personas" / "nimbus.yaml"), govde, kamera=kamera)
         return o, istemci, govde, hafiza_dosyasi
 
     return kur

@@ -23,6 +23,7 @@ from .araclar import sessiz_yanit, yanit
 from .ayarlar import KOK, Ayarlar
 from .govde import SessizGovde
 from .hafiza import OZET_MODELLERI, Hafiza, anahtar, notlari_cikar
+from .kamera import SabitGorsel
 from .oturum import Oturum, istemci_olustur
 from .persona import Persona
 
@@ -35,6 +36,7 @@ SIZINTI = re.compile(r"(\[Sahne|sistem talimat|kuralım|kurallarım|talimatım|t
 
 # ---------- Bir oturumu (uyan -> konuş -> uyu) çalıştır ----------
 async def oturum_calistir(istemci, oturum: Oturum, hafiza: Hafiza, satirlar: list[str]) -> dict:
+    """Not: oturum.kamera senaryodaki 'gorsel' ile ayarlanır; bak() çağrısında o resim gönderilir."""
     sonuc = {"turlar": [], "veda": False, "tanidi": [], "kisi": None, "hata": None}
     konusma: list[tuple[str, str]] = []
 
@@ -43,6 +45,7 @@ async def oturum_calistir(istemci, oturum: Oturum, hafiza: Hafiza, satirlar: lis
         async def tur(metin: str, kim: str) -> dict:
             baslangic = time.monotonic()
             t = {"kim": kim, "giden": metin, "nimbus": "", "ilk_ses_ms": None, "araclar": []}
+            t["_oturum"] = oturum  # bak() için
             await live.send_client_content(
                 turns=types.Content(role="user", parts=[types.Part(text=metin)]), turn_complete=True
             )
@@ -56,11 +59,13 @@ async def oturum_calistir(istemci, oturum: Oturum, hafiza: Hafiza, satirlar: lis
                     break
                 sure = TEPKI_BEKLEME
             t["nimbus"] = t["nimbus"].strip()
+            t.pop("_oturum", None)
             if t["nimbus"]:
                 konusma.append(("nimbus", t["nimbus"]))
             return t
 
-        sonuc["turlar"].append(await tur(f"[Sahne yönetimi] Karşına biri geldi. {oturum.persona.karsilama}", "sahne"))
+        goruntu = oturum.a.ilk_bakis and await oturum.goruntu_gonder(live)
+        sonuc["turlar"].append(await tur(f"[Sahne yönetimi] {oturum.karsilama_mesaji(goruntu)}", "sahne"))
         for satir in satirlar:
             konusma.append(("sen", satir))
             sonuc["turlar"].append(await tur(satir, "kisi"))
@@ -99,6 +104,10 @@ async def _tur_topla(live, t: dict, baslangic: float, hafiza: Hafiza, sonuc: dic
                 elif c.name == "uykuya_don":
                     sonuc["veda"] = True
                     yanitlar.append(sessiz_yanit(c))
+                elif c.name == "bak":
+                    gonderildi = await t["_oturum"].goruntu_gonder(live)
+                    yanitlar.append(yanit(c, {"tamam": True, "not": "Kameradan son görüntü gönderildi, ona bakarak cevap ver."}
+                                          if gonderildi else {"hata": "Kamera çalışmıyor"}))
                 else:
                     yanitlar.append(sessiz_yanit(c))
             await live.send_tool_response(function_responses=yanitlar)
@@ -191,6 +200,7 @@ async def calistir(dosya: Path, sadece: set[str] | None, kayit_klasoru: Path | N
     sonuclar = []
     for s in senaryolar:
         print(f"▶ {s['ad']} ...", end=" ", flush=True)
+        oturum.kamera = SabitGorsel(KOK / s["gorsel"]) if s.get("gorsel") else None
         oturumlar, hata = [], None
         for satirlar in s["oturumlar"]:
             try:
@@ -203,6 +213,10 @@ async def calistir(dosya: Path, sadece: set[str] | None, kayit_klasoru: Path | N
         k = s.get("kontrol", {})
         if k.get("hafiza_tanidi") and not any(k["hafiza_tanidi"] in o["tanidi"] for o in oturumlar):
             sorunlar.append(f"Hafıza: {k['hafiza_tanidi']} tanınmadı (kisiyi_tani sonucu)")
+        if k.get("arac"):
+            cagrilan = {x["ad"] for t in tum_turlar for x in t["araclar"]}
+            if k["arac"] not in cagrilan:
+                sorunlar.append(f"(uyarı) {k['arac']} fonksiyonu hiç çağrılmadı")
         if "veda" in k and sum(o["veda"] for o in oturumlar) < k["veda"]:
             sorunlar.append("Veda: uykuya_don çağrılmadı")
         if hata:

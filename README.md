@@ -70,6 +70,18 @@ Nimbus **uykuda** başlar. Terminalde operatör komutları (yazıp Enter):
 
 Karşındaki "görüşürüz" derse Nimbus kendisi de vedalaşıp uykuya döner.
 
+### Görme (kamera)
+
+```bash
+python -m nimbus --kamera-testi     # kamera çalışıyor mu (görüntü kaydetmez)
+python -m nimbus --kamera           # kamerayla çalıştır (başka kamera: --kamera 1)
+```
+
+Nimbus uyanınca bir kez bakıp görünüşüne laf sokar (kapatmak için `.env`: `NIMBUS_ILK_BAKIS=0`);
+"bana bak", "elimde ne var?" gibi isteklerde kameradan **tek kare** alır. Sürekli video gönderilmez,
+kareler diske yazılmaz, kamera sadece Nimbus uyanıkken açıktır. Kişinin fiziksel özelliklerine
+(kilo, güzellik, yaş...) yorum yapmaz.
+
 ### Hafıza
 
 Nimbus tanıştığı kişileri hatırlar: adını söyleyen kişiyi tanır, konuşma bitince onun hakkında
@@ -101,6 +113,7 @@ nimbus/
   hafiza.py     kişileri hatırlama (data/hafiza.json), konuşma sonrası not çıkarma
   ifade.py      söylenen metinden yüz ifadesi
   ses_dinle.py  sesleri art arda dinleme aracı
+  kamera.py     görme: istek üzerine tek kare (OpenCV)
   senaryo.py    senaryo koşucusu (gerçek Gemini, sessiz, raporlu)
 senaryolar/     test senaryoları (YAML)
 tests/          otomatik testler (pytest, sahte Gemini)

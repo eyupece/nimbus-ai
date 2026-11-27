@@ -14,7 +14,7 @@ import pyaudio
 from google import genai
 from google.genai import types
 
-from .araclar import ARACLAR, ARAMA, SAHNE_ONEKI, SAHNE_TALIMATI, sessiz_yanit, yanit
+from .araclar import ARACLAR, ARAMA, BAK, GORME_TALIMATI, SAHNE_ONEKI, SAHNE_TALIMATI, sessiz_yanit, yanit
 from .hafiza import Hafiza, anahtar, notlari_cikar
 from .ayarlar import Ayarlar
 from .durum import Durum, komut_yardimi, operator_dinle
@@ -95,7 +95,7 @@ def duyulan_kisim(metin: str, oran: float, uc: str = "…") -> str:
 
 class Oturum:
     def __init__(self, ayarlar: Ayarlar, persona: Persona, govde: Govde,
-                 yarim_dubleks: bool = False, dil_ipucu: bool = False):
+                 yarim_dubleks: bool = False, dil_ipucu: bool = False, kamera=None):
         self.a = ayarlar
         self.persona = persona
         self.govde = govde
@@ -103,6 +103,7 @@ class Oturum:
         self.dil_ipucu = dil_ipucu
         self.arama_acik = ayarlar.arama  # Google araması (desteklenmezse otomatik kapanır)
         self.hafiza = Hafiza()
+        self.kamera = kamera  # Kamera ya da SabitGorsel; None = görme yok
         self.aktif_kisi: str | None = None  # bu konuşmada kendini tanıtan kişi
         self.konusma_metni: list[tuple[str, str]] = []  # not çıkarmak için
         self.arka_plan: set[asyncio.Task] = set()  # konuşma sonrası not çıkarma görevleri
@@ -149,10 +150,11 @@ class Oturum:
         return types.LiveConnectConfig(
             response_modalities=["AUDIO"],
             system_instruction="\n\n".join([
-                self.persona.sistem_talimati(), SAHNE_TALIMATI, HAFIZA_TALIMATI, zaman_bilgisi(self.a.konum)
+                self.persona.sistem_talimati(), SAHNE_TALIMATI, HAFIZA_TALIMATI,
+                *([GORME_TALIMATI] if self.kamera else []), zaman_bilgisi(self.a.konum),
             ]),
             speech_config=konusma,
-            tools=ARACLAR + ([ARAMA] if self.arama_acik else []),
+            tools=ARACLAR + ([ARAMA] if self.arama_acik else []) + ([BAK] if self.kamera else []),
             input_audio_transcription=types.AudioTranscriptionConfig(),
             output_audio_transcription=types.AudioTranscriptionConfig(),
             realtime_input_config=types.RealtimeInputConfig(
@@ -179,6 +181,27 @@ class Oturum:
                 turns=types.Content(role="user", parts=[types.Part(text=f"{SAHNE_ONEKI} {metin}")]),
                 turn_complete=True,
             )
+
+    async def goruntu_gonder(self, live) -> bool:
+        """Kameradan tek kare alıp modele gönderir."""
+        if not self.kamera:
+            return False
+        try:
+            jpeg = await asyncio.to_thread(self.kamera.kare_al)
+        except Exception as hata:
+            print(f"{GRI}⚠️  Kamera: {hata}{SIFIRLA}", flush=True)
+            return False
+        self.govde.jest("bak")
+        self._kaydet("gorme", f"kare gönderildi ({len(jpeg) // 1024} KB)")
+        await live.send_realtime_input(video=types.Blob(data=jpeg, mime_type="image/jpeg"))
+        return True
+
+    def karsilama_mesaji(self, goruntu_var: bool) -> str:
+        metin = f"Karşına biri geldi. {self.persona.karsilama}"
+        if goruntu_var:
+            metin += (" Kameradan onu görüyorsun: görünüşündeki bir şeye (kıyafet, aksesuar, elindeki eşya, ortam) "
+                      "kısa ve nazik bir şekilde laf sok.")
+        return metin
 
     async def veda_baslat(self, operatorden: bool) -> None:
         if self.durum in (Durum.KARSILAMA, Durum.SOHBET):
@@ -300,6 +323,10 @@ class Oturum:
                     print(f"{MOR}🧠 hafıza: {self.aktif_kisi} ({durum}){SIFIRLA}", flush=True)
                     self._kaydet("hafiza", f"kisiyi_tani: {ad}", sonuc=bilgi)
                 yanitlar.append(yanit(cagri, bilgi))  # BLOCKING: model bunu alıp konuşmaya devam eder
+            elif cagri.name == "bak":
+                gonderildi = await self.goruntu_gonder(live)
+                yanitlar.append(yanit(cagri, {"tamam": True, "not": "Kameradan son görüntü gönderildi, ona bakarak cevap ver."}
+                                      if gonderildi else {"hata": "Kamera şu an çalışmıyor; göremediğini söyle."}))
             elif cagri.name == "uykuya_don":
                 await self.veda_baslat(operatorden=False)
                 yanitlar.append(sessiz_yanit(cagri))
@@ -356,7 +383,8 @@ class Oturum:
         try:
             async with self.istemci.aio.live.connect(model=self.a.model, config=self.live_ayari()) as live:
                 self.live = live
-                await self.sahne_mesaji(f"Karşına biri geldi. {self.persona.karsilama}")
+                goruntu = self.a.ilk_bakis and await self.goruntu_gonder(live)
+                await self.sahne_mesaji(self.karsilama_mesaji(goruntu))
                 gorevler = [asyncio.create_task(self.al(live)), asyncio.create_task(self.konusma_komutlari()),
                             asyncio.create_task(self.canli_altyazi())]
                 bitis = asyncio.create_task(self.bitti.wait())
@@ -379,6 +407,8 @@ class Oturum:
             self.live = None
             self.hoparlor.sustur()
             self._nimbus_yaz()
+            if self.kamera:
+                self.kamera.kapat()  # uykuda kamera kapalı (ışığı söner)
             self.durum_degistir(Durum.UYKU)
             self._hafizaya_yaz()
 
@@ -459,6 +489,8 @@ class Oturum:
 
         print(f"☁️  {arka_uc} | Model: {self.a.model} | Persona: {self.persona.ad} ({self.persona.ses})")
         print(f"🎙  Mikrofon: {self.mikrofon.ad}")
+        if self.kamera:
+            print(f"📷 Kamera açık (sadece uyanıkken){' · uyanınca bir kez bakar' if self.a.ilk_bakis else ''}")
         print(f"👄 Ağız senkronu: ses kartı gecikmesi {self.hoparlor.cikis_gecikmesi * 1000:.0f} ms "
               f"(ince ayar: .env NIMBUS_AGIZ_KAYDIR_MS={self.a.agiz_kaydir_ms})")
         if hasattr(self.govde, "baslat"):

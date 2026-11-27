@@ -46,6 +46,21 @@ ARACLAR = [
     )
 ]
 
+# Görme: sadece kamera açıkken modele verilir
+BAK = types.Tool(function_declarations=[types.FunctionDeclaration(
+    name="bak",
+    description=(
+        "Kameranla karşındakine ya da çevrene bak. Görmen gereken bir şey sorulduğunda (ne giydiği, elinde ne olduğu, "
+        "'bana bak' derse, bir şey gösterirse) cevap vermeden önce çağır; görüntü sana gönderilir, ona göre cevap ver."
+    ),
+    behavior=types.Behavior.BLOCKING,
+)])
+GORME_TALIMATI = (
+    "Bir kameran var. Görmen gereken bir şey olunca bak fonksiyonunu çağır; görmediğin bir şeyi asla uydurma. "
+    "Görünüşe dair sadece kıyafet, aksesuar, elindeki eşyalar, ortam ve yüz ifadesi gibi şeylere değin; "
+    "vücut, kilo, ten rengi, yaş, güzellik/çirkinlik gibi kişisel özelliklere asla yorum yapma."
+)
+
 # Gerçek dünya bilgisi: hava durumu, maç, haber, genel bilgi
 ARAMA = types.Tool(google_search=types.GoogleSearch())
 

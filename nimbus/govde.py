@@ -10,10 +10,10 @@ kendi olay döngülerine güvenli şekilde aktarmalıdır.
 from typing import Protocol
 
 # Modelin çağırabileceği jestler (fonksiyon tanımları Faz 1'in sonraki adımında)
-JESTLER = ("goz_kirp", "gozleri_kis", "saskin", "dusun", "gul", "kizgin", "kas_kaldir")
+JESTLER = ("goz_kirp", "gozleri_kis", "saskin", "dusun", "gul", "kizgin", "kas_kaldir", "bak")
 JEST_EMOJI = {"goz_kirp": "😉 göz kırptı", "gozleri_kis": "🤨 gözlerini kıstı", "saskin": "😮 şaşırdı",
               "dusun": "🤔 düşündü", "gul": "😄 gülümsedi", "kizgin": "😠 sitem etti",
-              "kas_kaldir": "🤔 kaşlarını kaldırdı"}
+              "kas_kaldir": "🤔 kaşlarını kaldırdı", "bak": "👀 kameradan baktı"}
 
 
 class Govde(Protocol):

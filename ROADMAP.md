@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 27 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Hafıza tamam, senaryo testleri 7/7 → sıradaki: görme (kamera)
+- **Şimdi:** Görme hazır (senaryo + canlı test bekliyor) → sonra: Faz 1.5'in kalanı (eylem: sonuç ekranı/LED/slayt) ya da Faz 2 (donanım)
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -131,7 +131,9 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
       not çıkarma (konuşma sırasında fonksiyonla not almak jestlerdeki gibi akışı bozardı), benzer isim ipucu,
       `--hafiza` / `--unut AD`; kayıtlar yerelde `data/hafiza.json`. Not: kisiyi_tani artık BLOCKING (senaryo testi bulgusu).
       Senaryo testiyle doğrulandı ✓
-- [ ] **Görme:** `bak()` ile istek üzerine tek kare; bağlam sıkıştırma + oturum devamı
+- [x] **Görme:** `bak()` (BLOCKING) ile istek üzerine tek kare (OpenCV, 768 px JPEG); uyanınca ilk bakış (kapatılabilir);
+      kamera sadece uyanıkken açık; fiziksel özellik yorumu yasak; senaryolarda kamera yerine resim (`senaryolar/gorseller/`).
+      (canlı test bekliyor)
 - [ ] **Ek özellik (opsiyonel, varsayılan kapalı):** lokal yüz tanıma (embedding'ler cihazda kalır, README'de açık rıza notu)
 - [ ] 🎬 "Seni gördü ve hatırladı" videosu
 
