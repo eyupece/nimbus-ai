@@ -144,8 +144,8 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [ ] 🎬 "Seni gördü ve hatırladı" videosu
 
 ## Faz 2: Donanım
-- [ ] Mimari kararı: ESP32-S3 ince istemci mi, Raspberry Pi bağımsız mı?
-- [ ] Alışveriş: ESP32-S3, servo, INMP441 mikrofon, MAX98357A amfi, hoparlör, güç
+- [ ] Mimari kararı: öneri **ESP32-S3 ince istemci** (beyin dizüstünde kalır; gerekçe ALISVERIS.md'de) — Eyüp onayı bekliyor
+- [ ] Alışveriş: liste hazır → [`donanim/ALISVERIS.md`](donanim/ALISVERIS.md) (zorunlu ~1.500–2.000 TL); sipariş Eyüp'te
 - [ ] Gövde arayüzünün servo arka ucu + ağız senkronu
 - [ ] Başa takma / kaldırma sensörü
 - [ ] Jestleri önceden animasyon olarak hazırlama (Bottango / Blender), modelin fonksiyonla tetiklemesi
