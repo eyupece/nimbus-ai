@@ -103,8 +103,10 @@ async def notlari_cikar(istemci, ad: str, eski_notlar: list[str], konusma: list[
         f"KONUŞMA:\n{metin}\n\n"
         f"{ad} hakkında hatırlanmaya değer bilgileri (memleketi, işi, ilgi alanları, sevdikleri, ilginç/komik anlar, "
         f"Nimbus'la arasındaki şakalar) eski bilgilerle birleştirip en fazla {EN_FAZLA_NOT} kısa Türkçe not olarak ver. "
-        "Her not tek kısa cümle olsun. Sadece konuşmada geçenleri yaz, uydurma. Hassas kişisel veri (sağlık, din, "
-        "siyaset, adres, telefon) yazma. Sadece JSON dizi döndür: [\"not 1\", \"not 2\"]"
+        "Her not tek kısa cümle olsun. Sadece konuşmada geçenleri yaz, uydurma. Sadece bir dahaki karşılaşmada işe "
+        "yarayacak kalıcı bilgileri yaz; konuşmanın akışını, selamlaşma ya da vedalaşmayı, isim karışıklıklarını, "
+        "adını ve 'Nimbus'la tanıştı' gibi bariz şeyleri yazma. Hassas kişisel veri (sağlık, din, siyaset, adres, "
+        "telefon) yazma. Sadece JSON dizi döndür: [\"not 1\", \"not 2\"]"
     )
     global _calisan_model
     ayar = types.GenerateContentConfig(response_mime_type="application/json", temperature=0.2)
