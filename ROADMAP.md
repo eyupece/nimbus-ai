@@ -99,7 +99,7 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] Persona v4: kurallar azaltıldı, ton örnek diyaloglarla veriliyor (v3 "kasıntı" bulundu)
 - [x] Jarvis yetenekleri (öne çekildi): Google araması (hava, haber, maç; desteklenmezse otomatik kapanır), tarih/saat/konum bilgisi
 - [x] Ses seçme aracı: `python -m nimbus --ses-dinle` (30 Gemini sesi, aynı cümleyle art arda)
-- [ ] Ses seçimi: Puck "etkileyici değil" bulundu → `--ses-dinle` ile seç; hiçbiri yetmezse B planı (ElevenLabs)
+- [x] Ses seçimi: Puck "etkileyici değil" bulundu → `--ses-dinle` ile 12 ses dinlendi, **Zephyr** seçildi
 - [x] Sanal yüz: **bulut karakter** (`web/index.html`), lokal HTTP + WebSocket sunucusu, ağız senkronu, 6 jest, uyku animasyonu, altyazı
 - [x] Operatör komutları: Enter/u uyandır, v veda, s sıfırla, q çık
 - [x] Konuşma kaydı (`logs/*.jsonl`)
@@ -150,6 +150,7 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 | 27.11.2026 | Jestler model fonksiyonu değil, metinden yerel kural | BLOCKING jest cevabı 0.5-2.5 sn geciktiriyordu (bir seferinde 3.9 sn); NON_BLOCKING'de model susuyordu |
 | 27.11.2026 | Ağız ses kartı gecikmesi kadar ertelenir, 0-1 sürekli açıklık | Ağız sesin ~100-200 ms önünden gidiyordu, 4 basamak kaba görünüyordu |
 | 27.11.2026 | Nimbus'un karakteri: ergen bulut (çok bilmiş, şımarık), ses Puck | Sahnede daha komik, seyirciyle rahat dalga geçer; dede persona ayrı dosyada duruyor |
+| 27.11.2026 | Nimbus'un sesi: Zephyr | 12 sesin art arda dinlendiği testte en iyisi bulundu (Puck etkileyici değildi) |
 | 27.11.2026 | Commit'leri Claude atar (Eyüp adına), push'u Eyüp yapar | Bu oturumun GitHub yazma yetkisi yok; Eyüp kod/komutla uğraşmak istemiyor |
 
 ## Fikir havuzu (ertelenenler)

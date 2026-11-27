@@ -8,7 +8,7 @@
 # Google araması ve tarih/saat bilgisi kodda ekleniyor (NIMBUS_ARAMA, NIMBUS_KONUM).
 
 ad: Nimbus
-ses: Puck          # beğenmezsen: python -m nimbus --ses-dinle
+ses: Zephyr        # --ses-dinle testinde seçildi (27.11.2026). Başka ses denemek için: python -m nimbus --ses-dinle
 dil: tr-TR
 
 hikaye: |
