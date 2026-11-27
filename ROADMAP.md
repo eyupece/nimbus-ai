@@ -134,7 +134,9 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] **Görme:** `bak()` (BLOCKING) ile istek üzerine tek kare (OpenCV, 768 px JPEG); uyanınca ilk bakış (kapatılabilir);
       kamera sadece uyanıkken açık; fiziksel özellik yorumu yasak; senaryolarda kamera yerine resim (`senaryolar/gorseller/`).
       Senaryo bulgusu (1/2): ilk bakışta görüntüde kimse yokken kıyafete laf soktu (karşılama talimatı zorluyordu) ve
-      kişisel sorularda "aura/iç enerji" klişesine kaydı → talimatlar düzeltildi. (tekrar koşu + canlı test bekliyor)
+      kişisel sorularda "aura/iç enerji" klişesine kaydı → talimatlar düzeltildi.
+      Canlı test: kulaklık, kırmızı tişört, siyah çerçeveli yuvarlak gözlük doğru görüldü ✓. Sorunlar: uyanınca karşılama ~8 sn
+      (kamera açılışı bekleniyordu → bağlantıyla paralel açılış + 0.7 sn ısınma), "Bu ne?" sorusunda bakmadı → talimat genişledi.
 - [ ] **Ek özellik (opsiyonel, varsayılan kapalı):** lokal yüz tanıma (embedding'ler cihazda kalır, README'de açık rıza notu)
 - [ ] 🎬 "Seni gördü ve hatırladı" videosu
 

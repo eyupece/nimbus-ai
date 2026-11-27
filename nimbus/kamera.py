@@ -14,6 +14,7 @@ import time
 from pathlib import Path
 
 EN_BUYUK_KENAR = 768  # modele gönderilecek karenin en uzun kenarı (piksel)
+ISINMA_SN = 0.7  # açıldıktan sonra ilk kareler genelde karanlık (otomatik pozlama oturmadı)
 JPEG_KALITESI = 80
 
 
@@ -43,6 +44,8 @@ class Kamera:
         self._son = None
         self._calis = False
         self._is: threading.Thread | None = None
+        self._acilis = 0.0
+        self.acilis_ms: int | None = None  # son açılışın süresi (teşhis için)
 
     @property
     def acik(self) -> bool:
@@ -51,6 +54,7 @@ class Kamera:
     def ac(self) -> None:
         if self._calis:
             return
+        baslangic = time.monotonic()
         try:
             import cv2
         except ImportError as e:
@@ -60,6 +64,8 @@ class Kamera:
         if not cap.isOpened():
             raise KameraHatasi(f"Kamera {self.indeks} açılamadı (başka bir uygulama kullanıyor olabilir)")
         self._cap, self._son, self._calis = cap, None, True
+        self._acilis = time.monotonic()
+        self.acilis_ms = round((self._acilis - baslangic) * 1000)
         self._is = threading.Thread(target=self._dongu, daemon=True)
         self._is.start()
 
@@ -75,8 +81,11 @@ class Kamera:
         """Son kareyi JPEG olarak döndürür (gerekirse kamerayı açar)."""
         self.ac()
         bitis = time.monotonic() + zaman_asimi
-        while self._son is None:
+        # İlk kare gelene ve ısınma süresi dolana kadar bekle (karanlık kare gönderme)
+        while self._son is None or time.monotonic() - self._acilis < ISINMA_SN:
             if time.monotonic() > bitis:
+                if self._son is not None:
+                    break
                 raise KameraHatasi("Kameradan görüntü gelmedi")
             time.sleep(0.03)
         return _jpeg(self._son)

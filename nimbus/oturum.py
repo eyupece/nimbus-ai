@@ -382,8 +382,19 @@ class Oturum:
         self.konusma_metni = []
         self.durum_degistir(Durum.KARSILAMA)
         try:
+            # Kamera açılması Windows'ta birkaç saniye sürebiliyor: bağlantı kurulurken paralel aç
+            kamera_hazir = None
+            if self.kamera and self.a.ilk_bakis:
+                kamera_hazir = asyncio.create_task(asyncio.to_thread(self.kamera.ac))
             async with self.istemci.aio.live.connect(model=self.a.model, config=self.live_ayari()) as live:
                 self.live = live
+                if kamera_hazir:
+                    try:
+                        await kamera_hazir
+                        if getattr(self.kamera, "acilis_ms", None) is not None:
+                            print(f"{GRI}📷 kamera {self.kamera.acilis_ms} ms'de açıldı{SIFIRLA}", flush=True)
+                    except Exception as hata:
+                        print(f"{GRI}⚠️  Kamera açılamadı: {hata}{SIFIRLA}", flush=True)
                 goruntu = self.a.ilk_bakis and await self.goruntu_gonder(live)
                 await self.sahne_mesaji(self.karsilama_mesaji(goruntu))
                 gorevler = [asyncio.create_task(self.al(live)), asyncio.create_task(self.konusma_komutlari()),
