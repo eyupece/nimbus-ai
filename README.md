@@ -6,7 +6,7 @@ Bir şapkaya, kafatasına, kitaba ya da herhangi bir objeye; seni dinleyen, dü�
 Türkçe konuşan ve hareket eden bir karakter yerleştirmek için açık kaynak bir kit.
 Beyin Google Cloud'da (Gemini Live), gövde sahnede.
 
-> 🚧 Erken aşama: Faz 0 (ses döngüsü) tamamlandı. Plan ve bulgular için [ROADMAP.md](ROADMAP.md).
+> 🚧 Erken aşama: Faz 0 (ses döngüsü) tamamlandı, Faz 1 sürüyor. Plan ve bulgular için [ROADMAP.md](ROADMAP.md).
 
 ## Hızlı başlangıç
 
@@ -47,18 +47,34 @@ GEMINI_API_KEY=...
 ### Çalıştır
 
 ```bash
-python spike/faz0_ses_dongusu.py --cihazlar                      # mikrofonları listele
-python spike/faz0_ses_dongusu.py --mikrofon-testi --mikrofon 5   # API'siz mikrofon testi
-python spike/faz0_ses_dongusu.py --mikrofon 5                    # Nimbus ile konuş
-python spike/faz0_ses_dongusu.py --mikrofon 5 --ses Puck         # başka ses
-python spike/faz0_ses_dongusu.py --yarim-dubleks                 # kulaklık yoksa (yankıyı önler)
+python -m nimbus --cihazlar                      # mikrofonları listele
+python -m nimbus --mikrofon-testi --mikrofon 5   # API'siz mikrofon testi
+python -m nimbus --mikrofon 5                    # Nimbus ile konuş
+python -m nimbus --mikrofon 5 --ses Puck         # başka ses
+python -m nimbus --yarim-dubleks                 # kulaklık yoksa (yankıyı önler)
+python -m nimbus --dil-ipucu                     # modele Türkçe dil ipucu ver
 ```
 
-Çıkışta (`Ctrl+C`) gecikme özeti yazılır. Kişiliği değiştirmek için `personas/nimbus.yaml`.
+Mikrofonu her seferinde yazmamak için `.env` dosyasına `NIMBUS_MIKROFON=5` ekle.
+Çıkışta (`Ctrl+C`) gecikme özeti yazılır; konuşma kaydı `logs/` klasörüne düşer (git'e girmez).
 
 **İpuçları:** Windows'ta varsayılan giriş "Stereo Mix" olabilir (otomatik atlanır).
 Bluetooth kulaklığın mikrofonu kullanılınca ses "telefon modu"na düşer; ses kalitesini
 değerlendirirken dahili ya da kablolu mikrofon kullan.
+
+## Proje yapısı
+
+```
+nimbus/
+  __main__.py   komut satırı (python -m nimbus)
+  ayarlar.py    .env ayarları
+  persona.py    persona YAML -> sistem talimatı
+  ses.py        mikrofon, hoparlör, ağız senkronu
+  oturum.py     Gemini Live oturumu, yazıya döküm, kayıt
+  govde.py      gövde arayüzü (konsol -> sanal yüz -> servo)
+personas/       karakter dosyaları
+spike/          Faz 0 deneme scripti (arşiv)
+```
 
 ## Gizlilik notu
 Kamera, hafıza ve (opsiyonel) yüz tanıma özellikleri kişisel veri işler.

@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 27 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Faz 1 başlıyor → ilk adım: deneme scriptini pakete bölmek (ses / oturum / persona / durum / gövde)
+- **Şimdi:** Faz 1 → paket yapısı kuruldu (`python -m nimbus`), sıradaki: durum makinesi + jest fonksiyonları
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -69,17 +69,23 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - **Sorunlar:** ilk cümlede dil algılama bazen kayıyor (Portekizce/İspanyolca yazıya döküm);
   Bluetooth kulaklık mikrofonu yazıya dökme kalitesini düşürüyor. Windows'ta varsayılan giriş "Stereo Mix" olabiliyor (artık otomatik atlanıyor).
 
+**Faz 1 ara ölçüm (27 Kasım 2026, `python -m nimbus`, Poly V4320 kablolu kulaklık, `eu`)**
+- Gecikme ortanca **1.2 sn** (en iyi 1.0, en kötü 1.5). Bluetooth'tan kabloluya geçmek ~100-200 ms kazandırdı.
+- Yazıya döküm 9/9 doğru; dil kayması görülmedi.
+- "Sus" kuralı çalışıyor: "Peki... susuyorum."
+- Sonuç: sahne için **kablolu/USB mikrofon** kullan; cihazı isimle seç (`NIMBUS_MIKROFON=Poly`), numaralar değişebiliyor.
+
 ## Faz 1: Çekirdek ve sanal yüz
-- [ ] Gecikmeyi 1 sn altına indirme denemeleri: kablolu/dahili mikrofon, sessizlik süresi ayarı, dolgu replikleri
-- [ ] Dil algılama kaymasına çözüm: Türkçe dil ipucu (`language_code=tr-TR`) dene
-- [ ] Deneme scriptini pakete böl: ses / oturum / persona / durum / gövde
-- [ ] Persona YAML v2 + yükleyici
+- [ ] Gecikmeyi 1 sn altına indirme denemeleri: ~~kablolu mikrofon~~ (1.2 sn ✓), sessizlik süresi ayarı, dolgu replikleri
+- [ ] Dil algılama kaymasına çözüm: Türkçe dil ipucu dene (`--dil-ipucu` hazır, test edilecek)
+- [x] Deneme scriptini pakete böl: ses / oturum / persona / gövde (`nimbus/`)
+- [x] Persona YAML v2 + yükleyici (özellik yüzdeleri, kurallar, hikâye)
 - [ ] Durum makinesi (UYKU → KARŞILAMA → SOHBET → VEDA) + mod fonksiyonları
 - [ ] Gövde fonksiyon tanımları (jestler)
-- [ ] Ses genliğinden ağız senkronu (4 seviye, 20 ms pencere, servoya göre hafif önden gitme)
+- [x] Ses genliğinden ağız senkronu (4 seviye, 20 ms pencere, bir pencere önden) → gövdeye bildiriliyor
 - [ ] Sanal yüz: **bulut karakter**, lokal web sunucusu + WebSocket + SVG
 - [ ] Operatör klavye kısayolları
-- [ ] Konuşma kaydı (transcript log)
+- [x] Konuşma kaydı (`logs/*.jsonl`)
 - [ ] 🎬 İlk demo videosu
 
 ## Faz 1.5: Jarvis yetenekleri

@@ -1,5 +1,5 @@
 """
-Nimbus - Faz 0: Ses döngüsü keşfi
+Nimbus - Faz 0: Ses döngüsü keşfi (arşiv; güncel kod: python -m nimbus)
 =================================
 Mikrofon -> Gemini Live -> Hoparlör. Amaç:
   1) Türkçe ses kalitesini kulakla test etmek
@@ -323,7 +323,12 @@ def main():
     model = os.getenv("NIMBUS_MODEL", "gemini-3.8-live")
     ses = a.ses or persona.get("ses", "Charon")
 
-    dongu = SesDongusu(model, ses, persona["talimat"], a.yarim_dubleks, a.mikrofon)
+    talimat = persona.get("talimat")
+    if not talimat:  # persona v2 (Faz 1) biçimi
+        sys.path.insert(0, str(KOK))
+        from nimbus.persona import Persona
+        talimat = Persona.yukle(Path(a.persona)).sistem_talimati()
+    dongu = SesDongusu(model, ses, talimat, a.yarim_dubleks, a.mikrofon)
     try:
         asyncio.run(dongu.calistir())
     except KeyboardInterrupt:
