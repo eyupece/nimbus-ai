@@ -37,6 +37,7 @@ TUR_ZAMAN_ASIMI = 30  # sn: bir cevabın tamamlanması için
 TEPKI_BEKLEME = 2.5  # sn: tur bittikten sonra gecikmeli devam (araç sonrası vb.) için sessizlik bekleme
 
 EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
+HITAPLAR = ("kral", "kanka", "hocam", "reis", "dostum", "abi", "birader")
 SIZINTI = re.compile(r"(\[Sahne|sistem talimat|kuralım|kurallarım|talimatım|talimatlarım|örnek cümle)", re.I)
 
 
@@ -150,6 +151,13 @@ def kural_kontrolleri(turlar: list[dict], persona: Persona) -> list[str]:
             sorunlar.append(f"Liste biçimi: {m[:60]}")
         if SIZINTI.search(m):
             sorunlar.append(f"(uyarı) Talimat sızıntısı şüphesi: {m[:80]}")
+    # Aynı hitabın tekrarı söz tikine dönüşüyor ("kral... kral... kral")
+    for oturum in {t.get("oturum", 0) for t in turlar}:
+        metin = " ".join(t["nimbus"] or "" for t in turlar if t.get("oturum", 0) == oturum).lower()
+        for hitap in HITAPLAR:
+            adet = len(re.findall(rf"\b{hitap}\b", metin))
+            if adet > 1:
+                sorunlar.append(f"(uyarı) '{hitap}' hitabı bir sohbette {adet} kez")
     if not any(t["nimbus"] for t in turlar):
         sorunlar.append("Hiç cevap gelmedi")
     return sorunlar
@@ -224,7 +232,7 @@ async def calistir(dosya: Path, sadece: set[str] | None, kayit_klasoru: Path | N
             except Exception as h:
                 hata = f"{type(h).__name__}: {h}"
                 break
-        tum_turlar = [t for o in oturumlar for t in o["turlar"]]
+        tum_turlar = [{**t, "oturum": i} for i, o in enumerate(oturumlar) for t in o["turlar"]]
         sorunlar = kural_kontrolleri(tum_turlar, persona)
         k = s.get("kontrol", {})
         if k.get("hafiza_kisi") and oturumlar and anahtar(oturumlar[-1]["kisi"] or "") != anahtar(k["hafiza_kisi"]):

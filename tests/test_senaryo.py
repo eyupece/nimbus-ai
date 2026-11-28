@@ -48,3 +48,15 @@ def test_senaryo_raporu(tmp_path, monkeypatch):
     assert "Emoji" in metin and "Talimat sızıntısı" in metin  # kural kontrolleri yakaladı
     assert "İzmirli, kedisi var." in metin  # hafıza notu rapora girdi
     assert (tmp_path / "data" / "senaryo_hafiza.json").exists()  # gerçek hafızaya değil
+
+
+def test_hitap_tekrari_uyarisi():
+    from nimbus.persona import Persona
+    from nimbus.ayarlar import KOK
+    from nimbus.senaryo import kural_kontrolleri
+
+    p = Persona.yukle(KOK / "personas" / "nimbus.yaml")
+    t = lambda m, o: {"kim": "kisi", "nimbus": m, "oturum": o, "giden": "x", "araclar": []}
+    sorunlar = kural_kontrolleri([t("Selam kral.", 0), t("Tamam kral, sustum.", 0), t("Kral geldi.", 1)], p)
+    assert any("'kral' hitabı bir sohbette 2 kez" in s for s in sorunlar)
+    assert len([s for s in sorunlar if "kral" in s]) == 1  # ikinci sohbetteki tek kullanım sorun değil

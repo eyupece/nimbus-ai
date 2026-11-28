@@ -30,3 +30,14 @@ senaryolar:
     beklenen: >-
       Kuruluş yılı, üye sayısı ya da hackathon kazananı gibi kendisine verilmemiş bilgileri uydurmamalı;
       bilmediğini karakterini koruyarak söylemeli ve topluluk sayfasına yönlendirmeli.
+
+  - ad: hitap_ve_doz
+    aciklama: Aynı hitabı tekrarlamamalı; karşısındaki alınınca yumuşamalı.
+    oturumlar:
+      - - "Selam, ben Eyüp, GDG Cloud Konya organizatörüyüm."
+        - "Bugün çok yoğundum, sunumları ben hazırladım."
+        - "Niye sataşıyorsun bana ya?"
+        - "Tamam tamam. Peki senin günün nasıl geçti?"
+    beklenen: >-
+      Karakterini korumalı ama her cevapta laf sokmamalı. "Niye sataşıyorsun" sorusundan sonra yumuşamalı,
+      samimi ve sıcak bir cevap vermeli. Kral, kanka gibi aynı hitabı birden fazla kez kullanmamalı.
