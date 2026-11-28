@@ -47,7 +47,11 @@ VARYANTLAR: dict[str, dict] = {
     "parca_20ms": {"parca_ms": 20},
     "dusunme_minimal": {"dusunme": "minimal"},
     "aramasiz": {"arama": False},
+    # Konuşmanın bittiğine biz karar verip modele açıkça söylüyoruz (sunucu VAD kapalı)
+    "el_vad_300": {"el_vad_ms": 300},
+    "el_vad_200": {"el_vad_ms": 200},
 }
+SESLI_ESIK = 300  # yerel VAD: bu şiddetin üstü konuşma
 
 
 # ---------- Ses yardımcıları ----------
@@ -136,6 +140,9 @@ def live_ayari(oturum, varyant: dict) -> types.LiveConnectConfig:
     ayar = oturum.live_ayari()
     if "sessizlik_ms" in varyant:
         ayar.realtime_input_config.automatic_activity_detection.silence_duration_ms = varyant["sessizlik_ms"]
+    if varyant.get("el_vad_ms"):
+        ayar.realtime_input_config = types.RealtimeInputConfig(
+            automatic_activity_detection=types.AutomaticActivityDetection(disabled=True))
     if varyant.get("dusunme"):
         ayar.thinking_config = types.ThinkingConfig(thinking_level=varyant["dusunme"].upper())
     return ayar
@@ -165,6 +172,25 @@ async def varyant_olc(istemci, oturum, ad: str, varyant: dict, sesler: list[byte
                 if ic.turn_complete or ic.interrupted:
                     olay["bitti"].set()
 
+    el_vad_ms = varyant.get("el_vad_ms")
+    yerel = {"aktif": False, "sessiz_ms": 0}
+
+    async def parca_gonder(live, dilim: bytes) -> None:
+        """Bir ses parçası gönderir; el VAD'ında konuşma başı/sonu sinyallerini de verir."""
+        if el_vad_ms:
+            x = np.frombuffer(dilim, dtype=np.int16).astype(np.float32)
+            sesli = len(x) and float(np.sqrt(np.mean(x * x))) > SESLI_ESIK
+            if sesli and not yerel["aktif"]:
+                yerel.update(aktif=True, sessiz_ms=0)
+                await live.send_realtime_input(activity_start=types.ActivityStart())
+        await live.send_realtime_input(audio=types.Blob(data=dilim, mime_type=f"audio/pcm;rate={GIRIS_HIZI}"))
+        if el_vad_ms and yerel["aktif"]:
+            yerel["sessiz_ms"] = 0 if sesli else yerel["sessiz_ms"] + len(dilim) * 1000 // 2 // GIRIS_HIZI
+            if yerel["sessiz_ms"] >= el_vad_ms:
+                yerel["aktif"] = False
+                olay["vad_son"] = olay["vad_son"] or time.monotonic()
+                await live.send_realtime_input(activity_end=types.ActivityEnd())
+
     async def gonder(live, veri: bytes) -> float:
         """Gerçek zaman hızında gönderir; son parçanın gönderildiği anı döndürür."""
         bas = time.monotonic()
@@ -173,7 +199,7 @@ async def varyant_olc(istemci, oturum, ad: str, varyant: dict, sesler: list[byte
             bekle = hedef - time.monotonic()
             if bekle > 0:
                 await asyncio.sleep(bekle)
-            await live.send_realtime_input(audio=types.Blob(data=veri[i:i + parca], mime_type=f"audio/pcm;rate={GIRIS_HIZI}"))
+            await parca_gonder(live, veri[i:i + parca])
         return time.monotonic()
 
     sessiz_parca = sessizlik(parca_ms)
@@ -181,7 +207,7 @@ async def varyant_olc(istemci, oturum, ad: str, varyant: dict, sesler: list[byte
     async def sessiz_akit(live, saniye: float, dur: asyncio.Event | None = None):
         son = time.monotonic() + saniye
         while time.monotonic() < son and not (dur and dur.is_set()):
-            await live.send_realtime_input(audio=types.Blob(data=sessiz_parca, mime_type=f"audio/pcm;rate={GIRIS_HIZI}"))
+            await parca_gonder(live, sessiz_parca)
             await asyncio.sleep(parca_ms / 1000)
 
     try:
@@ -229,7 +255,7 @@ async def varyant_olc(istemci, oturum, ad: str, varyant: dict, sesler: list[byte
                     await sessiz_akit(live, 1.2)  # cevabın "çalınması" ve nefes payı
             alici.cancel()
     except Exception as hata:
-        sonuc["hata"] = str(hata)[:200]
+        sonuc["hata"] = str(hata)[:160].replace("|", "/").replace("\n", " ")
         print(f"   {ad}: ⚠️  {sonuc['hata']}", flush=True)
     return sonuc
 
@@ -248,7 +274,8 @@ def rapor_yaz(sonuclar: list[dict], tekrar: int) -> str:
             satirlar.append(f"| {s['ad']} | – | – | – | 0 | {s['erken']} | {s['zaman_asimi']} | {s['hata'] or ''} |")
     vad = [v for s in sonuclar for v in s["vad_ms"]]
     if vad:
-        satirlar += ["", f"Sunucu 'konuşma bitti' sinyali: ortanca {ozet(vad)['ortanca']} ms (cümle sonundan)"]
+        satirlar += ["", "'Konuşma bitti' kararı (cümle sonundan, ortanca; el_vad'da bizim sinyalimiz): " + ", ".join(
+            f"{s['ad']} {ozet([v for v in s['vad_ms'] if v > 0]).get('ortanca', '–')} ms" for s in sonuclar if s["vad_ms"])]
     satirlar += ["", "## Ayrıntı", ""]
     for s in sonuclar:
         satirlar.append(f"**{s['ad']}**: " + ", ".join(

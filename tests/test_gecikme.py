@@ -107,3 +107,40 @@ def test_varyant_olcumu_uctan_uca(ortam, monkeypatch):
     assert sonuc["hata"] is None, sonuc["hata"]
     assert len(sonuc["gecikmeler"]) == 1 and 100 < sonuc["gecikmeler"][0] < 600
     assert sonuc["erken"] == 1  # 300 ms duraklamada "cevap verdi"
+
+
+def test_el_vad_konusma_basi_ve_sonu_sinyali(ortam, monkeypatch):
+    import asyncio
+
+    o, _, _, _ = ortam([])
+    live = _VadLive()
+    sinyaller = []
+
+    async def kayitli(audio=None, activity_start=None, activity_end=None, **k):
+        from conftest import icerik, ses
+
+        if activity_start:
+            sinyaller.append("bas")
+        elif activity_end:
+            sinyaller.append("son")
+            await live.kuyruk.put(ses(0.1))
+            await live.kuyruk.put(icerik(turn_complete=True))
+        # el VAD'ında sunucu kendi kararını vermez
+    live.send_realtime_input = kayitli
+
+    class _Ctx:
+        async def __aenter__(s):
+            return live
+
+        async def __aexit__(s, *a):
+            pass
+
+    istemci = type("I", (), {})()
+    istemci.aio = type("A", (), {})()
+    istemci.aio.live = type("L", (), {"connect": staticmethod(lambda model, config: _Ctx())})()
+    sesli = (np.ones(3200, dtype=np.int16) * 3000).tobytes()
+    monkeypatch.setattr(G, "CUMLELER", ["a"])
+    sonuc = asyncio.run(G.varyant_olc(istemci, o, "el", {"el_vad_ms": 200, "parca_ms": 20}, [sesli], 1))
+    assert sinyaller[:2] == ["bas", "son"]
+    assert sonuc["hata"] is None and len(sonuc["gecikmeler"]) == 1 and 150 < sonuc["gecikmeler"][0] < 500
+    assert G.live_ayari(o, {"el_vad_ms": 200}).realtime_input_config.automatic_activity_detection.disabled
