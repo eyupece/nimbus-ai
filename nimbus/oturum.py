@@ -38,6 +38,9 @@ class KonusmaAlgilayici:
         self.taban += (siddet - self.taban) * (0.002 if siddet > self.taban else 0.05)
         return siddet > max(250.0, self.taban * 3)
 
+# Sen susunca bu kadar sonra yüz "dinledim, düşünüyorum" der (model ~1 sn sonra cevap veriyor)
+DINLEDIM_SN = 0.35
+
 MAVI, SARI, GRI, MOR, SIFIRLA = "\033[94m", "\033[93m", "\033[90m", "\033[95m", "\033[0m"
 
 
@@ -130,6 +133,7 @@ class Oturum:
         # Gecikme: mikrofonda son konuşma sesi -> Nimbus'un ilk ses parçası
         self.son_konusma_ani: float | None = None
         self.konusma_algilayici = KonusmaAlgilayici()
+        self.dinleniyor = False  # kişi konuşuyor: susunca "dinledim" tepkisi verilecek
         self.yanit_basladi = False
         self.gecikmeler: list[float] = []
 
@@ -239,14 +243,26 @@ class Oturum:
                 continue
             if self.yarim_dubleks and time.monotonic() < self.hoparlor.konusuyor_bitis + 0.3:
                 continue
-            if self.konusma_algilayici.konusuyor_mu(rms(veri)):
-                self.son_konusma_ani = time.monotonic()
+            self.anlik_tepki(self.konusma_algilayici.konusuyor_mu(rms(veri)))
             try:
                 await self.live.send_realtime_input(
                     audio=types.Blob(data=veri, mime_type=f"audio/pcm;rate={GIRIS_HIZI}")
                 )
             except Exception:
                 pass  # bağlantı kapanırken gelen son parçalar
+
+    def anlik_tepki(self, konusuyor: bool) -> None:
+        """Kişi susar susmaz yüz/LED tepki versin: cevap ~1 sn sürse de duyulduğunu hissettirir."""
+        simdi = time.monotonic()
+        nimbus_konusuyor = simdi < self.hoparlor.konusuyor_bitis + 0.3  # yankı "konuşma" sayılmasın
+        if konusuyor:
+            self.son_konusma_ani = simdi
+            if not nimbus_konusuyor:
+                self.dinleniyor = True
+        elif (self.dinleniyor and not nimbus_konusuyor and not self.yanit_basladi and self.son_konusma_ani
+              and simdi - self.son_konusma_ani >= DINLEDIM_SN):
+            self.dinleniyor = False
+            self.govde.jest("dinledim")
 
     async def al(self, live) -> None:
         try:
@@ -433,6 +449,7 @@ class Oturum:
         """Bir kişiyle baştan sona bir konuşma: bağlan, karşıla, sohbet et, vedalaş."""
         self.bitti = asyncio.Event()
         self.tur_susturuldu = False
+        self.dinleniyor = False
         self.aktif_kisi = None
         self.konusma_metni = []
         self.durum_degistir(Durum.KARSILAMA)

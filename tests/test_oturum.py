@@ -94,3 +94,34 @@ def test_hafiza_tanisma_ve_tekrar_gelis(ortam):
     assert ikinci.response["taniyor_musun"] is True and "Konyalı." in ikinci.response["bildiklerin"]
     kayit = json.loads(dosya.read_text(encoding="utf-8"))["kisiler"]["eyüp"]
     assert kayit["gorusme_sayisi"] == 2
+
+
+def test_kisi_susunca_aninda_dinledim_tepkisi(ortam):
+    import time
+    import types as pytypes
+
+    o, _, govde, _ = ortam([])
+    o.hoparlor = pytypes.SimpleNamespace(konusuyor_bitis=0.0)
+    dinledim = lambda: [x for x in govde.olaylar if x == ("jest", "dinledim")]
+    o.anlik_tepki(True)
+    o.anlik_tepki(False)
+    assert not dinledim()  # henüz çok erken
+    time.sleep(0.4)
+    o.anlik_tepki(False)
+    o.anlik_tepki(False)
+    assert len(dinledim()) == 1  # bir kez
+
+    # Nimbus konuşurken gelen ses (yankı) tepki doğurmaz
+    o.hoparlor.konusuyor_bitis = time.monotonic() + 5
+    o.anlik_tepki(True)
+    o.hoparlor.konusuyor_bitis = 0.0
+    time.sleep(0.4)
+    o.anlik_tepki(False)
+    assert len(dinledim()) == 1
+
+    # Cevap zaten başladıysa tepki yok
+    o.anlik_tepki(True)
+    o.yanit_basladi = True
+    time.sleep(0.4)
+    o.anlik_tepki(False)
+    assert len(dinledim()) == 1

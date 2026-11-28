@@ -10,7 +10,7 @@ kendi olay döngülerine güvenli şekilde aktarmalıdır.
 from typing import Protocol
 
 # Modelin çağırabileceği jestler (fonksiyon tanımları Faz 1'in sonraki adımında)
-JESTLER = ("goz_kirp", "gozleri_kis", "saskin", "dusun", "gul", "kizgin", "kas_kaldir", "bak")
+JESTLER = ("goz_kirp", "gozleri_kis", "saskin", "dusun", "gul", "kizgin", "kas_kaldir", "bak", "dinledim")
 JEST_EMOJI = {"goz_kirp": "😉 göz kırptı", "gozleri_kis": "🤨 gözlerini kıstı", "saskin": "😮 şaşırdı",
               "dusun": "🤔 düşündü", "gul": "😄 gülümsedi", "kizgin": "😠 sitem etti",
               "kas_kaldir": "🤔 kaşlarını kaldırdı", "bak": "👀 kameradan baktı"}
@@ -56,6 +56,8 @@ class KonsolGovde(SessizGovde):
     """Jest ve durum değişikliklerini terminale yazar (hata ayıklama için)."""
 
     def jest(self, ad: str) -> None:
+        if ad == "dinledim":  # her turda olur, terminali kalabalıklaştırmasın
+            return
         print(f"\033[95m{JEST_EMOJI.get(ad, '🎭 ' + ad)}\033[0m", flush=True)
 
     def durum(self, ad: str) -> None:

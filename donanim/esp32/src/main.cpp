@@ -244,7 +244,7 @@ static void olayIsle(const char* json) {
     alanAl(json, "ad", durumAd, sizeof(durumAd));
     Serial.printf("durum: %s\n", durumAd);
   } else if (strcmp(tip, "jest") == 0) {
-    if (alanAl(json, "ad", jestAd, sizeof(jestAd))) jestBitis = millis() + 1500;
+    if (alanAl(json, "ad", jestAd, sizeof(jestAd))) jestBitis = millis() + (strcmp(jestAd, "dinledim") == 0 ? 3000 : 1500);
   }
 }
 
@@ -321,7 +321,11 @@ static void dokunmaKontrol() {
 }
 
 // ---------- Baş ve ışık ----------
-static bool jestVar(const char* ad) { return millis() < jestBitis && strcmp(jestAd, ad) == 0; }
+static bool jestVar(const char* ad) {
+  // "dinledim" cevap başlayınca biter
+  if (strcmp(jestAd, "dinledim") == 0 && millis() - sonSes < 200) jestBitis = 0;
+  return millis() < jestBitis && strcmp(jestAd, ad) == 0;
+}
 
 static void basGuncelle() {
   static uint32_t son = 0;
@@ -329,6 +333,7 @@ static void basGuncelle() {
   son = millis();
   float hedef = strcmp(durumAd, "uyku") == 0 ? BAS_UYKU : BAS_ORTA;
   if (jestVar("kas_kaldir") || jestVar("dusun")) hedef = BAS_ORTA + 15;
+  else if (jestVar("dinledim")) hedef = BAS_ORTA + 8;  // hafif "hımm" eğilmesi
   else if (jestVar("saskin")) hedef = BAS_ORTA - 12;
   else if (jestVar("bak")) hedef = BAS_ORTA - 8;
   else if (jestVar("gul")) hedef = BAS_ORTA + 6 * sinf(millis() / 90.0f);  // keyifli sallanma
@@ -361,7 +366,7 @@ static void isikGuncelle() {
     halka.fill(renk(255, 190, 40, 0.8f));
   } else if (millis() < jestBitis && strcmp(jestAd, "saskin") == 0) {
     halka.fill(renk(190, 60, 255, 0.9f));
-  } else if (millis() < jestBitis && (strcmp(jestAd, "dusun") == 0 || strcmp(jestAd, "kas_kaldir") == 0)) {
+  } else if (jestVar("dusun") || jestVar("kas_kaldir") || jestVar("dinledim")) {
     halka.clear();
     for (int i = 0; i < 3; i++) halka.setPixelColor((t / 70 + i) % LED_SAYISI, renk(60, 140, 255, 1 - i * 0.3f));
   } else if (strcmp(durumAd, "uyku") == 0) {  // uyku: yavaş mavi nefes

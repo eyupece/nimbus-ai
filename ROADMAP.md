@@ -94,6 +94,8 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
       seviyesi ayarı projeye kapalı. 450 ms duraklamada hiçbir ayarda araya girmedi, 700 ms'de hepsinde girdi.
       → Sunucu tarafı ayarlar varsayılanda kalıyor; ~1 sn modelin tabanı. Kalan kazançlar: hoparlör tamponu (Windows'ta
       190 ms) ve hissedilen gecikme (konuşma bitince anında tepki).
+- [x] Anında tepki (28.11): sen susunca 0.35 sn sonra yüzde düşünce noktaları + kaş, ESP32'de dönen mavi LED ve hafif baş
+      eğme; Nimbus konuşmaya başlayınca biter. Yankı ve süren cevap tepki doğurmaz. (Dolgu sesleri ve hızlı model: şimdilik yok)
 - [ ] Dil algılama kaymasına çözüm: Türkçe dil ipucu dene (`--dil-ipucu` hazır, test edilecek)
 - [x] Deneme scriptini pakete böl: ses / oturum / persona / gövde (`nimbus/`)
 - [x] Persona YAML v2 + yükleyici (özellik yüzdeleri, kurallar, hikâye)

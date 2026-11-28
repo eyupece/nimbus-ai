@@ -78,6 +78,15 @@
   /* Ağız: açıklık 0-1 */
   #agiz { transition: ry .045s linear, rx .045s linear; }
 
+  /* Dinledim: sen susunca, cevap gelene kadar düşünme noktaları */
+  .nokta { fill: #e8eeff; opacity: 0; transform-box: fill-box; transform-origin: center; }
+  body.dinledim .nokta { animation: nokta 0.9s ease-in-out infinite; }
+  body.dinledim .nokta:nth-of-type(2) { animation-delay: .15s; }
+  body.dinledim .nokta:nth-of-type(3) { animation-delay: .3s; }
+  @keyframes nokta { 0%, 100% { opacity: .25; transform: translateY(0); } 50% { opacity: .95; transform: translateY(-8px); } }
+  body.dinledim .kas { opacity: .85; }
+  body.dinledim #kas-sag { transform: translateY(-8px) rotate(-6deg); }
+
   /* Uyku zzz */
   .z { font-weight: 700; fill: #dfe6ff; opacity: 0; }
   body.uyku .z { animation: zzz 3.6s ease-in-out infinite; }
@@ -170,6 +179,13 @@
       <!-- Ağız -->
       <ellipse id="agiz" cx="380" cy="368" rx="26" ry="4" fill="var(--goz)"/>
 
+      <!-- Dinledim -->
+      <g class="dusunce" transform="translate(628 112)">
+        <circle class="nokta" cx="0" cy="0" r="9"/>
+        <circle class="nokta" cx="30" cy="-14" r="12"/>
+        <circle class="nokta" cx="66" cy="-32" r="15"/>
+      </g>
+
       <!-- Uyku -->
       <g class="uyku-z" transform="translate(560 170)">
         <text class="z" x="0" y="0" font-size="34">z</text>
@@ -206,7 +222,7 @@ const gozbebekleri = document.querySelectorAll(".gozbebegi");
 let sonKonusma = 0;
 function agizAyarla(aciklik) {
   const a = Math.max(0, Math.min(1, aciklik));
-  if (a > 0.08) sonKonusma = performance.now();
+  if (a > 0.08) { sonKonusma = performance.now(); dinledimBitir(); }
   agiz.setAttribute("rx", (26 - 7 * a).toFixed(1));  // açıldıkça biraz daralır ("o" şekli)
   agiz.setAttribute("ry", (4 + 22 * a).toFixed(1));
 }
@@ -218,12 +234,24 @@ function durumAyarla(ad) {
   durum = ad;
   govde.classList.toggle("uyku", ad === "uyku");
   durumEtiketi.textContent = ad.toUpperCase();
-  if (ad === "uyku") { agizAyarla(0); altyaziGoster(null); kart && kart.classList.remove("gorunur"); }
+  if (ad === "uyku") { dinledimBitir(); agizAyarla(0); altyaziGoster(null); kart && kart.classList.remove("gorunur"); }
 }
 
 // ---------- Jestler ----------
 let jestZamanlayici = null;
+let dinledimZamanlayici = null;
+function dinledimBitir() {
+  clearTimeout(dinledimZamanlayici);
+  if (govde.classList.contains("dinledim")) { govde.classList.remove("dinledim"); bakis(0, 0); }
+}
 function jestYap(ad) {
+  if (ad === "dinledim") {  // cevap gelene (ağız açılana) ya da 3 sn dolana kadar
+    clearTimeout(dinledimZamanlayici);
+    govde.classList.add("dinledim");
+    bakis(8, -12);
+    dinledimZamanlayici = setTimeout(dinledimBitir, 3000);
+    return;
+  }
   clearTimeout(jestZamanlayici);
   JEST_SINIFLARI.forEach(j => govde.classList.remove(j));
   if (ad === "goz_kirp") {
@@ -253,7 +281,7 @@ function bakis(x, y) {
   gozbebekleri.forEach(g => g.style.transform = `translate(${x}px, ${y}px)`);
 }
 setInterval(() => {
-  if (durum !== "uyku" && !govde.classList.contains("dusun")) {
+  if (durum !== "uyku" && !govde.classList.contains("dusun") && !govde.classList.contains("dinledim")) {
     bakis((Math.random() - .5) * 10, (Math.random() - .5) * 8);
   }
 }, 2200);
