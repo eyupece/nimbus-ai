@@ -173,6 +173,9 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 - [x] Derleme Eyüp'ün bilgisayarında ✓ (RAM %17, flash %14; derleyici kurulu)
 - [ ] Parçalar gelince: kurulum, kalibrasyon (ağız açıları, ses, mikrofon kazancı), gecikme ölçümü
 - [ ] Başa takma / kaldırma sensörü (dokunmatik ile başlandı)
+- [ ] Sesle söz kesme (ESP32): şu an yarım dubleks (Nimbus konuşurken mikrofon kapalı, yankı olmasın diye), kesmek için
+      dokunma / 'k'. Parçalar gelince: 1) enerji tabanlı söz kesme (mikrofon, hoparlör yankısından belirgin yüksekse kes;
+      kutu sabit olduğu için ayarlanabilir), 2) gerekirse ESP32-S3 yankı giderme (ESP-SR AFE / AEC)
 - [ ] Jestleri önceden animasyon olarak hazırlama (Bottango / Blender), modelin fonksiyonla tetiklemesi
 - [ ] 🎬 Fiziksel demo videosu
 
