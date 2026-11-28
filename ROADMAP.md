@@ -87,6 +87,13 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
       Ölçüm aracı hazır (28.11): `./n gecikme` aynı cümleleri (model seslendiriyor, kayıt yok) farklı ayarlarla gönderir:
       sessizlik 400/300/200 ms, 20 ms ses parçası, düşünme "minimal", aramasız. Duraklamalı cümleler kısa sessizlikte
       "lafı ağzından alma" riskini ölçer. Sonuca göre ayar → sonra dolgu replikleri / "düşünüyor" ifadesi
+      **Sonuç (28.11, 2 ölçüm turu):** cümle sonu → ilk ses ortanca ~970–1020 ms ve ayarlarla değişmiyor.
+      Sessizlik 400→200 ms sunucunun "bitti" kararını 750→510 ms'ye çekiyor ama model ilk sesi yine ~1 sn'de veriyor
+      (kendi içinde bekliyor). El VAD (biz "bitti" deriz) daha kötü: 300 ms'de 1194 ms; model açık sinyalden sonra ~880 ms
+      harcıyor, otomatik modda ise konuşma sürerken hazırlanıyor. 20 ms parça daha kötü, arama aracı etkisiz, düşünme
+      seviyesi ayarı projeye kapalı. 450 ms duraklamada hiçbir ayarda araya girmedi, 700 ms'de hepsinde girdi.
+      → Sunucu tarafı ayarlar varsayılanda kalıyor; ~1 sn modelin tabanı. Kalan kazançlar: hoparlör tamponu (Windows'ta
+      190 ms) ve hissedilen gecikme (konuşma bitince anında tepki).
 - [ ] Dil algılama kaymasına çözüm: Türkçe dil ipucu dene (`--dil-ipucu` hazır, test edilecek)
 - [x] Deneme scriptini pakete böl: ses / oturum / persona / gövde (`nimbus/`)
 - [x] Persona YAML v2 + yükleyici (özellik yüzdeleri, kurallar, hikâye)
@@ -219,6 +226,7 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 | 27.11.2026 | Commit'leri Claude atar (Eyüp adına), push'u Eyüp yapar | Bu oturumun GitHub yazma yetkisi yok; Eyüp kod/komutla uğraşmak istemiyor |
 | 28.11.2026 | Nimbus = GDG Cloud Konya ekip üyesi (`personas/gdg-konya.yaml`), genel kişilik de duruyor | Eyüp ana organizatör, marka kullanımında sorun yok; tema bağımsızlık bozulmasın diye ayrı persona + ayrı bilgi dosyası |
 | 28.11.2026 | Faz 2 mimarisi: ESP32-S3 ince istemci; LED halka + dokunmatik alınıyor, kameralı kart sonraya | Ucuz, hızlı, yazılımın çoğu hazır; ses yine objeden çıkar; ileride beyin Pi'ye taşınabilir |
+| 28.11.2026 | Gecikme: Live sunucu ayarları (sessizlik, el VAD, parça boyutu) varsayılanda kalır | Ölçüm: hiçbiri ~1 sn tabanını düşürmedi, el VAD kötüleştirdi |
 
 ## Fikir havuzu (ertelenenler)
 - **Karar modu senaryoları** (SORGU → KARAR): Nimbus 3-4 soru sorup kişi hakkında dramatik bir karar açıklar.
