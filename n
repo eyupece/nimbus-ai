@@ -4,6 +4,8 @@
 #   ./n --kamera --sunum     -> python -m nimbus --kamera --sunum
 #   ./n senaryo [...]        -> python -m nimbus.senaryo [...]
 #   ./n test                 -> pytest
+#   ./n esp32-yukle [...]    -> ESP32'ye yazılımı yükle (bkz. donanim/BAGLANTI.md)
+#   ./n esp32-izle           -> ESP32 seri ekranı
 cd "$(dirname "$0")" || exit 1
 PY=.venv/Scripts/python.exe
 [ -x "$PY" ] || PY=.venv/bin/python
@@ -14,5 +16,7 @@ fi
 case "$1" in
   senaryo) shift; exec "$PY" -m nimbus.senaryo "$@" ;;
   test)    shift; exec "$PY" -m pytest "$@" ;;
+  esp32-yukle) shift; exec "$PY" -m nimbus.esp32_yukle "$@" ;;
+  esp32-izle)  shift; exec "$PY" -m nimbus.esp32_yukle --sadece-izle "$@" ;;
   *)       exec "$PY" -m nimbus "$@" ;;
 esac

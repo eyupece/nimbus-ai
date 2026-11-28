@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="760" viewBox="0 0 1120 760" font-family="Segoe UI,Helvetica,Arial,sans-serif" xmlns:c2pa="http://c2pa.org/manifest">
+<rect width="1120" height="760" fill="#ffffff"/>
+<text x="20" y="34" font-size="22" font-weight="700" fill="#1f2937">Nimbus bedeni: bağlantı şeması</text>
+<text x="20" y="56" font-size="13" fill="#6b7280">ESP32-S3 N16R8 DevKitC-1 · kablo rengi = görev · tüm GND'ler ortak</text>
+<rect x="450" y="110" width="200" height="470" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+<text x="550.0" y="132" font-size="15" font-weight="700" text-anchor="middle" fill="#111827">ESP32-S3</text>
+<text x="550.0" y="150" font-size="11" text-anchor="middle" fill="#6b7280">N16R8 DevKitC-1</text>
+<rect x="520" y="566" width="60" height="22" rx="3" fill="#9ca3af"/><text x="550" y="604" font-size="11" text-anchor="middle" fill="#374151">USB "COM" → dizüstü</text>
+<circle cx="450" cy="165" r="4.5" fill="#111827"/>
+<text x="460" y="169" font-size="12" fill="#111827">3V3</text>
+<circle cx="450" cy="195" r="4.5" fill="#111827"/>
+<text x="460" y="199" font-size="12" fill="#111827">GND</text>
+<circle cx="450" cy="240" r="4.5" fill="#111827"/>
+<text x="460" y="244" font-size="12" fill="#111827">GPIO 4</text>
+<circle cx="450" cy="270" r="4.5" fill="#111827"/>
+<text x="460" y="274" font-size="12" fill="#111827">GPIO 5</text>
+<circle cx="450" cy="300" r="4.5" fill="#111827"/>
+<text x="460" y="304" font-size="12" fill="#111827">GPIO 6</text>
+<circle cx="450" cy="370" r="4.5" fill="#111827"/>
+<text x="460" y="374" font-size="12" fill="#111827">GPIO 8</text>
+<circle cx="450" cy="450" r="4.5" fill="#111827"/>
+<text x="460" y="454" font-size="12" fill="#111827">GPIO 9</text>
+<circle cx="650" cy="165" r="4.5" fill="#111827"/>
+<text x="640" y="169" font-size="12" text-anchor="end" fill="#111827">GPIO 15</text>
+<circle cx="650" cy="190" r="4.5" fill="#111827"/>
+<text x="640" y="194" font-size="12" text-anchor="end" fill="#111827">GPIO 16</text>
+<circle cx="650" cy="215" r="4.5" fill="#111827"/>
+<text x="640" y="219" font-size="12" text-anchor="end" fill="#111827">GPIO 7</text>
+<circle cx="650" cy="330" r="4.5" fill="#111827"/>
+<text x="640" y="334" font-size="12" text-anchor="end" fill="#111827">GPIO 17</text>
+<circle cx="650" cy="430" r="4.5" fill="#111827"/>
+<text x="640" y="434" font-size="12" text-anchor="end" fill="#111827">GPIO 18</text>
+<circle cx="650" cy="520" r="4.5" fill="#111827"/>
+<text x="640" y="524" font-size="12" text-anchor="end" fill="#111827">5V</text>
+<text x="638" y="538" font-size="10" text-anchor="end" fill="#6b7280">(sadece USB yokken)</text>
+<rect x="60" y="120" width="190" height="170" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+<text x="155.0" y="142" font-size="15" font-weight="700" text-anchor="middle" fill="#111827">INMP441</text>
+<text x="155.0" y="160" font-size="11" text-anchor="middle" fill="#6b7280">mikrofon · 3V3!</text>
+<circle cx="250" cy="175" r="4.5" fill="#111827"/>
+<text x="240" y="179" font-size="12" text-anchor="end" fill="#111827">VDD</text>
+<circle cx="250" cy="200" r="4.5" fill="#111827"/>
+<text x="240" y="204" font-size="12" text-anchor="end" fill="#111827">GND</text>
+<circle cx="250" cy="225" r="4.5" fill="#111827"/>
+<text x="240" y="229" font-size="12" text-anchor="end" fill="#111827">SCK</text>
+<circle cx="250" cy="250" r="4.5" fill="#111827"/>
+<text x="240" y="254" font-size="12" text-anchor="end" fill="#111827">WS</text>
+<circle cx="250" cy="275" r="4.5" fill="#111827"/>
+<text x="240" y="279" font-size="12" text-anchor="end" fill="#111827">SD</text>
+<text x="70" y="182" font-size="11" fill="#6b7280">L/R → GND</text>
+<path d="M250,175 L330,175 L330,165 L450,165" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250,200 L345,200 L345,195 L450,195" fill="none" stroke="#1e3a8a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250,225 L360.0,225 L360.0,240 L450,240" fill="none" stroke="#7c3aed" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250,250 L375.0,250 L375.0,270 L450,270" fill="none" stroke="#a855f7" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250,275 L390.0,275 L390.0,300 L450,300" fill="none" stroke="#c084fc" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="60" y="330" width="190" height="90" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+<text x="155.0" y="352" font-size="15" font-weight="700" text-anchor="middle" fill="#111827">NeoPixel halka</text>
+<text x="155.0" y="370" font-size="11" text-anchor="middle" fill="#6b7280">12 LED · 5V ray</text>
+<circle cx="250" cy="385" r="4.5" fill="#111827"/>
+<text x="240" y="389" font-size="12" text-anchor="end" fill="#111827">DIN</text>
+<path d="M250,385 L380,385 L380,370 L450,370" fill="none" stroke="#059669" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="70" y="410" font-size="11" fill="#6b7280">5V → + ray · GND → − ray</text>
+<path d="M60,395 L35,395 L35,640" fill="none" stroke="#dc2626" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M60,405 L45,405 L45,670" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="60" y="450" width="190" height="100" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+<text x="155.0" y="472" font-size="15" font-weight="700" text-anchor="middle" fill="#111827">TTP223</text>
+<text x="155.0" y="490" font-size="11" text-anchor="middle" fill="#6b7280">dokunmatik · 3V3</text>
+<circle cx="250" cy="495" r="4.5" fill="#111827"/>
+<text x="240" y="499" font-size="12" text-anchor="end" fill="#111827">VCC</text>
+<circle cx="250" cy="520" r="4.5" fill="#111827"/>
+<text x="240" y="524" font-size="12" text-anchor="end" fill="#111827">I/O</text>
+<path d="M250,520 L395,520 L395,450 L450,450" fill="none" stroke="#0891b2" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250,495 L320,495 L320,175 L330,175" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="70" y="540" font-size="11" fill="#6b7280">GND → − ray</text>
+<path d="M150,550 L150,670" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="820" y="100" width="170" height="150" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+<text x="905.0" y="122" font-size="15" font-weight="700" text-anchor="middle" fill="#111827">MAX98357A</text>
+<text x="905.0" y="140" font-size="11" text-anchor="middle" fill="#6b7280">amfi · VIN 5V ray</text>
+<circle cx="820" cy="160" r="4.5" fill="#111827"/>
+<text x="830" y="164" font-size="12" fill="#111827">BCLK</text>
+<circle cx="820" cy="185" r="4.5" fill="#111827"/>
+<text x="830" y="189" font-size="12" fill="#111827">LRC</text>
+<circle cx="820" cy="210" r="4.5" fill="#111827"/>
+<text x="830" y="214" font-size="12" fill="#111827">DIN</text>
+<path d="M650,165 L820,160" fill="none" stroke="#ea580c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M650,190 L820,185" fill="none" stroke="#f97316" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M650,215 L820,210" fill="none" stroke="#fb923c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="830" y="240" font-size="11" fill="#6b7280">VIN → + ray · GND → − ray</text>
+<path d="M990,230 L1085,230 L1085,640" fill="none" stroke="#dc2626" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M990,240 L1097,240 L1097,670" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1045,120 l25,-25 v90 l-25,-25 z" fill="#374151"/><rect x="1027" y="120" width="18" height="40" fill="#374151"/>
+<text x="1035" y="195" font-size="12" text-anchor="middle" fill="#111827">Hoparlör 4Ω 3W</text>
+<path d="M990,150 L1027,130" fill="none" stroke="#111827" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M990,170 L1027,150" fill="none" stroke="#6b7280" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="820" y="310" width="170" height="80" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+<text x="905.0" y="332" font-size="15" font-weight="700" text-anchor="middle" fill="#111827">Servo: ağız</text>
+<text x="905.0" y="350" font-size="11" text-anchor="middle" fill="#6b7280">MG90S</text>
+<circle cx="820" cy="360" r="4.5" fill="#111827"/>
+<text x="830" y="364" font-size="12" fill="#111827">turuncu</text>
+<path d="M650,330 L820,360" fill="none" stroke="#d97706" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M990,340 L1045,340 L1045,640" fill="none" stroke="#dc2626" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M990,350 L1055,350 L1055,670" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="985" y="380" font-size="10" text-anchor="end" fill="#6b7280">kırmızı + · kahve −</text>
+<rect x="820" y="410" width="170" height="80" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+<text x="905.0" y="432" font-size="15" font-weight="700" text-anchor="middle" fill="#111827">Servo: baş</text>
+<text x="905.0" y="450" font-size="11" text-anchor="middle" fill="#6b7280">MG90S</text>
+<circle cx="820" cy="460" r="4.5" fill="#111827"/>
+<text x="830" y="464" font-size="12" fill="#111827">turuncu</text>
+<path d="M650,430 L820,460" fill="none" stroke="#d97706" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M990,440 L1020,440 L1020,640" fill="none" stroke="#dc2626" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M990,450 L1030,450 L1030,670" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="985" y="480" font-size="10" text-anchor="end" fill="#6b7280">kırmızı + · kahve −</text>
+<path d="M480,580 L480,670" fill="none" stroke="#1e3a8a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="444" y="620" font-size="11" text-anchor="end" fill="#1e3a8a">ESP32 GND → − ray</text>
+<path d="M650,520 L690,520 L690,640" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="7 6"/>
+<rect x="14" y="628" width="1096" height="56" rx="8" fill="#f9fafb" stroke="#d1d5db"/>
+<path d="M70,640 L1102,640" fill="none" stroke="#dc2626" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M70,670 L1102,670" fill="none" stroke="#1e3a8a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="560" y="635" font-size="12" fill="#dc2626" font-weight="700">+5V ray</text>
+<text x="560" y="665" font-size="12" fill="#1e3a8a" font-weight="700">GND (−) ray</text>
+<rect x="24" y="690" width="120" height="46" rx="6" fill="#111827"/><text x="84" y="710" font-size="12" text-anchor="middle" fill="#fff">5V 3A adaptör</text><text x="84" y="726" font-size="10" text-anchor="middle" fill="#d1d5db">DC jak klemens</text>
+<path d="M70,690 L70,640" fill="none" stroke="#dc2626" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M90,690 L90,670" fill="none" stroke="#1e3a8a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="270" y="695" width="22" height="36" rx="4" fill="#1d4ed8"/><text x="300" y="718" font-size="12" fill="#111827">1000 µF (çizgili bacak −)</text>
+<path d="M276,695 L276,640" fill="none" stroke="#dc2626" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M286,695 L286,670" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="330" y1="730" x2="348" y2="730" stroke="#dc2626" stroke-width="4"/><text x="352" y="734" font-size="10" fill="#374151">5V</text>
+<line x1="422" y1="730" x2="440" y2="730" stroke="#f59e0b" stroke-width="4"/><text x="444" y="734" font-size="10" fill="#374151">3V3</text>
+<line x1="514" y1="730" x2="532" y2="730" stroke="#1e3a8a" stroke-width="4"/><text x="536" y="734" font-size="10" fill="#374151">GND</text>
+<line x1="606" y1="730" x2="624" y2="730" stroke="#7c3aed" stroke-width="4"/><text x="628" y="734" font-size="10" fill="#374151">mikrofon I2S</text>
+<line x1="698" y1="730" x2="716" y2="730" stroke="#ea580c" stroke-width="4"/><text x="720" y="734" font-size="10" fill="#374151">amfi I2S</text>
+<line x1="790" y1="730" x2="808" y2="730" stroke="#d97706" stroke-width="4"/><text x="812" y="734" font-size="10" fill="#374151">servo sinyal</text>
+<line x1="882" y1="730" x2="900" y2="730" stroke="#059669" stroke-width="4"/><text x="904" y="734" font-size="10" fill="#374151">LED</text>
+<line x1="974" y1="730" x2="992" y2="730" stroke="#0891b2" stroke-width="4"/><text x="996" y="734" font-size="10" fill="#374151">dokunma</text>
+<metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTplNTExN2U0NC02Yjc2LTRkZDgtODYyMC01YmMwZjMyM2VlZDgAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaJB7jdsHLFPI1zmO/lnNvEoAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDozZjE5ODk3Mi1lOTE3LTQ2NWMtOGI3YS0zYjg1MmViMjJhNWFscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoKQgqPhmLnzv+hsH4WMlNpAAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggNJ1bSzJ8oJNCKadXpSk79TgsA14MzNM64CBI5IH+VoOkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaHN1i0LaCeEc/bImHlqZ+M8AAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRMAAAAAAAAAAAAAAAAZGhhc2hYIG8T7TBeO4ZdiJspneA6HNmK5+P2vrxtBXYnUnVdDRhKZG5hbWVuanVtYmYgbWFuaWZlc3RqZXhjbHVzaW9uc4GiZXN0YXJ0GTLfZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOmU1MTE3ZTQ0LTZiNzYtNGRkOC04NjIwLTViYzBmMzIzZWVkOC9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjQ3MDI2ZjFkLWE0YzMtNDljZC1iMGI3LTE0MmVhNjRjNjVlZnJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCA0nVtLMnygk0Ipp1elKTv1OCwDXgzM0zrgIEjkgf5Wg6JjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggq2bmrxp5fJrHdFVsLUxhC25f6r0s8c2ucAZKuBjd292iY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFgg0qsF9I+dI50RNYKsVbqUTQsCQcsN9I2wYSJY5JW8Jtd0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQIMMj9OTDLCQhBiJBKYfCrFnD5DKs1Gw54+SYG8QyXBKVxIM973A+CCMV5QzMsZB3gGoYznsI5JrorWa12QA0NU=</c2pa:manifest></metadata></svg>

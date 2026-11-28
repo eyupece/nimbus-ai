@@ -96,7 +96,8 @@ def duyulan_kisim(metin: str, oran: float, uc: str = "…") -> str:
 
 class Oturum:
     def __init__(self, ayarlar: Ayarlar, persona: Persona, govde: Govde,
-                 yarim_dubleks: bool = False, dil_ipucu: bool = False, kamera=None, sunum: bool = False):
+                 yarim_dubleks: bool = False, dil_ipucu: bool = False, kamera=None, sunum: bool = False,
+                 esp32=None):
         self.a = ayarlar
         self.persona = persona
         self.govde = govde
@@ -106,6 +107,8 @@ class Oturum:
         self.hafiza = Hafiza()
         self.kamera = kamera  # Kamera ya da SabitGorsel; None = görme yok
         self.sunum = sunum  # slayt kontrolü
+        self.esp32 = esp32  # Esp32Kopru: mikrofon ve hoparlör ESP32'de
+        self.tur_susturuldu = False  # sözü kesildi: bu turun kalan sesini çalma
         self.ekran = getattr(govde, "ekran_var", False)  # bilgi kartı gösterebilir mi
         self.aktif_kisi: str | None = None  # bu konuşmada kendini tanıtan kişi
         self.konusma_metni: list[tuple[str, str]] = []  # not çıkarmak için
@@ -270,6 +273,8 @@ class Oturum:
                 if icerik.model_turn:
                     for parca in icerik.model_turn.parts or []:
                         if parca.inline_data and parca.inline_data.data:
+                            if self.tur_susturuldu:
+                                continue
                             if not self.yanit_basladi:
                                 self.yanit_basladi = True
                                 self.tur_alinan_bayt = 0
@@ -286,12 +291,14 @@ class Oturum:
                             if self.durum == Durum.VEDA:
                                 self.veda_sesi_geldi = True
 
-                if icerik.output_transcription and icerik.output_transcription.text:
+                if icerik.output_transcription and icerik.output_transcription.text and not self.tur_susturuldu:
                     self.nimbus_tampon = birlestir(self.nimbus_tampon, icerik.output_transcription.text)
                     if self.altyazi_turu and not self.altyazi_turu["kesildi"]:
                         self.altyazi_turu["metin"] = self.nimbus_tampon
 
-                if icerik.interrupted:
+                if icerik.interrupted and self.tur_susturuldu:
+                    self.tur_susturuldu = False
+                elif icerik.interrupted:
                     calinan = self.hoparlor.calinan_bayt - self.tur_baslangic_calinan
                     self.hoparlor.sustur()
                     if self.tur_alinan_bayt:
@@ -301,6 +308,7 @@ class Oturum:
                     self._nimbus_yaz(kesildi=True)
 
                 if icerik.turn_complete:
+                    self.tur_susturuldu = False
                     self._nimbus_yaz()
                     if self.durum == Durum.KARSILAMA:
                         self.durum_degistir(Durum.SOHBET)
@@ -389,6 +397,8 @@ class Oturum:
             komut = await self.komutlar.get()
             if komut == "v":
                 await self.veda_baslat(operatorden=True)
+            elif komut == "k":
+                self.sozu_kes()
             elif komut == "s":
                 self.hoparlor.sustur()
                 self.bitti.set()
@@ -397,9 +407,32 @@ class Oturum:
                 self.hoparlor.sustur()
                 self.bitti.set()
 
+    def sozu_kes(self) -> None:
+        """Nimbus konuşurken sözünü kes (operatör 'k' ya da ESP32'ye dokunma): susar ve dinler."""
+        if not self.yanit_basladi or self.tur_susturuldu:
+            return
+        calinan = self.hoparlor.calinan_bayt - self.tur_baslangic_calinan
+        self.tur_susturuldu = True
+        self.hoparlor.sustur()
+        if self.tur_alinan_bayt:
+            self.nimbus_tampon = duyulan_kisim(self.nimbus_tampon, calinan / self.tur_alinan_bayt)
+        if self.altyazi_turu:
+            self.altyazi_turu.update(metin=self.nimbus_tampon, kesildi=True)
+        self._nimbus_yaz(kesildi=True)
+
+    def dokunuldu(self, uzun: bool = False) -> None:
+        """ESP32'ye dokunuldu: uykudaysa uyan; konuşuyorsa sus; uzun dokunuşta vedalaş."""
+        if self.durum == Durum.UYKU:
+            self.komutlar.put_nowait("u")
+        elif uzun:
+            self.komutlar.put_nowait("v")
+        elif self.hoparlor and time.monotonic() < self.hoparlor.konusuyor_bitis:
+            self.komutlar.put_nowait("k")
+
     async def konusma(self) -> None:
         """Bir kişiyle baştan sona bir konuşma: bağlan, karşıla, sohbet et, vedalaş."""
         self.bitti = asyncio.Event()
+        self.tur_susturuldu = False
         self.aktif_kisi = None
         self.konusma_metni = []
         self.durum_degistir(Durum.KARSILAMA)
@@ -514,8 +547,12 @@ class Oturum:
     # ---------- Çalıştır ----------
     async def calistir(self) -> None:
         self.istemci, arka_uc = istemci_olustur(self.a)
-        self.mikrofon = Mikrofon(self.pya, self.a.mikrofon)
-        self.hoparlor = Hoparlor(self.pya, self.govde, kaydir_ms=self.a.agiz_kaydir_ms)
+        if self.esp32:
+            self.mikrofon = self.esp32.mikrofon()
+            self.hoparlor = Hoparlor(self.pya, self.govde, kaydir_ms=self.a.agiz_kaydir_ms, akis=self.esp32.akis())
+        else:
+            self.mikrofon = Mikrofon(self.pya, self.a.mikrofon)
+            self.hoparlor = Hoparlor(self.pya, self.govde, kaydir_ms=self.a.agiz_kaydir_ms)
 
         self.a.kayit_klasoru.mkdir(exist_ok=True)
         dosya = self.a.kayit_klasoru / f"konusma-{datetime.now():%Y%m%d-%H%M%S}.jsonl"

@@ -16,6 +16,7 @@ class Durum(str, Enum):
 # Operatör komutları (terminale yazıp Enter)
 KOMUTLAR = {
     "u": "uyandır (ya da sadece Enter)",
+    "k": "sözünü kes (konuşurken)",
     "v": "vedalaş ve uykuya dön",
     "s": "sıfırla: hemen sustur ve uykuya dön",
     "q": "çık",

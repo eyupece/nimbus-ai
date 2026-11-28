@@ -112,6 +112,20 @@ Mikrofonu her seferinde yazmamak için `.env` dosyasına `NIMBUS_MIKROFON=5` ekl
 Bluetooth kulaklığın mikrofonu kullanılınca ses "telefon modu"na düşer; ses kalitesini
 değerlendirirken dahili ya da kablolu mikrofon kullan.
 
+### ESP32 bedeni (Faz 2)
+Nimbus'un fiziksel bedeni: ESP32-S3 + mikrofon + hoparlör + 2 servo (ağız, baş) + LED halka + dokunmatik.
+Beyin dizüstünde kalır, ESP32 Wi-Fi ile bağlanır. Parçalar: [`donanim/ALISVERIS.md`](donanim/ALISVERIS.md),
+kablolama: [`donanim/BAGLANTI.md`](donanim/BAGLANTI.md).
+
+```bash
+./n esp32-yukle            # .env'deki Wi-Fi bilgileriyle ESP32'ye yazılımı yükle
+./n --esp32                # Nimbus'u ESP32 bedeniyle başlat (ekrandaki bulut yüz de çalışır)
+./n --esp32-sanal          # donanım olmadan dene: bu bilgisayarın mikrofonu/hoparlörü ağ üzerinden
+```
+
+ESP32 modunda Nimbus konuşurken mikrofon kapalıdır (aynı kutuda yankı olmasın); sözünü kesmek için
+dokunmatiğe dokun ya da terminale `k` yaz.
+
 ## Proje yapısı
 
 ```
@@ -133,9 +147,11 @@ senaryolar/     test senaryoları (YAML)
 tests/          otomatik testler (pytest, sahte Gemini)
   govde.py      gövde arayüzü (konsol -> sanal yüz -> servo)
   web.py        bulut yüz sunucusu (HTTP + WebSocket)
+  esp32.py      ESP32 bedeni köprüsü (Wi-Fi üzerinden mikrofon, hoparlör, servo, LED)
 web/index.html  bulut yüz (SVG + CSS + JS, harici bağımlılık yok)
 personas/       karakter dosyaları (nimbus.yaml genel, gdg-konya.yaml GDG Cloud Konya)
 bilgi/          kişiliğe eklenen bilgi dosyaları (topluluk, etkinlikler)
+donanim/        Faz 2 bedeni: alışveriş listesi, bağlantı şeması, esp32/ yazılımı
 spike/          Faz 0 deneme scripti (arşiv)
 ```
 

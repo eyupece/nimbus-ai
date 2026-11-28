@@ -137,15 +137,16 @@ class Hoparlor:
     Ağız hareketleri bu gecikme kadar ertelenir (+ NIMBUS_AGIZ_KAYDIR_MS ile ince ayar).
     """
 
-    def __init__(self, pya: pyaudio.PyAudio, govde, kaydir_ms: int = 0):
+    def __init__(self, pya: pyaudio.PyAudio, govde, kaydir_ms: int = 0, akis=None):
         self.govde = govde
         self.konusuyor_bitis = 0.0  # yarım dubleks için: son sesin bitiş zamanı
         self.calinan_bayt = 0  # şimdiye kadar ses kartına yazılan ses (kesilme oranı için)
         self._kuyruk: queue.Queue[bytes] = queue.Queue()
         self._agiz_kuyrugu: queue.Queue[tuple[float, float]] = queue.Queue()
         self._kesildi = threading.Event()
-        self._akis = pya.open(format=FORMAT, channels=KANAL, rate=CIKIS_HIZI, output=True,
-                              frames_per_buffer=AGIZ_PENCERE // 2)
+        # akis: ses kartı yerine başka bir çıkış (örn. Wi-Fi üzerinden ESP32 hoparlörü)
+        self._akis = akis or pya.open(format=FORMAT, channels=KANAL, rate=CIKIS_HIZI, output=True,
+                                      frames_per_buffer=AGIZ_PENCERE // 2)
         self.cikis_gecikmesi = self._akis.get_output_latency() + kaydir_ms / 1000
         self._calis = True
         self._is = threading.Thread(target=self._dongu, daemon=True)
@@ -165,6 +166,9 @@ class Hoparlor:
                     k.get_nowait()
                 except queue.Empty:
                     break
+        self.konusuyor_bitis = time.monotonic()
+        if hasattr(self._akis, "temizle"):
+            self._akis.temizle()
         self._agiz_kuyrugu.put((0.0, 0.0))
 
     def _dongu(self) -> None:

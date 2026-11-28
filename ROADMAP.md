@@ -9,7 +9,7 @@ Süre planı yok; görev listesi var. Her fazın sonunda gösterilebilir bir şe
 ## 📍 Şu an neredeyiz
 - **Son güncelleme:** 28 Kasım 2026
 - **Tamamlanan:** Faz 0 (ses döngüsü çalışıyor, Vertex AI + `gemini-3.8-live`, ~1.3 sn gecikme)
-- **Şimdi:** Faz 1.5 yazılımı tamam (hafıza, görme, eylem); Nimbus artık GDG Cloud Konya ekip üyesi (varsayılan kişilik). Faz 2 mimari onayı bekleniyor
+- **Şimdi:** Faz 2: ESP32 yazılımı ve bağlantı şeması hazır; parça siparişi ve lehim Eyüp'te. Nimbus GDG Cloud Konya ekip üyesi (varsayılan kişilik)
 - **Sonraki 🎬:** bulut yüzlü sanal Nimbus ile ilk demo videosu
 - **Açık sorular:** ses seçimi (Bluetooth'suz dinleme testi), karar modu senaryosu (bkz. Fikir havuzu)
 
@@ -159,10 +159,19 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
       Yeni etkinlik oldukça `bilgi/gdg-cloud-konya.md`'ye bir satır eklemek yeterli.
 
 ## Faz 2: Donanım
-- [ ] Mimari kararı: öneri **ESP32-S3 ince istemci** (beyin dizüstünde kalır; gerekçe ALISVERIS.md'de) — Eyüp onayı bekliyor
-- [ ] Alışveriş: liste hazır → [`donanim/ALISVERIS.md`](donanim/ALISVERIS.md) (zorunlu ~1.500–2.000 TL); sipariş Eyüp'te
-- [ ] Gövde arayüzünün servo arka ucu + ağız senkronu
-- [ ] Başa takma / kaldırma sensörü
+- [x] Mimari kararı: **ESP32-S3 ince istemci** (beyin dizüstünde; ileride Pi'ye taşınabilir, ESP32 değişmez) ✓ 28.11.2026
+- [ ] Alışveriş: [`donanim/ALISVERIS.md`](donanim/ALISVERIS.md) (zorunlu + LED halka + dokunmatik, ~1.700–2.300 TL); sipariş Eyüp'te
+- [ ] Lehim: mikrofon ve amfi pin başlıkları (Eyüp'ün tanıdığı)
+- [x] Bağlantı şeması: [`donanim/BAGLANTI.md`](donanim/BAGLANTI.md) + [`baglanti.svg`](donanim/baglanti.svg)
+- [x] ESP32 yazılımı: [`donanim/esp32/`](donanim/esp32/) (PlatformIO, Arduino core 2.0.17). Mikrofon → Wi-Fi → dizüstü,
+      ses → hoparlör, ağız servosu çalınan sesten (ağ gecikmesinden bağımsız), baş servosu jestlerle, LED halka durum/jest,
+      dokunma (uyan / sus / basılı tut: veda), UDP ile dizüstünü otomatik bulma, açılış testi (ışık, servo, bip)
+- [x] Dizüstü tarafı: `nimbus/esp32.py` (WebSocket köprüsü, anahtarlı), `./n --esp32`, `./n esp32-yukle`, `./n esp32-izle`;
+      ESP32 modunda yarım dubleks (mikrofon ve hoparlör aynı kutuda), söz kesme 'k' komutu / dokunma
+- [x] Donanımsız deneme: `./n --esp32-sanal` (dizüstü mikrofonu/hoparlörü ağ protokolü üzerinden) + 13 test
+- [ ] Derleme kontrolü Eyüp'ün bilgisayarında: `./n esp32-yukle --sadece-derle` (bu ortamdan derleyici indirilemiyor)
+- [ ] Parçalar gelince: kurulum, kalibrasyon (ağız açıları, ses, mikrofon kazancı), gecikme ölçümü
+- [ ] Başa takma / kaldırma sensörü (dokunmatik ile başlandı)
 - [ ] Jestleri önceden animasyon olarak hazırlama (Bottango / Blender), modelin fonksiyonla tetiklemesi
 - [ ] 🎬 Fiziksel demo videosu
 
@@ -202,6 +211,7 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 | 28.11.2026 | İsim teyidi örtük (adı cevapta söyle), açık soru sadece tuhaf isimlerde | Her yeni kişiye "X mi dedin?" sahnede yapay; ad söylenince kişi yanlışsa zaten düzeltir |
 | 27.11.2026 | Commit'leri Claude atar (Eyüp adına), push'u Eyüp yapar | Bu oturumun GitHub yazma yetkisi yok; Eyüp kod/komutla uğraşmak istemiyor |
 | 28.11.2026 | Nimbus = GDG Cloud Konya ekip üyesi (`personas/gdg-konya.yaml`), genel kişilik de duruyor | Eyüp ana organizatör, marka kullanımında sorun yok; tema bağımsızlık bozulmasın diye ayrı persona + ayrı bilgi dosyası |
+| 28.11.2026 | Faz 2 mimarisi: ESP32-S3 ince istemci; LED halka + dokunmatik alınıyor, kameralı kart sonraya | Ucuz, hızlı, yazılımın çoğu hazır; ses yine objeden çıkar; ileride beyin Pi'ye taşınabilir |
 
 ## Fikir havuzu (ertelenenler)
 - **Karar modu senaryoları** (SORGU → KARAR): Nimbus 3-4 soru sorup kişi hakkında dramatik bir karar açıklar.

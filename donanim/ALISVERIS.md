@@ -3,7 +3,7 @@
 > Hazırlanma: 28 Kasım 2026. Fiyatlar o gün arama sonuçlarında görülen KDV dahil fiyatlardır; stok ve fiyat değişir,
 > sepete eklemeden önce kontrol et. "Tahmini" yazanlar için Türkiye fiyatına bakılamadı.
 
-## Mimari kararı (öneri): ESP32-S3 "ince istemci"
+## Mimari kararı: ESP32-S3 "ince istemci" (onaylandı, 28.11.2026)
 
 Nimbus'un beyni (Gemini Live, hafıza, kamera, bulut yüz) zaten dizüstünde Python olarak çalışıyor. ESP32 sadece
 **kulak, ağız ve kas** olur: mikrofonu Wi-Fi üzerinden dizüstüne akıtır, gelen sesi hoparlöre verir, servoları oynatır.
@@ -11,6 +11,11 @@ Nimbus'un beyni (Gemini Live, hafıza, kamera, bulut yüz) zaten dizüstünde Py
 - Kod değişikliği az: `govde.py`'ye yeni bir "ESP32 gövdesi" eklenir (ağız senkronu ve jestler hazır), `ses.py`'ye ağ üzerinden ses.
 - Raspberry Pi'ye göre ucuz, küçük, az güç harcar; şapka/obje içine sığar.
 - Referans: [GefryV3/esp32-voice-assistant](https://github.com/GefryV3/esp32-voice-assistant) aynı mimariyi kullanıyor.
+- Ses objenin kendi hoparlöründen çıkar; dizüstü aynı Wi-Fi'da açık olmalı (başka odada olabilir).
+- Raspberry Pi kapısı açık: ileride dizüstüsüz istersek beyin bir Pi'ye taşınır, ESP32 tarafı değişmez.
+  (Pi 5 4GB tek başına ~3.800–5.000 TL + adaptör; mikrofon/amfi/servo yine gerekir.)
+
+Bağlantı şeması: [`BAGLANTI.md`](BAGLANTI.md) · Yazılım: [`esp32/`](esp32/) (`./n esp32-yukle`)
 
 ## Zorunlu parçalar
 
@@ -23,22 +28,26 @@ Nimbus'un beyni (Gemini Live, hafıza, kamera, bulut yüz) zaten dizüstünde Py
 | **MG90S servo (180°, metal dişli)** | 2 | 1: ağız/çene, 1: baş eğme ya da göz kapağı | ~125–130 TL/adet | [Robotistan](https://www.robotistan.com/mg90s-servo-motor-en) (127 TL), [Robotus](https://www.robotus.net/towerpro-mg90s-metal-disli-servo-motor) |
 | Breadboard + erkek-erkek / erkek-dişi jumper kablo seti | 1 | Lehimsiz prototip | tahmini 100–200 TL | herhangi bir elektronik mağazası |
 | 1000 µF 10 V+ elektrolitik kondansatör | 2 | Servo çekişinde ESP32'nin resetlenmesini önler | tahmini 10–20 TL | — |
-| 5 V 3 A USB-C adaptör (ya da powerbank) | 1 | Servolar + amfi için yeterli akım | tahmini 150–250 TL | — |
+| 5 V 3 A adaptör, 5.5×2.1 mm DC jak | 1 | Servolar, amfi ve LED için güç | tahmini 150–250 TL | — |
+| DC jak dişi **vidalı klemens** adaptörü (5.5×2.1) | 1 | Adaptörü lehimsiz breadboard rayına bağlar | tahmini 15–30 TL | — |
+| **WS2812B 12'li NeoPixel halka** | 1 | Göz/ruh hali ışığı: uyku, konuşma, jestlerde renk | ~130 TL ([Cimri: 12 bit halka](https://www.cimri.com/ws2812b)) | — |
+| **TTP223 dokunmatik modül** | 1 | Dokun: uyan / sus; basılı tut: vedalaş | tahmini 20–40 TL | — |
 
-**Zorunlu toplam: yaklaşık 1.500–2.000 TL**
+Jumper setinde **dişi-erkek** kablolar olsun: ESP32 breadboard'a takılmıyor, pinlerinden kabloyla bağlanıyor.
 
-## İsteğe bağlı (sahne etkisi)
+**Toplam: yaklaşık 1.700–2.300 TL**
 
-| Parça | Ne için | Yaklaşık fiyat |
+## Sonraya bırakılan
+
+| Parça | Neden şimdi değil | Yaklaşık fiyat |
 |---|---|---|
-| **WS2812B 12'li NeoPixel halka** | Göz/ruh hali ışığı; karar anında renk (yol haritasındaki LED maddesi) | ~130 TL ([Cimri: 12 bit halka](https://www.cimri.com/ws2812b)) |
-| **ESP32-S3 N16R8 + OV2640 kameralı kart** | Kamerayı objenin içine taşımak (şu an dizüstü kamerası kullanılıyor) | ~975 TL ([Robotikdepo](https://robotikdepo.com/esp32-s3-n16r8-ov2640-wifi-bluetooth-kamera-board)) |
-| TTP223 dokunmatik modül | "Başa takınca uyan" tetiği (alternatif: ESP32-S3'ün kendi dokunmatik pinleri, ek parça gerekmez) | tahmini 20–40 TL |
+| **ESP32-S3 N16R8 + OV2640 kameralı kart** | Ana kartın yerine geçmiyor (ikinci bir ESP32); Wi-Fi'dan görüntü ayrı iş; dizüstü kamerası iyi çalışıyor. Pi'ye geçersek Pi kamerası daha iyi | ~975 TL ([Robotikdepo](https://robotikdepo.com/esp32-s3-n16r8-ov2640-wifi-bluetooth-kamera-board)) |
 
 ## Notlar
 
-- **Lehimli pinli** kart al ("LEHİMLİ" yazanlar); lehim istemeyen breadboard prototipi için şart.
-- INMP441 ve MAX98357A modüllerinin pin başlıkları bazen lehimsiz gelir; ürün sayfasında "lehimli" yazıp yazmadığına bak.
-  Lehimsizse ya lehimli olanı seç ya da bir makerspace/GDG etkinliğinde lehimlet.
+- **Lehimli pinli** ESP32 kartı al ("LEHİMLİ" yazanlar).
+- INMP441 ve MAX98357A modüllerinin pin başlıkları neredeyse her satıcıda **ayrı** gelir (lehim gerekir). Ürün sayfasında
+  "lehimli" yazan varsa onu seç; yoksa tanıdığına lehimlet (~15 dk, liste: [`BAGLANTI.md`](BAGLANTI.md#lehim-gereken-yerler-tanıdığına-götür)).
+  Lehimden tamamen kaçmanın yolu hazır kutu kartlar (ESP32-S3-BOX vb.); pahalı ve servo bağlamak zorlaşıyor, önermiyoruz.
 - Servolar ESP32'nin 3.3 V pininden değil 5 V adaptörden beslenmeli (topraklar ortak).
 - Kargo eşiği: Robotistan ~1.500 TL üzeri ücretsiz; mümkünse her şeyi tek mağazadan al.

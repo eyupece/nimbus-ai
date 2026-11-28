@@ -5,7 +5,7 @@ import asyncio
 from pathlib import Path
 
 from .ayarlar import KOK, Ayarlar
-from .govde import KonsolGovde, SessizGovde
+from .govde import CokluGovde, KonsolGovde, SessizGovde
 from .oturum import Oturum
 from .persona import Persona
 from .ses import cihazlari_listele, mikrofon_testi
@@ -35,6 +35,12 @@ def main() -> None:
     p.add_argument("--sunum", action="store_true",
                    help="Sunum modu: 'sonraki slayt' gibi komutlarla ön plandaki pencereye ok tuşu gönderir")
     p.add_argument("--kamera-testi", nargs="?", const=0, type=int, metavar="INDEKS", help="Kamera çalışıyor mu")
+    p.add_argument("--esp32", action="store_true",
+                   help="ESP32 bedeniyle çalış: mikrofon/hoparlör/servo ESP32'de (.env: NIMBUS_ESP32=1)")
+    p.add_argument("--esp32-sanal", action="store_true",
+                   help="Donanım olmadan ESP32 yolunu dene: bu bilgisayarın mikrofonu/hoparlörü ağ üzerinden")
+    p.add_argument("--tam-dubleks", action="store_true",
+                   help="ESP32'de de Nimbus konuşurken mikrofonu açık tut (yankı yoksa)")
     p.add_argument("--hafiza", action="store_true", help="Nimbus'un hatırladığı kişileri listele")
     p.add_argument("--unut", metavar="AD", help="Bir kişiyi hafızadan tamamen sil")
     a = p.parse_args()
@@ -67,13 +73,29 @@ def main() -> None:
         govde = KonsolGovde()
     else:
         govde = SessizGovde()
+    esp32 = None
+    yarim_dubleks = a.yarim_dubleks
+    if a.esp32 or a.esp32_sanal or ayarlar.esp32:
+        from .ayarlar import esp32_anahtari
+        from .esp32 import Esp32Kopru
+
+        esp32 = Esp32Kopru(esp32_anahtari(), duyuru=not a.esp32_sanal)
+        govde = CokluGovde(govde, esp32)
+        # Hoparlör ve mikrofon aynı küçük kutuda: Nimbus kendi sesini duymasın (söz kesmek için dokun)
+        yarim_dubleks = not a.tam_dubleks
+        if a.esp32_sanal:
+            from .esp32_sanal import sanal_esp32_baslat
+            sanal_esp32_baslat(esp32, ayarlar.mikrofon)
     kamera_indeksi = a.kamera if a.kamera is not None else ayarlar.kamera
     kamera = None
     if kamera_indeksi is not None:
         from .kamera import Kamera
         kamera = Kamera(kamera_indeksi)
-    oturum = Oturum(ayarlar, persona, govde, yarim_dubleks=a.yarim_dubleks, dil_ipucu=a.dil_ipucu, kamera=kamera,
-                    sunum=a.sunum)
+    oturum = Oturum(ayarlar, persona, govde, yarim_dubleks=yarim_dubleks, dil_ipucu=a.dil_ipucu, kamera=kamera,
+                    sunum=a.sunum, esp32=esp32)
+    if esp32:
+        esp32.dokunma = oturum.dokunuldu
+        print("🤖 ESP32 modu: Nimbus konuşurken mikrofon kapalı; sözünü kesmek için dokun ya da 'k' yaz.")
     if a.sunum:
         print("🖥  Sunum modu: slayt komutları ön plandaki pencereye ok tuşu gönderir (sunumu öne al).")
     try:
