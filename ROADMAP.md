@@ -168,8 +168,9 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
       dokunma (uyan / sus / basılı tut: veda), UDP ile dizüstünü otomatik bulma, açılış testi (ışık, servo, bip)
 - [x] Dizüstü tarafı: `nimbus/esp32.py` (WebSocket köprüsü, anahtarlı), `./n --esp32`, `./n esp32-yukle`, `./n esp32-izle`;
       ESP32 modunda yarım dubleks (mikrofon ve hoparlör aynı kutuda), söz kesme 'k' komutu / dokunma
-- [x] Donanımsız deneme: `./n --esp32-sanal` (dizüstü mikrofonu/hoparlörü ağ protokolü üzerinden) + 13 test
-- [ ] Derleme kontrolü Eyüp'ün bilgisayarında: `./n esp32-yukle --sadece-derle` (bu ortamdan derleyici indirilemiyor)
+- [x] Donanımsız deneme: `./n --esp32-sanal` (dizüstü mikrofonu/hoparlörü ağ protokolü üzerinden) + 13 test.
+      Canlı ✓ 28.11: karşılama, hafıza (Eyüp'ü tanıdı), jestler ESP32'ye gitti, gecikme 1.0–1.7 sn (ortanca ~1.1, öncekiyle aynı)
+- [x] Derleme Eyüp'ün bilgisayarında ✓ (RAM %17, flash %14; derleyici kurulu)
 - [ ] Parçalar gelince: kurulum, kalibrasyon (ağız açıları, ses, mikrofon kazancı), gecikme ölçümü
 - [ ] Başa takma / kaldırma sensörü (dokunmatik ile başlandı)
 - [ ] Jestleri önceden animasyon olarak hazırlama (Bottango / Blender), modelin fonksiyonla tetiklemesi
