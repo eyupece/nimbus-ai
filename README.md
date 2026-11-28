@@ -174,6 +174,8 @@ python -m nimbus.senaryo --sadece hava_durumu   # bazıları
 Her cevap kurallarla (uzunluk, emoji, talimat sızıntısı...) ve bir değerlendirici modelle puanlanır.
 Rapor `logs/senaryo-*.md` dosyasına yazılır. Gerçek hafızaya dokunmaz.
 
+Gecikme karşılaştırması (gerçek Gemini, ~10 dk): `./n gecikme` → `logs/gecikme-*.md`
+
 ## Gizlilik notu
 Kamera, hafıza ve (opsiyonel) yüz tanıma özellikleri kişisel veri işler.
 Kullanmadan önce ilgili mevzuata (KVKK, GDPR vb.) uygun açık rıza alın.

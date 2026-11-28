@@ -84,6 +84,9 @@ UYKU ─(tetik)─► KARŞILAMA ─► SOHBET (serbest)
 
 ## Faz 1: Çekirdek ve sanal yüz
 - [ ] Gecikmeyi 1 sn altına indirme denemeleri: ~~kablolu mikrofon~~ (1.2 sn ✓), sessizlik süresi ayarı, dolgu replikleri
+      Ölçüm aracı hazır (28.11): `./n gecikme` aynı cümleleri (model seslendiriyor, kayıt yok) farklı ayarlarla gönderir:
+      sessizlik 400/300/200 ms, 20 ms ses parçası, düşünme "minimal", aramasız. Duraklamalı cümleler kısa sessizlikte
+      "lafı ağzından alma" riskini ölçer. Sonuca göre ayar → sonra dolgu replikleri / "düşünüyor" ifadesi
 - [ ] Dil algılama kaymasına çözüm: Türkçe dil ipucu dene (`--dil-ipucu` hazır, test edilecek)
 - [x] Deneme scriptini pakete böl: ses / oturum / persona / gövde (`nimbus/`)
 - [x] Persona YAML v2 + yükleyici (özellik yüzdeleri, kurallar, hikâye)
