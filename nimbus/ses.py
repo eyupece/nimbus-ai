@@ -59,7 +59,8 @@ def mikrofon_sec(pya: pyaudio.PyAudio, secim: str | None) -> dict:
         for d in cihazlar:
             if secim.lower() in cihaz_adi(d).lower():
                 return d
-        sys.exit(f"❌ '{secim}' adında mikrofon yok. Liste için: python -m nimbus --cihazlar")
+        print(f"⚠️  '{secim}' adında mikrofon yok (takılı değil mi?), varsayılan mikrofon kullanılıyor. "
+              "Liste: python -m nimbus --cihazlar")
 
     varsayilan = pya.get_default_input_device_info()
     if not any(k in cihaz_adi(varsayilan).lower() for k in GERI_DONGU):

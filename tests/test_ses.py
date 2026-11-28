@@ -38,3 +38,9 @@ def test_agiz_ses_karti_gecikmesi_kadar_gecikir():
     time.sleep(0.5)
     h.kapat()
     assert olaylar and 0.13 <= olaylar[0] - baslangic <= 0.3
+
+
+def test_bulunamayan_mikrofon_varsayilana_duser(capsys):
+    d = ses.mikrofon_sec(SahtePyAudio(), "Jabra")
+    assert "Stereo Mix" not in ses.cihaz_adi(d)
+    assert "varsayılan mikrofon" in capsys.readouterr().out
